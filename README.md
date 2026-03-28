@@ -105,7 +105,7 @@ npm start
 
 ## 👨‍💻 Autor
 
-Desenvolvido por **Jhames Paiva**
+Desenvolvido por **Jhames Paiva, Andre Castro, Bernanrdo Alonso, rthur Belinato**
 
 ---
 
