@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Entrar – EventoCom</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ===== VARIÁVEIS (idênticas ao index) ===== */
+    :root {
+      --primary:      #FF5C2B;
+      --primary-dark: #e04420;
+      --accent:       #FFD166;
+      --dark:         #111827;
+      --dark2:        #1f2937;
+      --mid:          #374151;
+      --light:        #F9FAFB;
+      --muted:        #6B7280;
+      --card-radius:  14px;
+      --font-head:    'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      background: var(--dark) !important;
+      padding: 14px 0;
+      border-bottom: 3px solid var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+    }
+    .navbar-brand {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: #fff !important;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+    .navbar-brand span { color: var(--primary); }
+
+    /* ===== LAYOUT PRINCIPAL ===== */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      min-height: calc(100vh - 67px);
+    }
+
+    /* Painel esquerdo — decorativo */
+    .panel-left {
+      display: none;
+      position: relative;
+      overflow: hidden;
+      background: var(--dark2);
+    }
+
+    @media (min-width: 992px) {
+      .panel-left { display: flex; flex: 0 0 52%; flex-direction: column; justify-content: flex-end; }
+    }
+
+    .panel-left img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .45;
+    }
+
+    .panel-left::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(17,24,39,.6) 0%, rgba(255,92,43,.18) 100%);
+    }
+
+    .panel-left-content {
+      position: relative;
+      z-index: 2;
+      padding: 48px 52px;
+    }
+
+    .panel-left-content .tagline {
+      font-family: var(--font-head);
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+
+    .panel-left-content .tagline span { color: var(--accent); }
+
+    .panel-left-content p {
+      font-family: var(--font-body);
+      color: rgba(255,255,255,.7);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 360px;
+    }
+
+    .panel-left-content .feature-list {
+      list-style: none;
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .panel-left-content .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-body);
+      font-size: .9rem;
+      color: rgba(255,255,255,.8);
+    }
+
+    .panel-left-content .feature-list li .icon-wrap {
+      width: 32px; height: 32px;
+      background: rgba(255,92,43,.25);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .panel-left-content .feature-list li .icon-wrap i {
+      color: var(--accent);
+      font-size: .95rem;
+    }
+
+    /* Painel direito — formulário */
+    .panel-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      background: var(--light);
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .login-box .box-header {
+      margin-bottom: 32px;
+    }
+
+    .login-box .box-header h1 {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.9rem;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .login-box .box-header h1 span { color: var(--primary); }
+
+    .login-box .box-header p {
+      font-family: var(--font-body);
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    /* Form inputs */
+    .form-label-custom {
+      font-family: var(--font-body);
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--mid);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .input-custom {
+      font-family: var(--font-body) !important;
+      font-size: .95rem !important;
+      padding-left: 42px !important;
+      height: 50px !important;
+      border-radius: 10px !important;
+      border: 2px solid #e5e7eb !important;
+      background: #fff !important;
+      color: var(--dark) !important;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .input-custom:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 3px rgba(255,92,43,.12) !important;
+    }
+
+    .input-custom::placeholder { color: #9ca3af !important; }
+
+    /* Toggle senha */
+    .btn-toggle-pass {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0;
+      z-index: 5;
+      transition: color .2s;
+    }
+    .btn-toggle-pass:hover { color: var(--primary); }
+
+    /* Lembrar / Esqueceu */
+    .row-remember {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 6px 0 24px;
+    }
+
+    .form-check-label {
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: var(--mid);
+      cursor: pointer;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .form-check-input:focus {
+      box-shadow: 0 0 0 3px rgba(255,92,43,.15);
+      border-color: var(--primary);
+    }
+
+    .link-forgot {
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color .2s;
+    }
+    .link-forgot:hover { color: var(--primary-dark); text-decoration: underline; }
+
+    /* Botão principal */
+    .btn-login {
+      width: 100%;
+      height: 52px;
+      background: var(--primary);
+      color: #fff;
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: .02em;
+      border: none;
+      border-radius: 12px;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-login:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255,92,43,.35);
+      color: #fff;
+    }
+    .btn-login:active { transform: translateY(0); }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+      color: #d1d5db;
+      font-family: var(--font-body);
+      font-size: .82rem;
+      color: var(--muted);
+    }
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    /* Botões sociais */
+    .btn-social {
+      width: 100%;
+      height: 48px;
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all .2s;
+      text-decoration: none;
+      border: 2px solid #e5e7eb;
+      background: #fff;
+      color: var(--dark);
+    }
+    .btn-social:hover {
+      border-color: #d1d5db;
+      background: #f9fafb;
+      color: var(--dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-social .icon-google {
+      width: 20px; height: 20px;
+    }
+
+    /* Rodapé do card */
+    .login-footer {
+      margin-top: 28px;
+      text-align: center;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    .login-footer a {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .login-footer a:hover { text-decoration: underline; }
+
+    /* Alerta de erro */
+    .alert-custom {
+      border-radius: 10px;
+      border: none;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,.4);
+      font-family: var(--font-body);
+      font-size: .78rem;
+      padding: 18px 0;
+      border-top: 3px solid var(--primary);
+      text-align: center;
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <i class="bi bi-calendar-event-fill me-1"></i>Evento<span>Com</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<div class="main-wrapper">
+
+  <!-- Painel esquerdo (visível apenas em desktop) -->
+  <div class="panel-left">
+    <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&q=80" alt="Evento"/>
+    <div class="panel-left-content">
+      <p class="tagline">Sua comunidade<br/>te <span>espera.</span></p>
+      <p>Descubra, participe e crie eventos que conectam pessoas. Tudo em um só lugar.</p>
+      <ul class="feature-list">
+        <li>
+          <div class="icon-wrap"><i class="bi bi-search-heart"></i></div>
+          Encontre eventos perto de você
+        </li>
+        <li>
+          <div class="icon-wrap"><i class="bi bi-ticket-perforated-fill"></i></div>
+          Inscreva-se com um clique
+        </li>
+        <li>
+          <div class="icon-wrap"><i class="bi bi-plus-circle-fill"></i></div>
+          Crie e gerencie seus próprios eventos
+        </li>
+        <li>
+          <div class="icon-wrap"><i class="bi bi-people-fill"></i></div>
+          Conecte-se com sua comunidade
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Painel direito — formulário -->
+  <div class="panel-right">
+    <div class="login-box">
+
+      <div class="box-header">
+        <h1>Bem-vindo de <span>volta!</span></h1>
+        <p>Entre na sua conta para continuar explorando eventos.</p>
+      </div>
+
+      <!-- Alerta de erro (oculto por padrão) -->
+      <div id="alertaErro" class="alert alert-danger alert-custom d-none" role="alert">
+        <i class="bi bi-exclamation-circle-fill fs-5"></i>
+        <span id="msgErro">E-mail ou senha incorretos. Tente novamente.</span>
+      </div>
+
+      <!-- Formulário -->
+      <form id="formLogin" novalidate>
+
+        <!-- E-mail -->
+        <div class="mb-3">
+          <label class="form-label-custom" for="inputEmail">E-mail</label>
+          <div class="input-wrap">
+            <i class="bi bi-envelope-fill input-icon"></i>
+            <input
+              type="email"
+              id="inputEmail"
+              class="form-control input-custom"
+              placeholder="seu@email.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <div class="invalid-feedback" style="font-family:var(--font-body);font-size:.82rem;">
+            Informe um e-mail válido.
+          </div>
+        </div>
+
+        <!-- Senha -->
+        <div class="mb-1">
+          <label class="form-label-custom" for="inputSenha">Senha</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input
+              type="password"
+              id="inputSenha"
+              class="form-control input-custom"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+              minlength="6"
+            />
+            <button type="button" class="btn-toggle-pass" id="btnToggleSenha" aria-label="Mostrar senha">
+              <i class="bi bi-eye-fill" id="iconeSenha"></i>
+            </button>
+          </div>
+          <div class="invalid-feedback" style="font-family:var(--font-body);font-size:.82rem;">
+            Informe sua senha (mínimo 6 caracteres).
+          </div>
+        </div>
+
+        <!-- Lembrar + Esqueceu -->
+        <div class="row-remember">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="chkLembrar"/>
+            <label class="form-check-label" for="chkLembrar">Lembrar de mim</label>
+          </div>
+          <a href="recuperar-senha.html" class="link-forgot">Esqueceu a senha?</a>
+        </div>
+
+        <!-- Botão entrar -->
+        <button type="submit" class="btn btn-login" id="btnEntrar">
+          <i class="bi bi-box-arrow-in-right"></i>
+          Entrar
+        </button>
+
+      </form>
+
+      <!-- Divisor -->
+      <div class="divider">ou continue com</div>
+
+      <!-- Login social -->
+      <div class="d-flex flex-column gap-2">
+        <a href="#" class="btn-social">
+          <!-- Ícone Google SVG inline -->
+          <svg class="icon-google" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.84l6.1-6.1C34.36 2.99 29.44 1 24 1 14.75 1 6.92 6.48 3.3 14.31l7.1 5.52C12.14 13.62 17.6 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.5 24.5c0-1.57-.14-3.1-.4-4.57H24v8.64h12.67c-.55 2.94-2.2 5.43-4.67 7.1l7.14 5.55C43.32 37.45 46.5 31.43 46.5 24.5z"/>
+            <path fill="#FBBC05" d="M10.4 28.17A14.57 14.57 0 0 1 9.5 24c0-1.45.25-2.85.69-4.17l-7.1-5.52A23.94 23.94 0 0 0 .5 24c0 3.87.93 7.53 2.58 10.77l7.32-6.6z"/>
+            <path fill="#34A853" d="M24 46.5c5.44 0 10.01-1.8 13.34-4.87l-7.14-5.55c-1.97 1.32-4.5 2.1-6.2 2.1-6.4 0-11.86-4.12-13.6-9.83l-7.32 6.6C6.92 41.52 14.75 46.5 24 46.5z"/>
+          </svg>
+          Entrar com Google
+        </a>
+      </div>
+
+      <!-- Rodapé do card -->
+      <p class="login-footer">
+        Ainda não tem uma conta?
+        <a href="/frontend/src/pages/cadastro/cadastro.html">Cadastre-se grátis</a>
+      </p>
+      <p class="login-footer mt-2">
+        <a href="/frontend/src/pages/home/home.html">
+          <i class="bi bi-arrow-left me-1"></i>Voltar para a página inicial
+        </a>
+      </p>
+
+    </div><!-- /login-box -->
+  </div><!-- /panel-right -->
+
+</div><!-- /main-wrapper -->
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <strong style="color:rgba(255,255,255,.6);font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;·&nbsp;
+    <a href="privacidade.html">Privacidade</a>
+    &nbsp;·&nbsp;
+    <a href="termos.html">Termos de Uso</a>
+    &nbsp;·&nbsp;
+    <a href="contato.html">Contato</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* === Toggle visibilidade da senha === */
+  const btnToggle  = document.getElementById('btnToggleSenha');
+  const inputSenha = document.getElementById('inputSenha');
+  const iconeSenha = document.getElementById('iconeSenha');
+
+  btnToggle.addEventListener('click', () => {
+    const visivel = inputSenha.type === 'text';
+    inputSenha.type = visivel ? 'password' : 'text';
+    iconeSenha.className = visivel ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill';
+  });
+
+  /* === Validação + simulação de submit === */
+  const form      = document.getElementById('formLogin');
+  const btnEntrar = document.getElementById('btnEntrar');
+  const alertaEl  = document.getElementById('alertaErro');
+  const msgErroEl = document.getElementById('msgErro');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alertaEl.classList.add('d-none');
+
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
+
+    // Estado de carregando
+    btnEntrar.disabled = true;
+    btnEntrar.innerHTML = `
+      <span class="spinner-border spinner-border-sm" role="status"></span>
+      Entrando...
+    `;
+
+    // Simulação de requisição (substituir pelo fetch real futuramente)
+    await new Promise(r => setTimeout(r, 1400));
+
+    // Exemplo: redireciona para home após login bem-sucedido
+    // window.location.href = 'index.html';
+
+    // Simulação de erro para demonstração
+    btnEntrar.disabled = false;
+    btnEntrar.innerHTML = `<i class="bi bi-box-arrow-in-right"></i> Entrar`;
+    alertaEl.classList.remove('d-none');
+    msgErroEl.textContent = 'E-mail ou senha incorretos. Verifique seus dados e tente novamente.';
+  });
+</script>
+</body>
+</html>
