@@ -1,0 +1,39 @@
+:root {
+    --primary-color: #5a2d82;
+    --secondary-color: #6c757d;
+}
+
+/* Navbar */
+.navbar-brand { font-weight: 800; color: var(--primary-color) !important; }
+.navbar-brand span { color: #333; }
+
+/* Hero */
+.carousel-item img {
+    height: 480px;
+    object-fit: cover;
+    filter: brightness(0.6);
+}
+
+/* Filtros */
+.search-section { background-color: #f8f9fa; border-bottom: 1px solid #eee; }
+
+/* Cards */
+.event-card { transition: transform 0.3s ease; }
+.event-card:hover { transform: translateY(-5px); }
+.event-card-img { height: 200px; object-fit: cover; }
+
+.date-badge {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.location-text { font-size: 0.75rem; }
+.btn-ver-mais { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; }
+
+/* Modal Styles */
+.modal-content { border-radius: 15px; overflow: hidden; }
+#modalImg { width: 100%; height: 250px; object-fit: cover; }

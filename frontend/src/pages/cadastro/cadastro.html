@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastro – EventoCom</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --primary:      #FF5C2B;
+      --primary-dark: #e04420;
+      --accent:       #FFD166;
+      --dark:         #111827;
+      --dark2:        #1f2937;
+      --mid:          #374151;
+      --light:        #F9FAFB;
+      --muted:        #6B7280;
+      --card-radius:  14px;
+      --font-head:    'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      background: var(--dark) !important;
+      padding: 14px 0;
+      border-bottom: 3px solid var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+    }
+    .navbar-brand {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: #fff !important;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+    .navbar-brand span { color: var(--primary); }
+
+    /* ===== MAIN ===== */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      min-height: calc(100vh - 67px);
+    }
+
+    /* Painel esquerdo */
+    .panel-left {
+      display: none;
+      position: relative;
+      overflow: hidden;
+      background: var(--dark2);
+    }
+    @media (min-width: 992px) {
+      .panel-left { display: flex; flex: 0 0 42%; flex-direction: column; justify-content: flex-end; }
+    }
+    .panel-left img {
+      position: absolute;
+      inset: 0; width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: .4;
+    }
+    .panel-left::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(17,24,39,.7) 0%, rgba(255,92,43,.2) 100%);
+    }
+    .panel-left-content {
+      position: relative;
+      z-index: 2;
+      padding: 48px 48px;
+    }
+    .panel-left-content .tagline {
+      font-family: var(--font-head);
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .panel-left-content .tagline span { color: var(--accent); }
+    .panel-left-content p {
+      font-family: var(--font-body);
+      color: rgba(255,255,255,.65);
+      font-size: .93rem;
+      line-height: 1.7;
+    }
+    .panel-left-content .step-list {
+      list-style: none;
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .panel-left-content .step-list li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: rgba(255,255,255,.8);
+    }
+    .step-num {
+      width: 30px; height: 30px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: .82rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* Painel direito */
+    .panel-right {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 24px 48px;
+      background: var(--light);
+      overflow-y: auto;
+    }
+
+    .cadastro-box {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .box-header {
+      margin-bottom: 28px;
+    }
+    .box-header h1 {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+    .box-header h1 span { color: var(--primary); }
+    .box-header p {
+      font-family: var(--font-body);
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    /* ===== TIPO SELECTOR ===== */
+    .tipo-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .tipo-card {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px 16px;
+      cursor: pointer;
+      background: #fff;
+      transition: all .22s;
+      text-align: center;
+      position: relative;
+      user-select: none;
+    }
+    .tipo-card:hover {
+      border-color: rgba(255,92,43,.4);
+      background: rgba(255,92,43,.03);
+    }
+    .tipo-card.active {
+      border-color: var(--primary);
+      background: rgba(255,92,43,.05);
+      box-shadow: 0 0 0 3px rgba(255,92,43,.12);
+    }
+    .tipo-card .tipo-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: #f3f4f6;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 10px;
+      font-size: 1.4rem;
+      color: var(--muted);
+      transition: all .22s;
+    }
+    .tipo-card.active .tipo-icon {
+      background: rgba(255,92,43,.12);
+      color: var(--primary);
+    }
+    .tipo-card .tipo-title {
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: .95rem;
+      color: var(--dark);
+      margin-bottom: 3px;
+    }
+    .tipo-card .tipo-desc {
+      font-family: var(--font-body);
+      font-size: .75rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .tipo-card .check-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: .65rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .tipo-card.active .check-badge {
+      display: flex;
+    }
+
+    /* ===== LABELS E INPUTS ===== */
+    .form-label-custom {
+      font-family: var(--font-body);
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--mid);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .input-wrap { position: relative; }
+    .input-wrap .input-icon {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: .95rem;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .input-custom {
+      font-family: var(--font-body) !important;
+      font-size: .93rem !important;
+      padding-left: 42px !important;
+      height: 48px !important;
+      border-radius: 10px !important;
+      border: 2px solid #e5e7eb !important;
+      background: #fff !important;
+      color: var(--dark) !important;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input-custom:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 3px rgba(255,92,43,.12) !important;
+    }
+    .input-custom::placeholder { color: #9ca3af !important; }
+
+    /* select precisa de padding diferente */
+    select.input-custom {
+      padding-left: 42px !important;
+      cursor: pointer;
+    }
+
+    .btn-toggle-pass {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: .95rem;
+      cursor: pointer;
+      padding: 0;
+      z-index: 5;
+      transition: color .2s;
+    }
+    .btn-toggle-pass:hover { color: var(--primary); }
+
+    /* Textarea */
+    textarea.input-custom {
+      height: auto !important;
+      padding-top: 12px !important;
+      padding-left: 42px !important;
+      resize: vertical;
+    }
+
+    /* Seção de grupo */
+    .form-section-title {
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin: 24px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid rgba(255,92,43,.18);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Força da senha */
+    .password-strength {
+      margin-top: 6px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .strength-bar {
+      flex: 1;
+      height: 4px;
+      border-radius: 4px;
+      background: #e5e7eb;
+      transition: background .3s;
+    }
+    .strength-label {
+      font-family: var(--font-body);
+      font-size: .75rem;
+      color: var(--muted);
+      margin-left: 4px;
+      min-width: 60px;
+    }
+
+    /* Checkbox termos */
+    .form-check-label {
+      font-family: var(--font-body);
+      font-size: .85rem;
+      color: var(--mid);
+    }
+    .form-check-label a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    .form-check-label a:hover { text-decoration: underline; }
+    .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
+    .form-check-input:focus {
+      box-shadow: 0 0 0 3px rgba(255,92,43,.15);
+      border-color: var(--primary);
+    }
+
+    /* Botão principal */
+    .btn-cadastrar {
+      width: 100%;
+      height: 52px;
+      background: var(--primary);
+      color: #fff;
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: .02em;
+      border: none;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      cursor: pointer;
+    }
+    .btn-cadastrar:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255,92,43,.35);
+      color: #fff;
+    }
+
+    .cadastro-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: var(--muted);
+    }
+    .cadastro-footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
+    .cadastro-footer a:hover { text-decoration: underline; }
+
+    /* Animação de transição do formulário */
+    .form-bloco {
+      animation: fadeSlideUp .3s ease both;
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,.4);
+      font-family: var(--font-body);
+      font-size: .78rem;
+      padding: 18px 0;
+      border-top: 3px solid var(--primary);
+      text-align: center;
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <i class="bi bi-calendar-event-fill me-1"></i>Evento<span>Com</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<div class="main-wrapper">
+
+  <!-- Painel esquerdo -->
+  <div class="panel-left">
+    <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?w=1200&q=80" alt="Comunidade"/>
+    <div class="panel-left-content">
+      <p class="tagline">Faça parte da<br/><span>comunidade.</span></p>
+      <p>Crie sua conta gratuitamente e comece a descobrir e organizar eventos incríveis.</p>
+      <ul class="step-list">
+        <li><div class="step-num">1</div> Escolha seu tipo de conta</li>
+        <li><div class="step-num">2</div> Preencha seus dados</li>
+        <li><div class="step-num">3</div> Confirme seu e-mail</li>
+        <li><div class="step-num">4</div> Explore os eventos!</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Painel direito -->
+  <div class="panel-right">
+    <div class="cadastro-box">
+
+      <div class="box-header">
+        <h1>Criar <span>conta</span></h1>
+        <p>Selecione o tipo de cadastro e preencha as informações abaixo.</p>
+      </div>
+
+      <!-- Seletor de tipo -->
+      <div class="tipo-selector">
+        <div class="tipo-card active" id="cardPF" onclick="setTipo('pf')">
+          <div class="check-badge"><i class="bi bi-check"></i></div>
+          <div class="tipo-icon"><i class="bi bi-person-fill"></i></div>
+          <p class="tipo-title">Pessoa Física</p>
+          <p class="tipo-desc">Quero participar e criar eventos como indivíduo</p>
+        </div>
+        <div class="tipo-card" id="cardPJ" onclick="setTipo('pj')">
+          <div class="check-badge"><i class="bi bi-check"></i></div>
+          <div class="tipo-icon"><i class="bi bi-building-fill"></i></div>
+          <p class="tipo-title">Instituição</p>
+          <p class="tipo-desc">Represento uma empresa, ONG ou organização</p>
+        </div>
+      </div>
+
+      <!-- ===== FORMULÁRIO ===== -->
+      <form id="formCadastro" novalidate>
+
+        <!-- ========== BLOCO PESSOA FÍSICA ========== -->
+        <div id="blocoPF" class="form-bloco">
+
+          <p class="form-section-title"><i class="bi bi-person-vcard-fill"></i>Dados Pessoais</p>
+
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Nome</label>
+              <div class="input-wrap">
+                <i class="bi bi-person-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Seu nome" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Sobrenome</label>
+              <div class="input-wrap">
+                <i class="bi bi-person-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Seu sobrenome" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">CPF</label>
+              <div class="input-wrap">
+                <i class="bi bi-card-text input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="000.000.000-00"
+                  maxlength="14" id="inputCPF"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Data de Nascimento</label>
+              <div class="input-wrap">
+                <i class="bi bi-calendar3 input-icon"></i>
+                <input type="date" class="form-control input-custom" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Telefone</label>
+              <div class="input-wrap">
+                <i class="bi bi-telephone-fill input-icon"></i>
+                <input type="tel" class="form-control input-custom" placeholder="(00) 00000-0000"
+                  maxlength="15" id="inputTelPF"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Gênero</label>
+              <div class="input-wrap">
+                <i class="bi bi-gender-ambiguous input-icon"></i>
+                <select class="form-select input-custom">
+                  <option value="" disabled selected>Selecione</option>
+                  <option>Masculino</option>
+                  <option>Feminino</option>
+                  <option>Não-binário</option>
+                  <option>Prefiro não informar</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <p class="form-section-title mt-3"><i class="bi bi-geo-alt-fill"></i>Localização</p>
+
+          <div class="row g-3">
+            <div class="col-12 col-sm-4">
+              <label class="form-label-custom">CEP</label>
+              <div class="input-wrap">
+                <i class="bi bi-pin-map-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="00000-000"
+                  maxlength="9" id="inputCEPpf"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-8">
+              <label class="form-label-custom">Cidade</label>
+              <div class="input-wrap">
+                <i class="bi bi-buildings-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Sua cidade" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Estado</label>
+              <div class="input-wrap">
+                <i class="bi bi-map-fill input-icon"></i>
+                <select class="form-select input-custom" required>
+                  <option value="" disabled selected>Selecione o estado</option>
+                  <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+                  <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+                  <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+                  <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+                  <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                  <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+                  <option>SP</option><option>SE</option><option>TO</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Bairro</label>
+              <div class="input-wrap">
+                <i class="bi bi-house-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Seu bairro"/>
+              </div>
+            </div>
+          </div>
+
+          <p class="form-section-title mt-3"><i class="bi bi-shield-lock-fill"></i>Acesso</p>
+
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label-custom">E-mail</label>
+              <div class="input-wrap">
+                <i class="bi bi-envelope-fill input-icon"></i>
+                <input type="email" class="form-control input-custom" placeholder="seu@email.com" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Senha</label>
+              <div class="input-wrap">
+                <i class="bi bi-lock-fill input-icon"></i>
+                <input type="password" class="form-control input-custom" placeholder="Mínimo 8 caracteres"
+                  id="inputSenhaPF" minlength="8" required oninput="avaliarSenha(this,'barrasPF','labelPF')"/>
+                <button type="button" class="btn-toggle-pass" onclick="toggleSenha('inputSenhaPF', 'iconePF')">
+                  <i class="bi bi-eye-fill" id="iconePF"></i>
+                </button>
+              </div>
+              <div class="password-strength mt-1">
+                <div class="strength-bar" id="barrasPF-1"></div>
+                <div class="strength-bar" id="barrasPF-2"></div>
+                <div class="strength-bar" id="barrasPF-3"></div>
+                <div class="strength-bar" id="barrasPF-4"></div>
+                <span class="strength-label" id="labelPF"></span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Confirmar Senha</label>
+              <div class="input-wrap">
+                <i class="bi bi-lock-fill input-icon"></i>
+                <input type="password" class="form-control input-custom" placeholder="Repita a senha"
+                  id="inputConfPF" required/>
+                <button type="button" class="btn-toggle-pass" onclick="toggleSenha('inputConfPF','iconeConfPF')">
+                  <i class="bi bi-eye-fill" id="iconeConfPF"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /blocoPF -->
+
+        <!-- ========== BLOCO INSTITUIÇÃO ========== -->
+        <div id="blocoPJ" class="form-bloco" style="display:none;">
+
+          <p class="form-section-title"><i class="bi bi-building-fill"></i>Dados da Instituição</p>
+
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label-custom">Razão Social / Nome da Organização</label>
+              <div class="input-wrap">
+                <i class="bi bi-building-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Nome oficial da instituição" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Nome Fantasia</label>
+              <div class="input-wrap">
+                <i class="bi bi-badge-ad-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Como é conhecida"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">CNPJ</label>
+              <div class="input-wrap">
+                <i class="bi bi-card-text input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="00.000.000/0000-00"
+                  maxlength="18" id="inputCNPJ"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Tipo de Instituição</label>
+              <div class="input-wrap">
+                <i class="bi bi-tags-fill input-icon"></i>
+                <select class="form-select input-custom" required>
+                  <option value="" disabled selected>Selecione</option>
+                  <option>Empresa Privada</option>
+                  <option>ONG / Associação</option>
+                  <option>Órgão Público</option>
+                  <option>Escola / Universidade</option>
+                  <option>Coletivo Cultural</option>
+                  <option>Outro</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Área de Atuação</label>
+              <div class="input-wrap">
+                <i class="bi bi-grid-fill input-icon"></i>
+                <select class="form-select input-custom">
+                  <option value="" disabled selected>Selecione</option>
+                  <option>Cultura & Arte</option>
+                  <option>Educação</option>
+                  <option>Esportes</option>
+                  <option>Gastronomia</option>
+                  <option>Saúde</option>
+                  <option>Tecnologia</option>
+                  <option>Social / Terceiro Setor</option>
+                  <option>Outro</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label-custom">Site ou Redes Sociais</label>
+              <div class="input-wrap">
+                <i class="bi bi-globe2 input-icon"></i>
+                <input type="url" class="form-control input-custom" placeholder="https://www.suainstituicao.com.br"/>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label-custom">Breve Descrição</label>
+              <div class="input-wrap" style="align-items:flex-start;">
+                <i class="bi bi-text-paragraph input-icon" style="top:14px;transform:none;"></i>
+                <textarea class="form-control input-custom" rows="3"
+                  placeholder="Fale um pouco sobre a instituição e os eventos que organiza..."
+                  style="padding-top:12px;resize:vertical;"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <p class="form-section-title mt-3"><i class="bi bi-person-badge-fill"></i>Responsável</p>
+
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Nome do Responsável</label>
+              <div class="input-wrap">
+                <i class="bi bi-person-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Nome completo" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">CPF do Responsável</label>
+              <div class="input-wrap">
+                <i class="bi bi-card-text input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="000.000.000-00"
+                  maxlength="14" id="inputCPFResp"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Cargo / Função</label>
+              <div class="input-wrap">
+                <i class="bi bi-briefcase-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Ex: Diretor, Coordenador"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Telefone de Contato</label>
+              <div class="input-wrap">
+                <i class="bi bi-telephone-fill input-icon"></i>
+                <input type="tel" class="form-control input-custom" placeholder="(00) 00000-0000"
+                  maxlength="15" id="inputTelPJ"/>
+              </div>
+            </div>
+          </div>
+
+          <p class="form-section-title mt-3"><i class="bi bi-geo-alt-fill"></i>Endereço</p>
+
+          <div class="row g-3">
+            <div class="col-12 col-sm-4">
+              <label class="form-label-custom">CEP</label>
+              <div class="input-wrap">
+                <i class="bi bi-pin-map-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="00000-000"
+                  maxlength="9" id="inputCEPpj"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-8">
+              <label class="form-label-custom">Logradouro</label>
+              <div class="input-wrap">
+                <i class="bi bi-signpost-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Rua, Av., Travessa..."/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-3">
+              <label class="form-label-custom">Número</label>
+              <div class="input-wrap">
+                <i class="bi bi-hash input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Nº"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-5">
+              <label class="form-label-custom">Cidade</label>
+              <div class="input-wrap">
+                <i class="bi bi-buildings-fill input-icon"></i>
+                <input type="text" class="form-control input-custom" placeholder="Cidade" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="form-label-custom">Estado</label>
+              <div class="input-wrap">
+                <i class="bi bi-map-fill input-icon"></i>
+                <select class="form-select input-custom" required>
+                  <option value="" disabled selected>UF</option>
+                  <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+                  <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+                  <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+                  <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+                  <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                  <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+                  <option>SP</option><option>SE</option><option>TO</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <p class="form-section-title mt-3"><i class="bi bi-shield-lock-fill"></i>Acesso</p>
+
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label-custom">E-mail Institucional</label>
+              <div class="input-wrap">
+                <i class="bi bi-envelope-fill input-icon"></i>
+                <input type="email" class="form-control input-custom" placeholder="contato@instituicao.com.br" required/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Senha</label>
+              <div class="input-wrap">
+                <i class="bi bi-lock-fill input-icon"></i>
+                <input type="password" class="form-control input-custom" placeholder="Mínimo 8 caracteres"
+                  id="inputSenhaPJ" minlength="8" required oninput="avaliarSenha(this,'barrasPJ','labelPJ')"/>
+                <button type="button" class="btn-toggle-pass" onclick="toggleSenha('inputSenhaPJ','iconePJ')">
+                  <i class="bi bi-eye-fill" id="iconePJ"></i>
+                </button>
+              </div>
+              <div class="password-strength mt-1">
+                <div class="strength-bar" id="barrasPJ-1"></div>
+                <div class="strength-bar" id="barrasPJ-2"></div>
+                <div class="strength-bar" id="barrasPJ-3"></div>
+                <div class="strength-bar" id="barrasPJ-4"></div>
+                <span class="strength-label" id="labelPJ"></span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label-custom">Confirmar Senha</label>
+              <div class="input-wrap">
+                <i class="bi bi-lock-fill input-icon"></i>
+                <input type="password" class="form-control input-custom" placeholder="Repita a senha"
+                  id="inputConfPJ" required/>
+                <button type="button" class="btn-toggle-pass" onclick="toggleSenha('inputConfPJ','iconeConfPJ')">
+                  <i class="bi bi-eye-fill" id="iconeConfPJ"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /blocoPJ -->
+
+        <!-- Termos (comum) -->
+        <div class="form-check mt-4">
+          <input class="form-check-input" type="checkbox" id="chkTermos" required/>
+          <label class="form-check-label" for="chkTermos">
+            Li e concordo com os <a href="termos.html" target="_blank">Termos de Uso</a>
+            e a <a href="privacidade.html" target="_blank">Política de Privacidade</a>
+          </label>
+        </div>
+        <div class="form-check mt-2">
+          <input class="form-check-input" type="checkbox" id="chkNewsletter"/>
+          <label class="form-check-label" for="chkNewsletter">
+            Quero receber novidades e recomendações de eventos por e-mail
+          </label>
+        </div>
+
+        <!-- Botão -->
+        <button type="submit" class="btn btn-cadastrar mt-4" id="btnCadastrar">
+          <i class="bi bi-person-check-fill"></i>
+          <span id="txtBtnCadastrar">Criar minha conta</span>
+        </button>
+
+      </form>
+
+      <p class="cadastro-footer">
+        Já tem uma conta? <a href="/frontend/src/pages/login/login.html">Entrar</a>
+      </p>
+      <p class="cadastro-footer mt-2">
+        <a href="/frontend/src/pages/home/home.html"><i class="bi bi-arrow-left me-1"></i>Voltar para a página inicial</a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <strong style="color:rgba(255,255,255,.6);font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;·&nbsp;
+    <a href="privacidade.html">Privacidade</a> &nbsp;·&nbsp;
+    <a href="termos.html">Termos de Uso</a> &nbsp;·&nbsp;
+    <a href="contato.html">Contato</a>
+    <br/><small class="mt-1 d-block" style="opacity:.6;">© 2025 EventoCom. Todos os direitos reservados.</small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* === Troca de tipo === */
+  let tipoAtual = 'pf';
+
+  function setTipo(tipo) {
+    tipoAtual = tipo;
+
+    document.getElementById('cardPF').classList.toggle('active', tipo === 'pf');
+    document.getElementById('cardPJ').classList.toggle('active', tipo === 'pj');
+
+    const blPF = document.getElementById('blocoPF');
+    const blPJ = document.getElementById('blocoPJ');
+
+    if (tipo === 'pf') {
+      blPJ.style.display = 'none';
+      blPF.style.display = 'block';
+      blPF.classList.remove('form-bloco');
+      void blPF.offsetWidth;
+      blPF.classList.add('form-bloco');
+      document.getElementById('txtBtnCadastrar').textContent = 'Criar minha conta';
+    } else {
+      blPF.style.display = 'none';
+      blPJ.style.display = 'block';
+      blPJ.classList.remove('form-bloco');
+      void blPJ.offsetWidth;
+      blPJ.classList.add('form-bloco');
+      document.getElementById('txtBtnCadastrar').textContent = 'Cadastrar Instituição';
+    }
+  }
+
+  /* === Toggle senha === */
+  function toggleSenha(inputId, iconeId) {
+    const input = document.getElementById(inputId);
+    const icone = document.getElementById(iconeId);
+    const visivel = input.type === 'text';
+    input.type = visivel ? 'password' : 'text';
+    icone.className = visivel ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill';
+  }
+
+  /* === Força da senha === */
+  function avaliarSenha(input, barrasId, labelId) {
+    const val = input.value;
+    let pontos = 0;
+    if (val.length >= 8)           pontos++;
+    if (/[A-Z]/.test(val))         pontos++;
+    if (/[0-9]/.test(val))         pontos++;
+    if (/[^a-zA-Z0-9]/.test(val))  pontos++;
+
+    const cores   = ['#ef4444','#f97316','#eab308','#22c55e'];
+    const labels  = ['Fraca','Regular','Boa','Forte'];
+
+    for (let i = 1; i <= 4; i++) {
+      const barra = document.getElementById(`${barrasId}-${i}`);
+      barra.style.background = i <= pontos ? cores[pontos - 1] : '#e5e7eb';
+    }
+    const labelEl = document.getElementById(labelId);
+    labelEl.textContent  = pontos > 0 ? labels[pontos - 1] : '';
+    labelEl.style.color  = pontos > 0 ? cores[pontos - 1] : 'var(--muted)';
+  }
+
+  /* === Máscara CPF === */
+  function maskCPF(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    el.value = v;
+  }
+
+  /* === Máscara CNPJ === */
+  function maskCNPJ(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 14);
+    v = v.replace(/(\d{2})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1/$2');
+    v = v.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+    el.value = v;
+  }
+
+  /* === Máscara Telefone === */
+  function maskTel(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length <= 10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    else                v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+    el.value = v;
+  }
+
+  /* === Máscara CEP === */
+  function maskCEP(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 8);
+    v = v.replace(/(\d{5})(\d{1,3})/, '$1-$2');
+    el.value = v;
+  }
+
+  document.getElementById('inputCPF').addEventListener('input',    () => maskCPF(document.getElementById('inputCPF')));
+  document.getElementById('inputCPFResp').addEventListener('input', () => maskCPF(document.getElementById('inputCPFResp')));
+  document.getElementById('inputCNPJ').addEventListener('input',   () => maskCNPJ(document.getElementById('inputCNPJ')));
+  document.getElementById('inputTelPF').addEventListener('input',  () => maskTel(document.getElementById('inputTelPF')));
+  document.getElementById('inputTelPJ').addEventListener('input',  () => maskTel(document.getElementById('inputTelPJ')));
+  document.getElementById('inputCEPpf').addEventListener('input',  () => maskCEP(document.getElementById('inputCEPpf')));
+  document.getElementById('inputCEPpj').addEventListener('input',  () => maskCEP(document.getElementById('inputCEPpj')));
+
+  /* === Submit === */
+  const form = document.getElementById('formCadastro');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!document.getElementById('chkTermos').checked) {
+      alert('Você precisa aceitar os Termos de Uso para continuar.');
+      return;
+    }
+
+    const btn = document.getElementById('btnCadastrar');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> Criando conta...`;
+
+    await new Promise(r => setTimeout(r, 1500));
+
+    // Substituir pelo fetch real futuramente:
+    // window.location.href = 'index.html';
+
+    btn.disabled = false;
+    btn.innerHTML = `<i class="bi bi-person-check-fill"></i> ${tipoAtual === 'pf' ? 'Criar minha conta' : 'Cadastrar Instituição'}`;
+    alert('Conta criada com sucesso! Verifique seu e-mail para confirmação.');
+  });
+</script>
+</body>
+</html>
