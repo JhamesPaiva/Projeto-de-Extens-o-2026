@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel da Instituição – EventoCom</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --primary:      #FF5C2B;
+      --primary-dark: #e04420;
+      --accent:       #FFD166;
+      --dark:         #111827;
+      --dark2:        #1f2937;
+      --mid:          #374151;
+      --light:        #F9FAFB;
+      --muted:        #6B7280;
+      --border:       #e5e7eb;
+      --card-radius:  14px;
+      --font-head:    'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--light); color: var(--dark); min-height: 100vh; }
+
+    /* ===== NAVBAR ===== */
+    .navbar { background: var(--dark) !important; padding: 14px 0; border-bottom: 3px solid var(--primary); position: sticky; top: 0; z-index: 1050; }
+    .navbar-brand { font-family: var(--font-head); font-weight: 800; font-size: 1.5rem; color: #fff !important; letter-spacing: -0.5px; text-decoration: none; }
+    .navbar-brand span { color: var(--primary); }
+    .navbar-toggler { border-color: rgba(255,255,255,.3); }
+    .navbar-toggler-icon { filter: invert(1); }
+    .nav-link { font-family: var(--font-body); font-weight: 500; color: rgba(255,255,255,.8) !important; padding: 8px 14px !important; border-radius: 8px; transition: all .2s; }
+    .nav-link:hover { color: #fff !important; background: rgba(255,255,255,.08); }
+    .btn-logout { font-family: var(--font-body); font-weight: 600; font-size: .85rem; border: 1.5px solid rgba(255,255,255,.3); color: rgba(255,255,255,.75) !important; border-radius: 8px; padding: 7px 16px; background: transparent; transition: all .2s; cursor: pointer; }
+    .btn-logout:hover { border-color: var(--primary); color: var(--primary) !important; }
+    .btn-nav-create { font-family: var(--font-body); font-weight: 700; background: var(--primary); color: #fff !important; border: none; border-radius: 8px; padding: 8px 18px; transition: all .2s; text-decoration: none; font-size: .88rem; }
+    .btn-nav-create:hover { background: var(--primary-dark); color: #fff !important; }
+
+    /* ===== HERO ===== */
+    .profile-hero { background: var(--dark2); position: relative; overflow: hidden; }
+    .profile-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 75% 50%, rgba(255,92,43,.15) 0%, transparent 65%); pointer-events:none; }
+    .profile-hero-inner { position:relative; z-index:1; padding: 40px 0 0; }
+
+    .inst-logo-wrap { position:relative; display:inline-block; }
+    .inst-logo {
+      width: 96px; height: 96px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), #ff8c5a);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-weight: 800; font-size: 2rem; color: #fff;
+      border: 4px solid var(--dark2); box-shadow: 0 4px 20px rgba(255,92,43,.35);
+      cursor: pointer; overflow: hidden;
+    }
+    .inst-logo img { width:100%; height:100%; object-fit:cover; display:none; }
+    .logo-edit-btn { position:absolute; bottom:2px; right:2px; width:28px; height:28px; border-radius:50%; background:var(--primary); color:#fff; border:2px solid var(--dark2); display:flex; align-items:center; justify-content:center; font-size:.7rem; cursor:pointer; transition:background .2s; }
+    .logo-edit-btn:hover { background:var(--primary-dark); }
+
+    .inst-name { font-family:var(--font-head); font-weight:800; font-size:1.6rem; color:#fff; margin-bottom:3px; }
+    .inst-fantasia { font-family:var(--font-body); font-size:.88rem; color:rgba(255,255,255,.5); margin-bottom:10px; }
+    .inst-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,209,102,.15); border:1px solid rgba(255,209,102,.3); color:var(--accent); border-radius:20px; font-family:var(--font-body); font-size:.75rem; font-weight:700; padding:4px 12px; text-transform:uppercase; letter-spacing:.05em; }
+
+    /* Tabs */
+    .profile-tabs { margin-top:28px; border-bottom:none; gap:4px; }
+    .profile-tabs .nav-link { font-family:var(--font-body) !important; font-weight:600 !important; font-size:.88rem !important; color:rgba(255,255,255,.5) !important; border:none !important; border-radius:0 !important; padding:12px 20px !important; border-bottom:3px solid transparent !important; transition:all .2s !important; background:transparent !important; }
+    .profile-tabs .nav-link:hover { color:rgba(255,255,255,.85) !important; background:rgba(255,255,255,.04) !important; }
+    .profile-tabs .nav-link.active { color:#fff !important; border-bottom-color:var(--primary) !important; background:transparent !important; }
+    .profile-tabs .nav-link i { margin-right:7px; }
+
+    /* ===== PAGE ===== */
+    .page-content { padding: 36px 0 64px; }
+    .tab-pane { animation: fadeUp .3s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ===== CARDS ===== */
+    .info-card { background:#fff; border-radius:var(--card-radius); box-shadow:0 2px 12px rgba(0,0,0,.06); padding:28px; margin-bottom:20px; }
+    .info-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:10px; }
+    .info-card-title { font-family:var(--font-head); font-weight:700; font-size:1rem; color:var(--dark); display:flex; align-items:center; gap:9px; }
+    .info-card-title i { color:var(--primary); }
+
+    .btn-edit-section { font-family:var(--font-body); font-weight:700; font-size:.8rem; color:var(--primary); background:rgba(255,92,43,.08); border:1.5px solid rgba(255,92,43,.25); border-radius:8px; padding:5px 14px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:6px; }
+    .btn-edit-section:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .btn-save-section { font-family:var(--font-body); font-weight:700; font-size:.8rem; color:#fff; background:var(--primary); border:1.5px solid var(--primary); border-radius:8px; padding:5px 16px; cursor:pointer; transition:all .2s; display:none; align-items:center; gap:6px; }
+    .btn-save-section:hover { background:var(--primary-dark); }
+    .btn-cancel-section { font-family:var(--font-body); font-weight:600; font-size:.8rem; color:var(--muted); background:#f3f4f6; border:1.5px solid var(--border); border-radius:8px; padding:5px 14px; cursor:pointer; transition:all .2s; display:none; align-items:center; gap:6px; }
+    .btn-cancel-section:hover { background:#e5e7eb; }
+    .edit-btns { display:flex; gap:8px; }
+
+    /* Fields */
+    .field-row { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:18px; }
+    .field-item { display:flex; flex-direction:column; gap:4px; }
+    .field-label { font-family:var(--font-body); font-size:.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+    .field-value { font-family:var(--font-body); font-size:.92rem; color:var(--dark); font-weight:500; }
+    .field-value.locked { display:flex; align-items:center; gap:7px; }
+    .lock-badge { font-size:.65rem; background:#f3f4f6; color:var(--muted); padding:2px 7px; border-radius:10px; font-weight:700; display:flex; align-items:center; gap:3px; }
+
+    .field-input-wrap { position:relative; display:none; }
+    .fi-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:.88rem; pointer-events:none; z-index:5; }
+    .fi-icon-top { position:absolute; left:12px; top:13px; color:var(--muted); font-size:.88rem; pointer-events:none; z-index:5; }
+    .field-input { font-family:var(--font-body) !important; font-size:.88rem !important; padding-left:36px !important; height:42px !important; border-radius:9px !important; border:2px solid var(--border) !important; background:#fff !important; color:var(--dark) !important; transition:border-color .2s; width:100%; }
+    .field-input:focus { border-color:var(--primary) !important; box-shadow:0 0 0 3px rgba(255,92,43,.1) !important; outline:none; }
+    select.field-input { cursor:pointer; }
+    textarea.field-input { height:auto !important; padding-top:12px !important; resize:vertical; }
+
+    .section-divider { font-family:var(--font-head); font-weight:700; font-size:.78rem; color:var(--primary); text-transform:uppercase; letter-spacing:.07em; margin:22px 0 14px; padding-bottom:8px; border-bottom:1.5px solid rgba(255,92,43,.15); display:flex; align-items:center; gap:7px; }
+
+    .editing .field-value { display:none !important; }
+    .editing .field-input-wrap { display:block !important; }
+    .locked-field .field-input-wrap { display:none !important; }
+    .locked-field .field-value { display:flex !important; }
+
+    /* ===== EVENTOS DA INSTITUIÇÃO ===== */
+    .stats-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:14px; margin-bottom:28px; }
+    .stat-item { background:#fff; border-radius:12px; padding:16px 18px; box-shadow:0 2px 8px rgba(0,0,0,.05); display:flex; align-items:center; gap:12px; }
+    .stat-icon { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0; }
+    .stat-icon.orange { background:rgba(255,92,43,.1); color:var(--primary); }
+    .stat-icon.green  { background:rgba(34,197,94,.1);  color:#16a34a; }
+    .stat-icon.blue   { background:rgba(59,130,246,.1); color:#2563eb; }
+    .stat-icon.gray   { background:rgba(107,114,128,.1);color:var(--muted); }
+    .stat-num { font-family:var(--font-head); font-weight:800; font-size:1.5rem; color:var(--dark); line-height:1; }
+    .stat-desc { font-family:var(--font-body); font-size:.75rem; color:var(--muted); margin-top:2px; }
+
+    /* Filtros */
+    .filter-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+    .filter-tab { font-family:var(--font-body); font-size:.8rem; font-weight:700; padding:6px 16px; border-radius:20px; border:1.5px solid var(--border); background:#fff; color:var(--muted); cursor:pointer; transition:all .2s; }
+    .filter-tab:hover { border-color:rgba(255,92,43,.4); color:var(--primary); }
+    .filter-tab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+    /* Cabeçalho da lista */
+    .eventos-list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
+    .btn-novo-evento { font-family:var(--font-body); font-weight:700; font-size:.85rem; background:var(--primary); color:#fff; border:none; border-radius:10px; padding:9px 20px; cursor:pointer; text-decoration:none; transition:all .2s; display:flex; align-items:center; gap:7px; }
+    .btn-novo-evento:hover { background:var(--primary-dark); color:#fff; transform:translateY(-1px); }
+
+    /* Cards de evento (lista expandida) */
+    .ev-item {
+      background:#fff; border-radius:var(--card-radius);
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      overflow:hidden; margin-bottom:16px;
+      border:2px solid transparent;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .ev-item:hover { border-color:rgba(255,92,43,.2); box-shadow:0 4px 18px rgba(0,0,0,.09); }
+
+    .ev-item-main { display:flex; gap:0; }
+    .ev-item-thumb { width:160px; flex-shrink:0; position:relative; overflow:hidden; }
+    .ev-item-thumb img { width:100%; height:100%; object-fit:cover; transition:transform .4s; }
+    .ev-item:hover .ev-item-thumb img { transform:scale(1.05); }
+
+    @media(max-width:576px) {
+      .ev-item-main { flex-direction:column; }
+      .ev-item-thumb { width:100%; height:160px; }
+    }
+
+    .ev-item-body { flex:1; padding:18px 20px; display:flex; flex-direction:column; justify-content:space-between; }
+    .ev-item-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    .ev-item-name { font-family:var(--font-head); font-weight:800; font-size:1.05rem; color:var(--dark); margin-bottom:6px; }
+
+    .ev-status-pill { font-family:var(--font-body); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:4px 12px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+    .pill-publicado  { background:rgba(34,197,94,.12); color:#16a34a; }
+    .pill-rascunho   { background:rgba(107,114,128,.12); color:var(--muted); }
+    .pill-encerrado  { background:rgba(239,68,68,.1); color:#dc2626; }
+    .pill-revisao    { background:rgba(234,179,8,.12); color:#b45309; }
+
+    .ev-meta-row { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:10px; }
+    .ev-meta-item { display:flex; align-items:center; gap:5px; font-family:var(--font-body); font-size:.78rem; color:var(--muted); }
+    .ev-meta-item i { color:var(--primary); font-size:.72rem; }
+
+    .ev-desc-preview { font-family:var(--font-body); font-size:.83rem; color:var(--mid); line-height:1.55; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:12px; }
+
+    /* Ações do evento */
+    .ev-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:12px 20px; background:#fafafa; border-top:1px solid var(--border); }
+    .btn-ev-ver { font-family:var(--font-body); font-weight:700; font-size:.78rem; color:var(--mid); background:#fff; border:1.5px solid var(--border); border-radius:7px; padding:5px 14px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; }
+    .btn-ev-ver:hover { border-color:var(--primary); color:var(--primary); }
+    .btn-ev-editar { font-family:var(--font-body); font-weight:700; font-size:.78rem; color:var(--primary); background:rgba(255,92,43,.08); border:1.5px solid rgba(255,92,43,.25); border-radius:7px; padding:5px 14px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; }
+    .btn-ev-editar:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .btn-ev-excluir { font-family:var(--font-body); font-weight:700; font-size:.78rem; color:#ef4444; background:rgba(239,68,68,.07); border:1.5px solid rgba(239,68,68,.2); border-radius:7px; padding:5px 14px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; margin-left:auto; }
+    .btn-ev-excluir:hover { background:#ef4444; color:#fff; border-color:#ef4444; }
+
+    /* Inscritos badge */
+    .inscritos-badge { display:flex; align-items:center; gap:5px; font-family:var(--font-body); font-size:.78rem; color:var(--mid); margin-left:auto; }
+    .inscritos-badge .num { font-family:var(--font-head); font-weight:800; font-size:1rem; color:var(--dark); }
+
+    /* Empty */
+    .empty-state { text-align:center; padding:60px 20px; background:#fff; border-radius:var(--card-radius); box-shadow:0 2px 10px rgba(0,0,0,.05); }
+    .empty-state .empty-icon { font-size:3rem; color:#e5e7eb; margin-bottom:16px; }
+    .empty-state h5 { font-family:var(--font-head); font-weight:700; font-size:1.05rem; color:var(--dark); margin-bottom:6px; }
+    .empty-state p { font-family:var(--font-body); font-size:.88rem; color:var(--muted); margin-bottom:20px; }
+
+    /* ===== MODAL VER EVENTO ===== */
+    .modal-ev-view .modal-content { border-radius:18px; border:none; overflow:hidden; }
+    .modal-ev-view .modal-hero { width:100%; height:260px; object-fit:cover; display:block; }
+    .modal-ev-view .modal-header { border:none; padding:0; position:relative; }
+    .modal-ev-view .modal-body { padding:28px 30px 10px; }
+    .modal-ev-view .modal-footer { border:none; padding:10px 30px 26px; }
+    .btn-close-float { position:absolute; top:12px; right:12px; background:rgba(0,0,0,.55); color:#fff; border:none; width:34px; height:34px; border-radius:50%; font-size:.9rem; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .2s; z-index:5; }
+    .btn-close-float:hover { background:rgba(0,0,0,.8); }
+    .modal-ev-name { font-family:var(--font-head); font-weight:800; font-size:1.45rem; color:var(--dark); margin-bottom:14px; }
+    .modal-info-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; font-family:var(--font-body); font-size:.88rem; color:var(--mid); }
+    .modal-info-row i { color:var(--primary); font-size:.95rem; margin-top:2px; flex-shrink:0; }
+    .modal-desc-label { font-family:var(--font-head); font-weight:700; font-size:.88rem; color:var(--dark); margin:16px 0 6px; }
+    .modal-desc-text { font-family:var(--font-body); font-size:.85rem; color:var(--mid); line-height:1.65; }
+
+    /* ===== MODAL EDITAR EVENTO ===== */
+    .modal-ev-edit .modal-content { border-radius:18px; border:none; }
+    .modal-ev-edit .modal-header { border:none; padding:24px 28px 0; }
+    .modal-ev-edit .modal-body { padding:16px 28px; max-height:70vh; overflow-y:auto; }
+    .modal-ev-edit .modal-footer { border:none; padding:12px 28px 24px; }
+    .modal-ev-edit .modal-title { font-family:var(--font-head); font-weight:800; font-size:1.15rem; color:var(--dark); }
+
+    /* Inputs dentro dos modais */
+    .medit-label { font-family:var(--font-body); font-size:.75rem; font-weight:700; color:var(--mid); text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px; display:block; }
+    .medit-input { font-family:var(--font-body) !important; font-size:.88rem !important; height:44px !important; border-radius:9px !important; border:2px solid var(--border) !important; background:#fff !important; color:var(--dark) !important; padding-left:38px !important; transition:border-color .2s; width:100%; }
+    .medit-input:focus { border-color:var(--primary) !important; box-shadow:0 0 0 3px rgba(255,92,43,.1) !important; outline:none; }
+    textarea.medit-input { height:auto !important; padding-top:11px !important; resize:vertical; }
+    select.medit-input { cursor:pointer; }
+    .medit-wrap { position:relative; }
+    .medit-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:.88rem; pointer-events:none; z-index:5; }
+    .medit-icon-top { position:absolute; left:12px; top:12px; color:var(--muted); font-size:.88rem; pointer-events:none; z-index:5; }
+    .medit-section { font-family:var(--font-head); font-weight:700; font-size:.78rem; color:var(--primary); text-transform:uppercase; letter-spacing:.07em; margin:20px 0 12px; padding-bottom:7px; border-bottom:1.5px solid rgba(255,92,43,.15); display:flex; align-items:center; gap:7px; }
+
+    .btn-salvar-evento { background:var(--primary); color:#fff; font-family:var(--font-head); font-weight:700; font-size:.9rem; border:none; border-radius:10px; padding:10px 28px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:7px; }
+    .btn-salvar-evento:hover { background:var(--primary-dark); box-shadow:0 4px 14px rgba(255,92,43,.3); }
+
+    /* ===== MODAL EXCLUIR ===== */
+    .modal-del .modal-content { border-radius:16px; border:none; }
+    .modal-del .modal-header  { border:none; padding:24px 24px 0; }
+    .modal-del .modal-body    { padding:14px 24px; }
+    .modal-del .modal-footer  { border:none; padding:0 24px 22px; }
+
+    /* ===== SEGURANÇA ===== */
+    .btn-toggle-pass { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:.9rem; transition:color .2s; z-index:5; }
+    .btn-toggle-pass:hover { color:var(--primary); }
+    .strength-row { display:flex; gap:4px; align-items:center; margin-top:5px; }
+    .s-bar { flex:1; height:3px; border-radius:3px; background:var(--border); transition:background .3s; }
+    .s-label { font-size:.72rem; color:var(--muted); min-width:52px; }
+    .danger-zone { border:1.5px solid rgba(239,68,68,.25); border-radius:var(--card-radius); padding:22px; background:rgba(239,68,68,.02); }
+    .danger-zone h6 { font-family:var(--font-head); font-weight:700; font-size:.9rem; color:#dc2626; margin-bottom:6px; }
+    .danger-zone p { font-family:var(--font-body); font-size:.83rem; color:var(--muted); margin-bottom:14px; }
+    .btn-danger-delete { font-family:var(--font-body); font-weight:700; font-size:.83rem; color:#dc2626; background:transparent; border:1.5px solid rgba(239,68,68,.4); border-radius:8px; padding:7px 18px; cursor:pointer; transition:all .2s; }
+    .btn-danger-delete:hover { background:#ef4444; color:#fff; border-color:#ef4444; }
+
+    /* Toast */
+    .toast-custom { position:fixed; bottom:28px; right:28px; z-index:9999; background:var(--dark); color:#fff; font-family:var(--font-body); font-size:.88rem; padding:14px 20px; border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.25); display:flex; align-items:center; gap:10px; transform:translateY(80px); opacity:0; transition:all .35s cubic-bezier(.34,1.56,.64,1); border-left:4px solid #22c55e; max-width:320px; }
+    .toast-custom.show { transform:translateY(0); opacity:1; }
+    .toast-custom i { font-size:1.1rem; }
+
+    /* ===== FOOTER ===== */
+    footer { background:var(--dark); color:rgba(255,255,255,.4); font-family:var(--font-body); font-size:.78rem; padding:18px 0; border-top:3px solid var(--primary); text-align:center; }
+    footer a { color:var(--primary); text-decoration:none; }
+
+    @media(max-width:767px) {
+      .inst-name { font-size:1.25rem; }
+      .stats-bar { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html"><i class="bi bi-calendar-event-fill me-1"></i>Evento<span>Com</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Explorar</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#">Meu Painel</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a href="criar-evento.html" class="btn-nav-create">
+          <i class="bi bi-plus-circle me-1"></i>Novo Evento
+        </a>
+        <span style="font-family:var(--font-body);font-size:.82rem;color:rgba(255,255,255,.55);">
+          <i class="bi bi-building-fill me-1" style="color:var(--accent);"></i>
+          <strong id="navNome" style="color:#fff;"></strong>
+        </span>
+        <button class="btn-logout" onclick="Auth.logout()">
+          <i class="bi bi-box-arrow-right me-1"></i>Sair
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<div class="profile-hero">
+  <div class="profile-hero-inner">
+    <div class="container">
+      <div class="d-flex align-items-end gap-4 flex-wrap">
+        <div class="inst-logo-wrap">
+          <div class="inst-logo" id="instLogo" onclick="document.getElementById('logoInput').click()">
+            <span id="logoInitials"></span>
+            <img id="logoImg" src="" alt=""/>
+          </div>
+          <div class="logo-edit-btn" onclick="document.getElementById('logoInput').click()">
+            <i class="bi bi-camera-fill"></i>
+          </div>
+          <input type="file" accept="image/*" style="display:none;" id="logoInput" onchange="trocarLogo(this)"/>
+        </div>
+        <div class="pb-1">
+          <p class="inst-name" id="instName">—</p>
+          <p class="inst-fantasia" id="instFantasia">—</p>
+          <span class="inst-badge"><i class="bi bi-building-fill"></i> Instituição</span>
+        </div>
+      </div>
+      <ul class="nav profile-tabs mt-0" id="profileTabs">
+        <li class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabDados">
+            <i class="bi bi-building-fill"></i>Dados da Instituição
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabEventos">
+            <i class="bi bi-calendar-event-fill"></i>Meus Eventos
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSenha">
+            <i class="bi bi-shield-lock-fill"></i>Segurança
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONTEÚDO ===== -->
+<div class="page-content">
+  <div class="container">
+    <div class="tab-content">
+
+      <!-- ========== ABA: DADOS DA INSTITUIÇÃO ========== -->
+      <div class="tab-pane fade show active" id="tabDados">
+        <div class="row g-4">
+          <div class="col-12 col-lg-8">
+
+            <!-- Dados Institucionais -->
+            <div class="info-card" id="cardInst">
+              <div class="info-card-header">
+                <p class="info-card-title"><i class="bi bi-building-fill"></i>Dados Institucionais</p>
+                <div class="edit-btns">
+                  <button class="btn-cancel-section" id="cancelInst" onclick="cancelarEdicao('cardInst','cancelInst','saveInst','editInst')"><i class="bi bi-x-lg"></i>Cancelar</button>
+                  <button class="btn-save-section"   id="saveInst"   onclick="salvarSecao('cardInst','cancelInst','saveInst','editInst','inst')"><i class="bi bi-check-lg"></i>Salvar</button>
+                  <button class="btn-edit-section"   id="editInst"   onclick="ativarEdicao('cardInst','cancelInst','saveInst','editInst')"><i class="bi bi-pencil-fill"></i>Editar</button>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-item locked-field" style="grid-column:1/-1;">
+                  <span class="field-label">Razão Social</span>
+                  <span class="field-value locked" id="fv-razao">
+                    <span id="fv-razao-val">—</span>
+                    <span class="lock-badge"><i class="bi bi-lock-fill"></i>Não editável</span>
+                  </span>
+                </div>
+                <div class="field-item" id="fi-fantasia">
+                  <span class="field-label">Nome Fantasia</span>
+                  <span class="field-value" id="fv-fantasia">—</span>
+                  <div class="field-input-wrap"><i class="bi bi-badge-ad-fill fi-icon"></i><input type="text" class="field-input" id="fi-fantasia-input"/></div>
+                </div>
+                <div class="field-item locked-field">
+                  <span class="field-label">CNPJ</span>
+                  <span class="field-value locked">
+                    <span id="fv-cnpj-val">—</span>
+                    <span class="lock-badge"><i class="bi bi-lock-fill"></i>Não editável</span>
+                  </span>
+                </div>
+                <div class="field-item" id="fi-tipo">
+                  <span class="field-label">Tipo de Instituição</span>
+                  <span class="field-value" id="fv-tipo">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-tags-fill fi-icon"></i>
+                    <select class="field-input" id="fi-tipo-input">
+                      <option>Empresa Privada</option><option>ONG / Associação</option>
+                      <option>Órgão Público</option><option>Escola / Universidade</option>
+                      <option>Coletivo Cultural</option><option>Outro</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-item" id="fi-area">
+                  <span class="field-label">Área de Atuação</span>
+                  <span class="field-value" id="fv-area">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-grid-fill fi-icon"></i>
+                    <select class="field-input" id="fi-area-input">
+                      <option>Cultura & Arte</option><option>Educação</option><option>Esportes</option>
+                      <option>Gastronomia</option><option>Saúde</option><option>Tecnologia</option>
+                      <option>Social / Terceiro Setor</option><option>Outro</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-item" id="fi-site">
+                  <span class="field-label">Site / Redes Sociais</span>
+                  <span class="field-value" id="fv-site">—</span>
+                  <div class="field-input-wrap"><i class="bi bi-globe2 fi-icon"></i><input type="url" class="field-input" id="fi-site-input" placeholder="https://..."/></div>
+                </div>
+              </div>
+
+              <!-- Descrição -->
+              <div class="section-divider mt-3"><i class="bi bi-text-paragraph"></i>Descrição</div>
+              <div class="field-item" id="fi-desc">
+                <span class="field-value" id="fv-desc" style="white-space:pre-line;line-height:1.6;">—</span>
+                <div class="field-input-wrap" style="position:relative;">
+                  <i class="bi bi-text-paragraph fi-icon-top"></i>
+                  <textarea class="field-input" id="fi-desc-input" rows="3" style="padding-left:36px !important;padding-top:11px;height:auto !important;"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Responsável -->
+            <div class="info-card" id="cardResp">
+              <div class="info-card-header">
+                <p class="info-card-title"><i class="bi bi-person-badge-fill"></i>Responsável Legal</p>
+                <div class="edit-btns">
+                  <button class="btn-cancel-section" id="cancelResp" onclick="cancelarEdicao('cardResp','cancelResp','saveResp','editResp')"><i class="bi bi-x-lg"></i>Cancelar</button>
+                  <button class="btn-save-section"   id="saveResp"   onclick="salvarSecao('cardResp','cancelResp','saveResp','editResp','resp')"><i class="bi bi-check-lg"></i>Salvar</button>
+                  <button class="btn-edit-section"   id="editResp"   onclick="ativarEdicao('cardResp','cancelResp','saveResp','editResp')"><i class="bi bi-pencil-fill"></i>Editar</button>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-item" id="fi-resp-nome">
+                  <span class="field-label">Nome do Responsável</span>
+                  <span class="field-value" id="fv-resp-nome">—</span>
+                  <div class="field-input-wrap"><i class="bi bi-person-fill fi-icon"></i><input type="text" class="field-input" id="fi-resp-nome-input"/></div>
+                </div>
+                <div class="field-item locked-field">
+                  <span class="field-label">CPF do Responsável</span>
+                  <span class="field-value locked">
+                    <span id="fv-resp-cpf-val">—</span>
+                    <span class="lock-badge"><i class="bi bi-lock-fill"></i>Não editável</span>
+                  </span>
+                </div>
+                <div class="field-item" id="fi-resp-cargo">
+                  <span class="field-label">Cargo / Função</span>
+                  <span class="field-value" id="fv-resp-cargo">—</span>
+                  <div class="field-input-wrap"><i class="bi bi-briefcase-fill fi-icon"></i><input type="text" class="field-input" id="fi-resp-cargo-input"/></div>
+                </div>
+                <div class="field-item" id="fi-resp-tel">
+                  <span class="field-label">Telefone</span>
+                  <span class="field-value" id="fv-resp-tel">—</span>
+                  <div class="field-input-wrap"><i class="bi bi-telephone-fill fi-icon"></i><input type="tel" class="field-input" id="fi-resp-tel-input" maxlength="15" oninput="maskTel(this)"/></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Endereço -->
+            <div class="info-card" id="cardEnd">
+              <div class="info-card-header">
+                <p class="info-card-title"><i class="bi bi-geo-alt-fill"></i>Endereço</p>
+                <div class="edit-btns">
+                  <button class="btn-cancel-section" id="cancelEnd" onclick="cancelarEdicao('cardEnd','cancelEnd','saveEnd','editEnd')"><i class="bi bi-x-lg"></i>Cancelar</button>
+                  <button class="btn-save-section"   id="saveEnd"   onclick="salvarSecao('cardEnd','cancelEnd','saveEnd','editEnd','end')"><i class="bi bi-check-lg"></i>Salvar</button>
+                  <button class="btn-edit-section"   id="editEnd"   onclick="ativarEdicao('cardEnd','cancelEnd','saveEnd','editEnd')"><i class="bi bi-pencil-fill"></i>Editar</button>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-item" id="fi-cep"><span class="field-label">CEP</span><span class="field-value" id="fv-cep">—</span><div class="field-input-wrap"><i class="bi bi-pin-map-fill fi-icon"></i><input type="text" class="field-input" id="fi-cep-input" maxlength="9" oninput="maskCEP(this)"/></div></div>
+                <div class="field-item" id="fi-logr"><span class="field-label">Logradouro</span><span class="field-value" id="fv-logr">—</span><div class="field-input-wrap"><i class="bi bi-signpost-fill fi-icon"></i><input type="text" class="field-input" id="fi-logr-input"/></div></div>
+                <div class="field-item" id="fi-num"><span class="field-label">Número</span><span class="field-value" id="fv-num">—</span><div class="field-input-wrap"><i class="bi bi-hash fi-icon"></i><input type="text" class="field-input" id="fi-num-input"/></div></div>
+                <div class="field-item" id="fi-cidade"><span class="field-label">Cidade</span><span class="field-value" id="fv-cidade">—</span><div class="field-input-wrap"><i class="bi bi-buildings-fill fi-icon"></i><input type="text" class="field-input" id="fi-cidade-input"/></div></div>
+                <div class="field-item" id="fi-estado">
+                  <span class="field-label">Estado</span><span class="field-value" id="fv-estado">—</span>
+                  <div class="field-input-wrap"><i class="bi bi-map-fill fi-icon"></i>
+                    <select class="field-input" id="fi-estado-input">
+                      <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- E-mail -->
+            <div class="info-card" id="cardEmail">
+              <div class="info-card-header">
+                <p class="info-card-title"><i class="bi bi-envelope-fill"></i>E-mail Institucional</p>
+                <div class="edit-btns">
+                  <button class="btn-cancel-section" id="cancelEmail" onclick="cancelarEdicao('cardEmail','cancelEmail','saveEmail','editEmail')"><i class="bi bi-x-lg"></i>Cancelar</button>
+                  <button class="btn-save-section"   id="saveEmail"   onclick="salvarSecao('cardEmail','cancelEmail','saveEmail','editEmail','email')"><i class="bi bi-check-lg"></i>Salvar</button>
+                  <button class="btn-edit-section"   id="editEmail"   onclick="ativarEdicao('cardEmail','cancelEmail','saveEmail','editEmail')"><i class="bi bi-pencil-fill"></i>Editar</button>
+                </div>
+              </div>
+              <div class="field-row" style="grid-template-columns:1fr;">
+                <div class="field-item" id="fi-email">
+                  <span class="field-label">E-mail</span>
+                  <span class="field-value" id="fv-email">—</span>
+                  <div class="field-input-wrap"><i class="bi bi-envelope-fill fi-icon"></i><input type="email" class="field-input" id="fi-email-input"/></div>
+                </div>
+              </div>
+              <p style="font-family:var(--font-body);font-size:.75rem;color:var(--muted);margin-top:10px;"><i class="bi bi-info-circle me-1"></i>Ao alterar o e-mail, você receberá um link de confirmação no novo endereço.</p>
+            </div>
+
+          </div><!-- /col -->
+
+          <!-- Sidebar -->
+          <div class="col-12 col-lg-4">
+            <div class="info-card">
+              <p class="info-card-title mb-4"><i class="bi bi-bar-chart-fill"></i>&nbsp;Resumo</p>
+              <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center justify-content-between p-3" style="background:#f9fafb;border-radius:10px;">
+                  <div class="d-flex align-items-center"><i class="bi bi-calendar-event-fill me-2" style="color:var(--primary);font-size:1.05rem;"></i><span style="font-family:var(--font-body);font-size:.85rem;color:var(--mid);">Eventos criados</span></div>
+                  <strong style="font-family:var(--font-head);font-size:1.1rem;" id="totalEventos">3</strong>
+                </div>
+                <div class="d-flex align-items-center justify-content-between p-3" style="background:#f9fafb;border-radius:10px;">
+                  <div class="d-flex align-items-center"><i class="bi bi-check-circle-fill me-2" style="color:#16a34a;font-size:1.05rem;"></i><span style="font-family:var(--font-body);font-size:.85rem;color:var(--mid);">Publicados</span></div>
+                  <strong style="font-family:var(--font-head);font-size:1.1rem;" id="totalPublicados">2</strong>
+                </div>
+                <div class="d-flex align-items-center justify-content-between p-3" style="background:#f9fafb;border-radius:10px;">
+                  <div class="d-flex align-items-center"><i class="bi bi-people-fill me-2" style="color:#2563eb;font-size:1.05rem;"></i><span style="font-family:var(--font-body);font-size:.85rem;color:var(--mid);">Total inscritos</span></div>
+                  <strong style="font-family:var(--font-head);font-size:1.1rem;" id="totalInscritos">184</strong>
+                </div>
+              </div>
+              <div class="mt-4">
+                <p style="font-family:var(--font-body);font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Membro desde</p>
+                <p style="font-family:var(--font-head);font-weight:700;font-size:.95rem;color:var(--dark);">Janeiro de 2025</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /tabDados -->
+
+      <!-- ========== ABA: MEUS EVENTOS ========== -->
+      <div class="tab-pane fade" id="tabEventos">
+
+        <div class="stats-bar">
+          <div class="stat-item"><div class="stat-icon orange"><i class="bi bi-calendar-event-fill"></i></div><div><p class="stat-num" id="st-total">3</p><p class="stat-desc">Total</p></div></div>
+          <div class="stat-item"><div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div><div><p class="stat-num" id="st-pub">2</p><p class="stat-desc">Publicados</p></div></div>
+          <div class="stat-item"><div class="stat-icon gray"><i class="bi bi-pencil-square"></i></div><div><p class="stat-num" id="st-ras">1</p><p class="stat-desc">Rascunhos</p></div></div>
+          <div class="stat-item"><div class="stat-icon blue"><i class="bi bi-people-fill"></i></div><div><p class="stat-num" id="st-ins">184</p><p class="stat-desc">Inscritos</p></div></div>
+        </div>
+
+        <div class="eventos-list-header">
+          <div>
+            <h5 style="font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--dark);margin:0;">Eventos da Instituição</h5>
+            <p style="font-family:var(--font-body);font-size:.82rem;color:var(--muted);margin:3px 0 0;">Gerencie todos os seus eventos publicados e rascunhos.</p>
+          </div>
+          <a href="criar-evento.html" class="btn-novo-evento">
+            <i class="bi bi-plus-circle-fill"></i>Novo Evento
+          </a>
+        </div>
+
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="filtrar('todos',this)">Todos (3)</button>
+          <button class="filter-tab" onclick="filtrar('publicado',this)">Publicados (2)</button>
+          <button class="filter-tab" onclick="filtrar('rascunho',this)">Rascunhos (1)</button>
+          <button class="filter-tab" onclick="filtrar('encerrado',this)">Encerrados (0)</button>
+        </div>
+
+        <div id="listaEventos"></div>
+        <div class="empty-state d-none" id="emptyState">
+          <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+          <h5>Nenhum evento aqui</h5>
+          <p>Crie seu primeiro evento e comece a receber inscrições!</p>
+          <a href="criar-evento.html" class="btn-novo-evento d-inline-flex mt-2"><i class="bi bi-plus-circle-fill"></i>Criar evento</a>
+        </div>
+
+      </div><!-- /tabEventos -->
+
+      <!-- ========== ABA: SEGURANÇA ========== -->
+      <div class="tab-pane fade" id="tabSenha">
+        <div class="row g-4">
+          <div class="col-12 col-lg-7">
+            <div class="info-card">
+              <div class="info-card-header"><p class="info-card-title"><i class="bi bi-lock-fill"></i>Alterar Senha</p></div>
+              <div class="d-flex flex-column gap-3">
+                <div><label class="field-label d-block mb-1">Senha Atual</label>
+                  <div class="field-input-wrap" style="display:block;">
+                    <i class="bi bi-lock-fill fi-icon"></i>
+                    <input type="password" class="field-input" id="senhaAtual" placeholder="••••••••" style="padding-right:40px;"/>
+                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaAtual','iconSA')"><i class="bi bi-eye-fill" id="iconSA"></i></button>
+                  </div>
+                </div>
+                <div><label class="field-label d-block mb-1">Nova Senha</label>
+                  <div class="field-input-wrap" style="display:block;">
+                    <i class="bi bi-lock-fill fi-icon"></i>
+                    <input type="password" class="field-input" id="senhaNova" placeholder="Mínimo 8 caracteres" style="padding-right:40px;" oninput="avaliarSenha(this)" minlength="8"/>
+                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaNova','iconSN')"><i class="bi bi-eye-fill" id="iconSN"></i></button>
+                  </div>
+                  <div class="strength-row mt-1"><div class="s-bar" id="sb1"></div><div class="s-bar" id="sb2"></div><div class="s-bar" id="sb3"></div><div class="s-bar" id="sb4"></div><span class="s-label" id="slabel"></span></div>
+                </div>
+                <div><label class="field-label d-block mb-1">Confirmar Nova Senha</label>
+                  <div class="field-input-wrap" style="display:block;">
+                    <i class="bi bi-lock-fill fi-icon"></i>
+                    <input type="password" class="field-input" id="senhaConf" placeholder="Repita a nova senha" style="padding-right:40px;"/>
+                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaConf','iconSC')"><i class="bi bi-eye-fill" id="iconSC"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn-save-section" style="display:flex;" onclick="salvarSenha()"><i class="bi bi-check-lg"></i>Atualizar Senha</button>
+              </div>
+            </div>
+            <div class="info-card">
+              <p class="info-card-title mb-4"><i class="bi bi-exclamation-triangle-fill" style="color:#ef4444;"></i>&nbsp;Zona de Perigo</p>
+              <div class="danger-zone">
+                <h6><i class="bi bi-trash3-fill me-2"></i>Excluir conta da instituição</h6>
+                <p>Esta ação é permanente. Todos os dados, eventos e inscrições serão removidos.</p>
+                <button class="btn-danger-delete" data-bs-toggle="modal" data-bs-target="#modalExcluirConta">
+                  <i class="bi bi-trash3-fill me-2"></i>Excluir conta
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-5">
+            <div class="info-card">
+              <p class="info-card-title mb-4"><i class="bi bi-shield-check-fill"></i>&nbsp;Dicas de Segurança</p>
+              <div class="d-flex flex-column gap-3">
+                <div class="d-flex gap-3 align-items-start"><div style="width:34px;height:34px;background:rgba(34,197,94,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-check2-circle" style="color:#16a34a;"></i></div><div><p style="font-family:var(--font-body);font-size:.85rem;font-weight:700;color:var(--dark);margin-bottom:2px;">Use uma senha forte</p><p style="font-family:var(--font-body);font-size:.78rem;color:var(--muted);">Combine letras maiúsculas, minúsculas, números e símbolos.</p></div></div>
+                <div class="d-flex gap-3 align-items-start"><div style="width:34px;height:34px;background:rgba(255,92,43,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-people-fill" style="color:var(--primary);"></i></div><div><p style="font-family:var(--font-body);font-size:.85rem;font-weight:700;color:var(--dark);margin-bottom:2px;">Acesso restrito</p><p style="font-family:var(--font-body);font-size:.78rem;color:var(--muted);">Compartilhe o acesso apenas com pessoas de confiança da sua equipe.</p></div></div>
+                <div class="d-flex gap-3 align-items-start"><div style="width:34px;height:34px;background:rgba(234,179,8,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-arrow-repeat" style="color:#b45309;"></i></div><div><p style="font-family:var(--font-body);font-size:.85rem;font-weight:700;color:var(--dark);margin-bottom:2px;">Troque periodicamente</p><p style="font-family:var(--font-body);font-size:.78rem;color:var(--muted);">Recomendamos atualizar sua senha a cada 6 meses.</p></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: VER EVENTO ===== -->
+<div class="modal fade modal-ev-view" id="modalVerEvento" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img id="mv-img" class="modal-hero" src="" alt=""/>
+        <button class="btn-close-float" onclick="bootstrap.Modal.getInstance(document.getElementById('modalVerEvento')).hide()"><i class="bi bi-x-lg"></i></button>
+        <span id="mv-status" class="ev-status-pill position-absolute bottom-0 start-0 m-3"></span>
+      </div>
+      <div class="modal-body">
+        <h4 class="modal-ev-name" id="mv-nome"></h4>
+        <div class="row g-2">
+          <div class="col-12 col-sm-6">
+            <div class="modal-info-row"><i class="bi bi-tags-fill"></i><span id="mv-cat"></span></div>
+            <div class="modal-info-row"><i class="bi bi-calendar3"></i><span id="mv-data"></span></div>
+            <div class="modal-info-row"><i class="bi bi-clock-fill"></i><span id="mv-hora"></span></div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <div class="modal-info-row"><i class="bi bi-geo-alt-fill"></i><span id="mv-local"></span></div>
+            <div class="modal-info-row"><i class="bi bi-display"></i><span id="mv-formato"></span></div>
+            <div class="modal-info-row"><i class="bi bi-ticket-perforated-fill"></i><span id="mv-entrada"></span></div>
+            <div class="modal-info-row"><i class="bi bi-person-fill"></i>Faixa etária: <strong id="mv-idade" class="ms-1"></strong></div>
+          </div>
+        </div>
+        <div class="modal-info-row mt-1"><i class="bi bi-people-fill"></i>Inscritos: <strong id="mv-inscritos" class="ms-1" style="color:var(--primary);"></strong></div>
+        <p class="modal-desc-label">Sobre o evento</p>
+        <p class="modal-desc-text" id="mv-desc"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="bootstrap.Modal.getInstance(document.getElementById('modalVerEvento')).hide()">Fechar</button>
+        <button class="btn-ev-editar" style="border-radius:9px;padding:8px 20px;" id="mv-btn-editar" onclick="abrirEditar()">
+          <i class="bi bi-pencil-fill"></i>Editar evento
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: EDITAR EVENTO ===== -->
+<div class="modal fade modal-ev-edit" id="modalEditarEvento" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-pencil-fill me-2" style="color:var(--primary);"></i>Editar Evento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <p class="medit-section"><i class="bi bi-stars"></i>Informações Básicas</p>
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="medit-label">Nome do Evento *</label>
+            <div class="medit-wrap"><i class="bi bi-stars medit-icon"></i><input type="text" class="medit-input" id="me-nome"/></div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <label class="medit-label">Categoria *</label>
+            <div class="medit-wrap"><i class="bi bi-tags-fill medit-icon"></i>
+              <select class="medit-input" id="me-categoria">
+                <option>Música</option><option>Gastronomia</option><option>Esportes</option>
+                <option>Arte & Cultura</option><option>Tecnologia</option>
+                <option>Saúde & Bem-estar</option><option>Educação</option><option>Outro</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <label class="medit-label">Faixa Etária</label>
+            <div class="medit-wrap"><i class="bi bi-person-fill medit-icon"></i>
+              <select class="medit-input" id="me-idade">
+                <option>Livre</option><option>+12</option><option>+16</option><option>+18</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="medit-label">Descrição Curta</label>
+            <div class="medit-wrap"><i class="bi bi-text-left medit-icon-top"></i><textarea class="medit-input" id="me-desc-curta" rows="2" style="padding-left:36px!important;padding-top:11px;height:auto!important;"></textarea></div>
+          </div>
+          <div class="col-12">
+            <label class="medit-label">Descrição Completa</label>
+            <div class="medit-wrap"><i class="bi bi-text-paragraph medit-icon-top"></i><textarea class="medit-input" id="me-desc" rows="4" style="padding-left:36px!important;padding-top:11px;height:auto!important;"></textarea></div>
+          </div>
+        </div>
+
+        <p class="medit-section"><i class="bi bi-calendar3"></i>Data & Local</p>
+        <div class="row g-3">
+          <div class="col-12 col-sm-4">
+            <label class="medit-label">Data *</label>
+            <div class="medit-wrap"><i class="bi bi-calendar-event medit-icon"></i><input type="date" class="medit-input" id="me-data"/></div>
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="medit-label">Hora Início</label>
+            <div class="medit-wrap"><i class="bi bi-clock-fill medit-icon"></i><input type="time" class="medit-input" id="me-hora-ini"/></div>
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="medit-label">Hora Fim</label>
+            <div class="medit-wrap"><i class="bi bi-clock-history medit-icon"></i><input type="time" class="medit-input" id="me-hora-fim"/></div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <label class="medit-label">Formato</label>
+            <div class="medit-wrap"><i class="bi bi-display medit-icon"></i>
+              <select class="medit-input" id="me-formato">
+                <option>Presencial</option><option>Online</option><option>Híbrido</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <label class="medit-label">Local / Estabelecimento</label>
+            <div class="medit-wrap"><i class="bi bi-building medit-icon"></i><input type="text" class="medit-input" id="me-local-nome"/></div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <label class="medit-label">Cidade</label>
+            <div class="medit-wrap"><i class="bi bi-buildings-fill medit-icon"></i><input type="text" class="medit-input" id="me-cidade"/></div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <label class="medit-label">Estado</label>
+            <div class="medit-wrap"><i class="bi bi-map-fill medit-icon"></i>
+              <select class="medit-input" id="me-estado">
+                <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <p class="medit-section"><i class="bi bi-ticket-perforated-fill"></i>Ingresso & Capacidade</p>
+        <div class="row g-3">
+          <div class="col-12 col-sm-4">
+            <label class="medit-label">Tipo de Entrada</label>
+            <div class="medit-wrap"><i class="bi bi-ticket-fill medit-icon"></i>
+              <select class="medit-input" id="me-entrada">
+                <option>Gratuito</option><option>Pago</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="medit-label">Valor (se pago)</label>
+            <div class="medit-wrap"><i class="bi bi-currency-dollar medit-icon"></i><input type="text" class="medit-input" id="me-valor" placeholder="R$ 0,00"/></div>
+          </div>
+          <div class="col-12 col-sm-4">
+            <label class="medit-label">Capacidade</label>
+            <div class="medit-wrap"><i class="bi bi-people-fill medit-icon"></i><input type="number" class="medit-input" id="me-capacidade" placeholder="Ex: 500"/></div>
+          </div>
+        </div>
+
+        <p class="medit-section"><i class="bi bi-flag-fill"></i>Status</p>
+        <div class="medit-wrap"><i class="bi bi-flag-fill medit-icon"></i>
+          <select class="medit-input" id="me-status">
+            <option value="publicado">Publicado</option>
+            <option value="rascunho">Rascunho</option>
+            <option value="encerrado">Encerrado</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn-salvar-evento" onclick="salvarEdicaoEvento()">
+          <i class="bi bi-check-lg"></i>Salvar alterações
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: EXCLUIR EVENTO ===== -->
+<div class="modal fade modal-del" id="modalExcluirEvento" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 style="font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:#dc2626;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Excluir evento?
+        </h5>
+      </div>
+      <div class="modal-body">
+        <p style="font-family:var(--font-body);font-size:.9rem;color:var(--mid);">
+          Você está prestes a excluir <strong id="delEvNome">—</strong>. Todos os inscritos serão notificados e essa ação não poderá ser desfeita.
+        </p>
+      </div>
+      <div class="modal-footer gap-2">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-sm" style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;" onclick="confirmarExclusao()">
+          <i class="bi bi-trash3-fill me-1"></i>Excluir evento
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: EXCLUIR CONTA ===== -->
+<div class="modal fade modal-del" id="modalExcluirConta" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h5 style="font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:#dc2626;"><i class="bi bi-exclamation-triangle-fill me-2"></i>Excluir conta permanentemente</h5></div>
+      <div class="modal-body">
+        <p style="font-family:var(--font-body);font-size:.9rem;color:var(--mid);margin-bottom:14px;">Todos os dados e eventos serão <strong>removidos permanentemente</strong>.</p>
+        <label style="font-family:var(--font-body);font-size:.8rem;font-weight:700;color:var(--mid);display:block;margin-bottom:6px;">Digite <strong style="color:#dc2626;">EXCLUIR</strong> para confirmar:</label>
+        <input type="text" class="field-input" id="inputConfExcluir" placeholder="EXCLUIR" style="display:block;padding-left:14px !important;"/>
+      </div>
+      <div class="modal-footer gap-2">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-sm" style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;" onclick="excluirConta()">Excluir conta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-custom" id="toast"><i class="bi bi-check-circle-fill"></i><span id="toastMsg"></span></div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <strong style="color:rgba(255,255,255,.6);font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;·&nbsp;<a href="privacidade.html">Privacidade</a> &nbsp;·&nbsp;<a href="termos.html">Termos</a>
+    <br/><small class="mt-1 d-block" style="opacity:.6;">© 2025 EventoCom.</small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="auth.js"></script>
+<script>
+
+/* =====================================================
+   DADOS SIMULADOS
+   ===================================================== */
+const dadosInst = {
+  razaoSocial: 'Instituto Cultural BH LTDA',
+  fantasia:    'Instituto Cultural BH',
+  cnpj:        '12.345.678/0001-99',
+  tipo:        'ONG / Associação',
+  area:        'Cultura & Arte',
+  site:        'https://institutocultural.com.br',
+  desc:        'Organização dedicada à promoção da cultura, arte e eventos comunitários em Belo Horizonte e região. Realizamos eventos educativos, shows, feiras e muito mais.',
+  respNome:    'Carlos Mendes',
+  respCpf:     '987.654.321-00',
+  respCargo:   'Diretor Executivo',
+  respTel:     '(31) 98765-4321',
+  cep:         '30112-000',
+  logradouro:  'Av. Afonso Pena',
+  numero:      '1500',
+  cidade:      'Belo Horizonte',
+  estado:      'MG',
+  email:       'instituicao@teste.com',
+};
+
+let eventosInst = [
+  {
+    id: 1, nome: 'Festival Verão Sonoro 2025', categoria: 'Música', status: 'publicado',
+    data: '2025-07-12', horaIni: '16:00', horaFim: '23:00',
+    formato: 'Presencial', localNome: 'Parque Municipal', cidade: 'São Paulo', estado: 'SP',
+    entrada: 'Pago', valor: 'R$ 40,00', capacidade: 500, inscritos: 128, idade: 'Livre',
+    descCurta: 'O maior festival de verão da cidade, com 20+ atrações musicais.',
+    desc: 'O Festival Verão Sonoro reúne mais de 20 atrações musicais em um único dia, com palcos simultâneos, área gastronômica e espaço cultural. Uma experiência inesquecível no coração da cidade.',
+    img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
+  },
+  {
+    id: 2, nome: 'Exposição Coletiva: Cores da Comunidade', categoria: 'Arte & Cultura', status: 'publicado',
+    data: '2025-08-05', horaIni: '10:00', horaFim: '18:00',
+    formato: 'Presencial', localNome: 'Centro Cultural', cidade: 'Curitiba', estado: 'PR',
+    entrada: 'Gratuito', valor: '—', capacidade: 300, inscritos: 56, idade: 'Livre',
+    descCurta: 'Exposição de artes visuais com 30 artistas locais sobre comunidade e diversidade.',
+    desc: 'Uma exposição de artes visuais que reúne 30 artistas locais em torno do tema comunidade, pertencimento e diversidade. Pinturas, fotografias, esculturas e instalações ocupam todo o espaço do Centro Cultural.',
+    img: 'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&q=80',
+  },
+  {
+    id: 3, nome: 'Workshop de Fotografia Urbana', categoria: 'Arte & Cultura', status: 'rascunho',
+    data: '2025-09-20', horaIni: '09:00', horaFim: '13:00',
+    formato: 'Presencial', localNome: 'Centro Cultural', cidade: 'Belo Horizonte', estado: 'MG',
+    entrada: 'Pago', valor: 'R$ 80,00', capacidade: 30, inscritos: 0, idade: '+16',
+    descCurta: 'Aprenda técnicas de fotografia nas ruas de BH com fotógrafos profissionais.',
+    desc: 'Um workshop prático de fotografia urbana pelas ruas e vielas de Belo Horizonte. Técnicas de composição, luz natural e storytelling visual com instrutores renomados.',
+    img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80',
+  },
+];
+
+/* =====================================================
+   INIT
+   ===================================================== */
+;(function init() {
+  Auth.restore();
+  const user = Auth.getUser();
+  if (!user || user.tipo !== 'pj') { window.location.href = 'login.html'; return; }
+
+  document.getElementById('navNome').textContent = dadosInst.fantasia || dadosInst.razaoSocial;
+
+  // Hero
+  document.getElementById('instName').textContent    = dadosInst.razaoSocial;
+  document.getElementById('instFantasia').textContent = dadosInst.fantasia;
+  document.getElementById('logoInitials').textContent =
+    dadosInst.fantasia.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+  // Preenche campos de exibição
+  document.getElementById('fv-razao-val').textContent = dadosInst.razaoSocial;
+  document.getElementById('fv-cnpj-val').textContent  = dadosInst.cnpj;
+  document.getElementById('fv-resp-cpf-val').textContent = dadosInst.respCpf;
+
+  setFV('fv-fantasia',   dadosInst.fantasia);
+  setFV('fv-tipo',       dadosInst.tipo);
+  setFV('fv-area',       dadosInst.area);
+  setFV('fv-site',       dadosInst.site);
+  setFV('fv-desc',       dadosInst.desc);
+  setFV('fv-resp-nome',  dadosInst.respNome);
+  setFV('fv-resp-cargo', dadosInst.respCargo);
+  setFV('fv-resp-tel',   dadosInst.respTel);
+  setFV('fv-cep',        dadosInst.cep);
+  setFV('fv-logr',       dadosInst.logradouro);
+  setFV('fv-num',        dadosInst.numero);
+  setFV('fv-cidade',     dadosInst.cidade);
+  setFV('fv-estado',     dadosInst.estado);
+  setFV('fv-email',      dadosInst.email);
+
+  // Inputs de edição
+  setVal('fi-fantasia-input',  dadosInst.fantasia);
+  setVal('fi-desc-input',      dadosInst.desc);
+  setVal('fi-resp-nome-input', dadosInst.respNome);
+  setVal('fi-resp-cargo-input',dadosInst.respCargo);
+  setVal('fi-resp-tel-input',  dadosInst.respTel);
+  setVal('fi-cep-input',       dadosInst.cep);
+  setVal('fi-logr-input',      dadosInst.logradouro);
+  setVal('fi-num-input',       dadosInst.numero);
+  setVal('fi-cidade-input',    dadosInst.cidade);
+  setVal('fi-email-input',     dadosInst.email);
+  setSel('fi-tipo-input',      dadosInst.tipo);
+  setSel('fi-area-input',      dadosInst.area);
+  setSel('fi-estado-input',    dadosInst.estado);
+
+  renderEventos(eventosInst);
+})();
+
+function setFV(id, v) { const el=document.getElementById(id); if(el) el.textContent=v||'—'; }
+function setVal(id,v) { const el=document.getElementById(id); if(el) el.value=v||''; }
+function setSel(id,v) {
+  const s=document.getElementById(id); if(!s) return;
+  for(const o of s.options){ if(o.value===v||o.text===v){s.value=o.value;break;} }
+}
+
+/* =====================================================
+   EDIÇÃO DE SEÇÕES
+   ===================================================== */
+function ativarEdicao(cId, canId, savId, edId) {
+  document.getElementById(cId).classList.add('editing');
+  document.getElementById(canId).style.display='flex';
+  document.getElementById(savId).style.display='flex';
+  document.getElementById(edId).style.display='none';
+}
+function cancelarEdicao(cId, canId, savId, edId) {
+  document.getElementById(cId).classList.remove('editing');
+  document.getElementById(canId).style.display='none';
+  document.getElementById(savId).style.display='none';
+  document.getElementById(edId).style.display='flex';
+}
+function salvarSecao(cId, canId, savId, edId, sec) {
+  if(sec==='inst') {
+    const fan = document.getElementById('fi-fantasia-input').value.trim();
+    const tip = document.getElementById('fi-tipo-input').value;
+    const are = document.getElementById('fi-area-input').value;
+    const sit = document.getElementById('fi-site-input').value.trim();
+    const dsc = document.getElementById('fi-desc-input').value.trim();
+    setFV('fv-fantasia',fan||'—'); setFV('fv-tipo',tip); setFV('fv-area',are);
+    setFV('fv-site',sit||'—');     setFV('fv-desc',dsc||'—');
+    document.getElementById('instFantasia').textContent = fan || dadosInst.razaoSocial;
+    document.getElementById('navNome').textContent      = fan || dadosInst.razaoSocial;
+  }
+  if(sec==='resp') {
+    setFV('fv-resp-nome',  document.getElementById('fi-resp-nome-input').value  ||'—');
+    setFV('fv-resp-cargo', document.getElementById('fi-resp-cargo-input').value ||'—');
+    setFV('fv-resp-tel',   document.getElementById('fi-resp-tel-input').value   ||'—');
+  }
+  if(sec==='end') {
+    setFV('fv-cep',    document.getElementById('fi-cep-input').value   ||'—');
+    setFV('fv-logr',   document.getElementById('fi-logr-input').value  ||'—');
+    setFV('fv-num',    document.getElementById('fi-num-input').value   ||'—');
+    setFV('fv-cidade', document.getElementById('fi-cidade-input').value||'—');
+    setFV('fv-estado', document.getElementById('fi-estado-input').value||'—');
+  }
+  if(sec==='email') {
+    const em = document.getElementById('fi-email-input').value.trim();
+    setFV('fv-email', em||'—');
+  }
+  cancelarEdicao(cId, canId, savId, edId);
+  showToast('Dados salvos com sucesso!');
+}
+
+/* =====================================================
+   LOGO
+   ===================================================== */
+function trocarLogo(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('logoImg');
+    img.src=e.target.result; img.style.display='block';
+    document.getElementById('logoInitials').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* =====================================================
+   RENDER EVENTOS
+   ===================================================== */
+const statusLabels  = { publicado:'Publicado', rascunho:'Rascunho', encerrado:'Encerrado', revisao:'Em Revisão' };
+const statusClasses = { publicado:'pill-publicado', rascunho:'pill-rascunho', encerrado:'pill-encerrado', revisao:'pill-revisao' };
+
+function renderEventos(lista) {
+  const container = document.getElementById('listaEventos');
+  const empty     = document.getElementById('emptyState');
+  if(!lista.length) { container.innerHTML=''; empty.classList.remove('d-none'); return; }
+  empty.classList.add('d-none');
+
+  container.innerHTML = lista.map(ev => {
+    const d = new Date(ev.data+'T00:00:00');
+    const dataFmt = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    return `
+    <div class="ev-item" data-status="${ev.status}" data-id="${ev.id}">
+      <div class="ev-item-main">
+        <div class="ev-item-thumb">
+          <img src="${ev.img}" alt="${ev.nome}" loading="lazy"/>
+        </div>
+        <div class="ev-item-body">
+          <div class="ev-item-top">
+            <div>
+              <h5 class="ev-item-name">${ev.nome}</h5>
+              <div class="ev-meta-row">
+                <span class="ev-meta-item"><i class="bi bi-tags-fill"></i>${ev.categoria}</span>
+                <span class="ev-meta-item"><i class="bi bi-calendar3"></i>${dataFmt}</span>
+                <span class="ev-meta-item"><i class="bi bi-clock-fill"></i>${ev.horaIni}${ev.horaFim?' às '+ev.horaFim:''}</span>
+                <span class="ev-meta-item"><i class="bi bi-geo-alt-fill"></i>${ev.localNome}, ${ev.cidade} – ${ev.estado}</span>
+                <span class="ev-meta-item"><i class="bi bi-display"></i>${ev.formato}</span>
+                <span class="ev-meta-item"><i class="bi bi-ticket-perforated-fill"></i>${ev.entrada}${ev.valor&&ev.valor!=='—'?' – '+ev.valor:''}</span>
+              </div>
+              <p class="ev-desc-preview">${ev.descCurta}</p>
+            </div>
+            <div class="d-flex flex-column align-items-end gap-2">
+              <span class="ev-status-pill ${statusClasses[ev.status]}">${statusLabels[ev.status]}</span>
+              <div class="inscritos-badge">
+                <i class="bi bi-people-fill" style="color:var(--primary);"></i>
+                <span class="num">${ev.inscritos}</span>
+                <span style="font-size:.72rem;color:var(--muted);">inscritos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ev-actions">
+        <button class="btn-ev-ver" onclick="verEvento(${ev.id})"><i class="bi bi-eye"></i>Ver detalhes</button>
+        <button class="btn-ev-editar" onclick="abrirEditarDireto(${ev.id})"><i class="bi bi-pencil-fill"></i>Editar</button>
+        <button class="btn-ev-excluir" onclick="pedirExclusao(${ev.id},'${ev.nome.replace(/'/g,"\\'")}')"><i class="bi bi-trash3-fill"></i>Excluir</button>
+      </div>
+    </div>`; }).join('');
+}
+
+function filtrar(status, btn) {
+  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const lista = status==='todos' ? eventosInst : eventosInst.filter(e=>e.status===status);
+  renderEventos(lista);
+}
+
+/* =====================================================
+   VER EVENTO
+   ===================================================== */
+let eventoAtual = null;
+
+function verEvento(id) {
+  const ev = eventosInst.find(e=>e.id===id); if(!ev) return;
+  eventoAtual = ev;
+  const d = new Date(ev.data+'T00:00:00');
+  const dataFmt = d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+
+  document.getElementById('mv-img').src       = ev.img;
+  document.getElementById('mv-nome').textContent   = ev.nome;
+  document.getElementById('mv-cat').textContent    = ev.categoria;
+  document.getElementById('mv-data').textContent   = dataFmt;
+  document.getElementById('mv-hora').textContent   = ev.horaIni + (ev.horaFim ? ' às ' + ev.horaFim : '');
+  document.getElementById('mv-local').textContent  = ev.localNome+', '+ev.cidade+' – '+ev.estado;
+  document.getElementById('mv-formato').textContent= ev.formato;
+  document.getElementById('mv-entrada').textContent= ev.entrada+(ev.valor&&ev.valor!=='—'?' – '+ev.valor:'');
+  document.getElementById('mv-idade').textContent  = ev.idade;
+  document.getElementById('mv-inscritos').textContent = ev.inscritos + ' / ' + ev.capacidade;
+  document.getElementById('mv-desc').textContent   = ev.desc;
+
+  const pill = document.getElementById('mv-status');
+  pill.textContent = statusLabels[ev.status];
+  pill.className   = 'ev-status-pill position-absolute bottom-0 start-0 m-3 '+statusClasses[ev.status];
+
+  new bootstrap.Modal(document.getElementById('modalVerEvento')).show();
+}
+
+/* =====================================================
+   EDITAR EVENTO
+   ===================================================== */
+function abrirEditar() {
+  bootstrap.Modal.getInstance(document.getElementById('modalVerEvento')).hide();
+  setTimeout(()=>{ if(eventoAtual) preencherFormEditar(eventoAtual); new bootstrap.Modal(document.getElementById('modalEditarEvento')).show(); }, 350);
+}
+
+function abrirEditarDireto(id) {
+  const ev = eventosInst.find(e=>e.id===id); if(!ev) return;
+  eventoAtual = ev;
+  preencherFormEditar(ev);
+  new bootstrap.Modal(document.getElementById('modalEditarEvento')).show();
+}
+
+function preencherFormEditar(ev) {
+  setVal('me-nome',      ev.nome);
+  setVal('me-desc-curta',ev.descCurta);
+  setVal('me-desc',      ev.desc);
+  setVal('me-data',      ev.data);
+  setVal('me-hora-ini',  ev.horaIni);
+  setVal('me-hora-fim',  ev.horaFim||'');
+  setVal('me-local-nome',ev.localNome);
+  setVal('me-cidade',    ev.cidade);
+  setVal('me-valor',     ev.valor==='—'?'':ev.valor);
+  setVal('me-capacidade',ev.capacidade);
+  setSel('me-categoria', ev.categoria);
+  setSel('me-idade',     ev.idade);
+  setSel('me-formato',   ev.formato);
+  setSel('me-entrada',   ev.entrada);
+  setSel('me-estado',    ev.estado);
+  setSel('me-status',    ev.status);
+}
+
+function salvarEdicaoEvento() {
+  if(!eventoAtual) return;
+  const idx = eventosInst.findIndex(e=>e.id===eventoAtual.id);
+  if(idx===-1) return;
+
+  eventosInst[idx] = {
+    ...eventosInst[idx],
+    nome:      document.getElementById('me-nome').value.trim()       || eventosInst[idx].nome,
+    descCurta: document.getElementById('me-desc-curta').value.trim(),
+    desc:      document.getElementById('me-desc').value.trim(),
+    data:      document.getElementById('me-data').value              || eventosInst[idx].data,
+    horaIni:   document.getElementById('me-hora-ini').value          || eventosInst[idx].horaIni,
+    horaFim:   document.getElementById('me-hora-fim').value,
+    localNome: document.getElementById('me-local-nome').value.trim() || eventosInst[idx].localNome,
+    cidade:    document.getElementById('me-cidade').value.trim()     || eventosInst[idx].cidade,
+    estado:    document.getElementById('me-estado').value,
+    entrada:   document.getElementById('me-entrada').value,
+    valor:     document.getElementById('me-valor').value.trim()      || '—',
+    capacidade:parseInt(document.getElementById('me-capacidade').value)||eventosInst[idx].capacidade,
+    categoria: document.getElementById('me-categoria').value,
+    idade:     document.getElementById('me-idade').value,
+    formato:   document.getElementById('me-formato').value,
+    status:    document.getElementById('me-status').value,
+  };
+
+  bootstrap.Modal.getInstance(document.getElementById('modalEditarEvento')).hide();
+  renderEventos(eventosInst);
+  atualizarStats();
+  showToast('Evento atualizado com sucesso!');
+  eventoAtual = null;
+}
+
+/* =====================================================
+   EXCLUIR EVENTO
+   ===================================================== */
+let excluirTarget = null;
+
+function pedirExclusao(id, nome) {
+  excluirTarget = id;
+  document.getElementById('delEvNome').textContent = nome;
+  new bootstrap.Modal(document.getElementById('modalExcluirEvento')).show();
+}
+
+function confirmarExclusao() {
+  if(!excluirTarget) return;
+  eventosInst = eventosInst.filter(e=>e.id!==excluirTarget);
+  bootstrap.Modal.getInstance(document.getElementById('modalExcluirEvento')).hide();
+  renderEventos(eventosInst);
+  atualizarStats();
+  showToast('Evento excluído.');
+  excluirTarget = null;
+}
+
+function atualizarStats() {
+  const tot = eventosInst.length;
+  const pub = eventosInst.filter(e=>e.status==='publicado').length;
+  const ras = eventosInst.filter(e=>e.status==='rascunho').length;
+  const ins = eventosInst.reduce((a,e)=>a+e.inscritos,0);
+  document.getElementById('st-total').textContent = tot;
+  document.getElementById('st-pub').textContent   = pub;
+  document.getElementById('st-ras').textContent   = ras;
+  document.getElementById('st-ins').textContent   = ins;
+  document.getElementById('totalEventos').textContent   = tot;
+  document.getElementById('totalPublicados').textContent= pub;
+  document.getElementById('totalInscritos').textContent = ins;
+}
+
+/* =====================================================
+   SENHA & SEGURANÇA
+   ===================================================== */
+function togglePass(inputId, iconId) {
+  const inp=document.getElementById(inputId), icon=document.getElementById(iconId);
+  const vis=inp.type==='text';
+  inp.type=vis?'password':'text';
+  icon.className=vis?'bi bi-eye-fill':'bi bi-eye-slash-fill';
+}
+function avaliarSenha(inp) {
+  const v=inp.value; let pts=0;
+  if(v.length>=8) pts++; if(/[A-Z]/.test(v)) pts++; if(/[0-9]/.test(v)) pts++; if(/[^a-zA-Z0-9]/.test(v)) pts++;
+  const cores=['#ef4444','#f97316','#eab308','#22c55e'], labels=['Fraca','Regular','Boa','Forte'];
+  for(let i=1;i<=4;i++) document.getElementById(`sb${i}`).style.background=i<=pts?cores[pts-1]:'#e5e7eb';
+  const lbl=document.getElementById('slabel');
+  lbl.textContent=pts>0?labels[pts-1]:''; lbl.style.color=pts>0?cores[pts-1]:'var(--muted)';
+}
+function salvarSenha() {
+  const a=document.getElementById('senhaAtual').value, n=document.getElementById('senhaNova').value, c=document.getElementById('senhaConf').value;
+  if(!a||!n||!c) { showToast('Preencha todos os campos.',true); return; }
+  if(n.length<8)  { showToast('A nova senha deve ter no mínimo 8 caracteres.',true); return; }
+  if(n!==c)       { showToast('As senhas não coincidem.',true); return; }
+  document.getElementById('senhaAtual').value='';
+  document.getElementById('senhaNova').value='';
+  document.getElementById('senhaConf').value='';
+  showToast('Senha atualizada com sucesso!');
+}
+function excluirConta() {
+  if(document.getElementById('inputConfExcluir').value.trim()!=='EXCLUIR') { showToast('Digite EXCLUIR para confirmar.',true); return; }
+  Auth.logout();
+}
+
+/* =====================================================
+   MÁSCARAS
+   ===================================================== */
+function maskTel(el) {
+  let v=el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length<=10) v=v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  else             v=v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+  el.value=v;
+}
+function maskCEP(el) {
+  let v=el.value.replace(/\D/g,'').slice(0,8);
+  el.value=v.replace(/(\d{5})(\d{1,3})/,'$1-$2');
+}
+
+/* =====================================================
+   TOAST
+   ===================================================== */
+let toastTimer;
+function showToast(msg, erro=false) {
+  const t=document.getElementById('toast'), i=t.querySelector('i');
+  document.getElementById('toastMsg').textContent=msg;
+  t.style.borderLeftColor=erro?'#ef4444':'#22c55e';
+  i.className=erro?'bi bi-x-circle-fill':'bi bi-check-circle-fill';
+  i.style.color=erro?'#ef4444':'#22c55e';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+</script>
+</body>
+</html>
