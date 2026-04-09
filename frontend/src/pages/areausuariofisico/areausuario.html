@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meu Perfil – EventoCom</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --primary:      #FF5C2B;
+      --primary-dark: #e04420;
+      --accent:       #FFD166;
+      --dark:         #111827;
+      --dark2:        #1f2937;
+      --mid:          #374151;
+      --light:        #F9FAFB;
+      --muted:        #6B7280;
+      --border:       #e5e7eb;
+      --card-radius:  14px;
+      --font-head:    'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--light);
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      background: var(--dark) !important;
+      padding: 14px 0;
+      border-bottom: 3px solid var(--primary);
+      position: sticky; top: 0; z-index: 1050;
+    }
+    .navbar-brand {
+      font-family: var(--font-head); font-weight: 800;
+      font-size: 1.5rem; color: #fff !important;
+      letter-spacing: -0.5px; text-decoration: none;
+    }
+    .navbar-brand span { color: var(--primary); }
+    .navbar-toggler { border-color: rgba(255,255,255,.3); }
+    .navbar-toggler-icon { filter: invert(1); }
+    .nav-link {
+      font-family: var(--font-body); font-weight: 500;
+      color: rgba(255,255,255,.8) !important;
+      padding: 8px 14px !important; border-radius: 8px; transition: all .2s;
+    }
+    .nav-link:hover { color: #fff !important; background: rgba(255,255,255,.08); }
+    .btn-logout {
+      font-family: var(--font-body); font-weight: 600; font-size: .85rem;
+      border: 1.5px solid rgba(255,255,255,.3); color: rgba(255,255,255,.75) !important;
+      border-radius: 8px; padding: 7px 16px; background: transparent;
+      transition: all .2s; cursor: pointer;
+    }
+    .btn-logout:hover { border-color: var(--primary); color: var(--primary) !important; }
+
+    /* ===== HERO DO PERFIL ===== */
+    .profile-hero {
+      background: var(--dark2);
+      padding: 0 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(255,92,43,.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .profile-hero-inner {
+      position: relative; z-index: 1;
+      padding: 40px 0 0;
+    }
+    .avatar-wrap {
+      position: relative; display: inline-block;
+    }
+    .avatar-circle {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-weight: 800;
+      font-size: 2rem; color: #fff;
+      border: 4px solid var(--dark2);
+      box-shadow: 0 4px 20px rgba(255,92,43,.35);
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .avatar-circle img {
+      width: 100%; height: 100%; object-fit: cover; display: none;
+    }
+    .avatar-edit-btn {
+      position: absolute; bottom: 2px; right: 2px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      border: 2px solid var(--dark2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; cursor: pointer;
+      transition: background .2s;
+    }
+    .avatar-edit-btn:hover { background: var(--primary-dark); }
+    .avatar-input { display: none; }
+
+    .profile-name {
+      font-family: var(--font-head); font-weight: 800;
+      font-size: 1.6rem; color: #fff; margin-bottom: 3px;
+    }
+    .profile-email {
+      font-family: var(--font-body); font-size: .88rem;
+      color: rgba(255,255,255,.5); margin-bottom: 10px;
+    }
+    .profile-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,209,102,.15); border: 1px solid rgba(255,209,102,.3);
+      color: var(--accent); border-radius: 20px;
+      font-family: var(--font-body); font-size: .75rem; font-weight: 700;
+      padding: 4px 12px; text-transform: uppercase; letter-spacing: .05em;
+    }
+
+    /* Tabs do perfil */
+    .profile-tabs {
+      margin-top: 28px;
+      border-bottom: none;
+      gap: 4px;
+    }
+    .profile-tabs .nav-link {
+      font-family: var(--font-body) !important; font-weight: 600 !important;
+      font-size: .88rem !important;
+      color: rgba(255,255,255,.5) !important;
+      border: none !important; border-radius: 0 !important;
+      padding: 12px 20px !important;
+      border-bottom: 3px solid transparent !important;
+      transition: all .2s !important;
+      background: transparent !important;
+    }
+    .profile-tabs .nav-link:hover {
+      color: rgba(255,255,255,.85) !important;
+      background: rgba(255,255,255,.04) !important;
+    }
+    .profile-tabs .nav-link.active {
+      color: #fff !important;
+      border-bottom-color: var(--primary) !important;
+      background: transparent !important;
+    }
+    .profile-tabs .nav-link i { margin-right: 7px; }
+
+    /* ===== LAYOUT ===== */
+    .page-content { padding: 36px 0 64px; }
+
+    .tab-pane { animation: fadeUp .3s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== CARDS ===== */
+    .info-card {
+      background: #fff; border-radius: var(--card-radius);
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      padding: 28px; margin-bottom: 20px;
+    }
+    .info-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 22px; flex-wrap: wrap; gap: 10px;
+    }
+    .info-card-title {
+      font-family: var(--font-head); font-weight: 700; font-size: 1rem;
+      color: var(--dark); display: flex; align-items: center; gap: 9px;
+    }
+    .info-card-title i { color: var(--primary); }
+
+    /* Botão editar / salvar */
+    .btn-edit-section {
+      font-family: var(--font-body); font-weight: 700; font-size: .8rem;
+      color: var(--primary); background: rgba(255,92,43,.08);
+      border: 1.5px solid rgba(255,92,43,.25); border-radius: 8px;
+      padding: 5px 14px; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-edit-section:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-save-section {
+      font-family: var(--font-body); font-weight: 700; font-size: .8rem;
+      color: #fff; background: var(--primary);
+      border: 1.5px solid var(--primary); border-radius: 8px;
+      padding: 5px 16px; cursor: pointer; transition: all .2s;
+      display: none; align-items: center; gap: 6px;
+    }
+    .btn-save-section:hover { background: var(--primary-dark); }
+    .btn-cancel-section {
+      font-family: var(--font-body); font-weight: 600; font-size: .8rem;
+      color: var(--muted); background: #f3f4f6;
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      padding: 5px 14px; cursor: pointer; transition: all .2s;
+      display: none; align-items: center; gap: 6px;
+    }
+    .btn-cancel-section:hover { background: #e5e7eb; }
+    .edit-btns { display: flex; gap: 8px; }
+
+    /* Campos de dados */
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .field-item { display: flex; flex-direction: column; gap: 4px; }
+    .field-label {
+      font-family: var(--font-body); font-size: .72rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .05em;
+    }
+    .field-value {
+      font-family: var(--font-body); font-size: .92rem; color: var(--dark);
+      font-weight: 500;
+    }
+    .field-value.locked {
+      display: flex; align-items: center; gap: 7px;
+    }
+    .field-value.locked .lock-badge {
+      font-size: .65rem; background: #f3f4f6; color: var(--muted);
+      padding: 2px 7px; border-radius: 10px; font-weight: 700;
+      display: flex; align-items: center; gap: 3px;
+    }
+
+    /* Inputs no modo edição */
+    .field-input-wrap { position: relative; display: none; }
+    .field-input-wrap .fi-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); color: var(--muted);
+      font-size: .88rem; pointer-events: none;
+    }
+    .field-input {
+      font-family: var(--font-body) !important; font-size: .88rem !important;
+      padding-left: 36px !important; height: 42px !important;
+      border-radius: 9px !important; border: 2px solid var(--border) !important;
+      background: #fff !important; color: var(--dark) !important;
+      transition: border-color .2s;
+      width: 100%;
+    }
+    .field-input:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 3px rgba(255,92,43,.1) !important;
+      outline: none;
+    }
+    select.field-input { cursor: pointer; }
+
+    /* Modo edição ativo */
+    .editing .field-value { display: none !important; }
+    .editing .field-input-wrap { display: block !important; }
+
+    /* Campo bloqueado nunca troca */
+    .field-item.locked-field .field-input-wrap { display: none !important; }
+    .field-item.locked-field .field-value { display: flex !important; }
+
+    /* Separador de seção */
+    .section-divider {
+      font-family: var(--font-head); font-weight: 700; font-size: .78rem;
+      color: var(--primary); text-transform: uppercase; letter-spacing: .07em;
+      margin: 22px 0 14px;
+      padding-bottom: 8px; border-bottom: 1.5px solid rgba(255,92,43,.15);
+      display: flex; align-items: center; gap: 7px;
+    }
+
+    /* Toast de sucesso */
+    .toast-custom {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      background: var(--dark); color: #fff;
+      font-family: var(--font-body); font-size: .88rem;
+      padding: 14px 20px; border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25);
+      display: flex; align-items: center; gap: 10px;
+      transform: translateY(80px); opacity: 0;
+      transition: all .35s cubic-bezier(.34,1.56,.64,1);
+      border-left: 4px solid #22c55e;
+      max-width: 320px;
+    }
+    .toast-custom.show { transform: translateY(0); opacity: 1; }
+    .toast-custom i { color: #22c55e; font-size: 1.1rem; }
+
+    /* ===== SENHA ===== */
+    .btn-toggle-pass {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%); background: transparent;
+      border: none; color: var(--muted); cursor: pointer; font-size: .9rem;
+      transition: color .2s; z-index: 5;
+    }
+    .btn-toggle-pass:hover { color: var(--primary); }
+    .strength-row { display: flex; gap: 4px; align-items: center; margin-top: 5px; }
+    .s-bar { flex: 1; height: 3px; border-radius: 3px; background: var(--border); transition: background .3s; }
+    .s-label { font-size: .72rem; color: var(--muted); min-width: 52px; }
+
+    /* ===== MEUS EVENTOS ===== */
+    .eventos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+
+    .ev-card {
+      background: #fff; border-radius: var(--card-radius);
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      overflow: hidden; transition: transform .22s, box-shadow .22s;
+    }
+    .ev-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+
+    .ev-card-img {
+      height: 150px; position: relative; overflow: hidden;
+    }
+    .ev-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+    .ev-card:hover .ev-card-img img { transform: scale(1.06); }
+
+    .ev-date-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: var(--primary); color: #fff;
+      font-family: var(--font-head); border-radius: 8px;
+      padding: 5px 10px; text-align: center; line-height: 1.1;
+      box-shadow: 0 2px 8px rgba(255,92,43,.4);
+    }
+    .ev-date-badge .day { font-size: 1.2rem; font-weight: 800; display: block; }
+    .ev-date-badge .mon { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+
+    .ev-status-badge {
+      position: absolute; top: 10px; right: 10px;
+      font-family: var(--font-body); font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .status-confirmado { background: rgba(34,197,94,.15); color: #16a34a; }
+    .status-pendente   { background: rgba(234,179,8,.15);  color: #b45309; }
+    .status-cancelado  { background: rgba(239,68,68,.15);  color: #dc2626; }
+    .status-concluido  { background: rgba(107,114,128,.15); color: var(--muted); }
+
+    .ev-card-body { padding: 14px 16px 12px; }
+    .ev-name {
+      font-family: var(--font-head); font-weight: 700; font-size: .95rem;
+      color: var(--dark); margin-bottom: 4px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .ev-meta { font-family: var(--font-body); font-size: .78rem; color: var(--muted); margin-bottom: 2px; }
+    .ev-meta i { font-size: .7rem; margin-right: 4px; color: var(--primary); }
+
+    .ev-card-footer {
+      padding: 0 16px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .btn-ev-detalhe {
+      font-family: var(--font-body); font-size: .75rem; font-weight: 700;
+      color: var(--primary); background: rgba(255,92,43,.08);
+      border: 1.5px solid rgba(255,92,43,.25); border-radius: 6px;
+      padding: 4px 12px; text-decoration: none; transition: all .2s; cursor: pointer;
+    }
+    .btn-ev-detalhe:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-ev-cancelar {
+      font-family: var(--font-body); font-size: .75rem; font-weight: 700;
+      color: #ef4444; background: rgba(239,68,68,.07);
+      border: 1.5px solid rgba(239,68,68,.2); border-radius: 6px;
+      padding: 4px 12px; cursor: pointer; transition: all .2s;
+    }
+    .btn-ev-cancelar:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+
+    /* Filtro de status */
+    .filter-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px;
+    }
+    .filter-tab {
+      font-family: var(--font-body); font-size: .8rem; font-weight: 700;
+      padding: 6px 16px; border-radius: 20px;
+      border: 1.5px solid var(--border); background: #fff;
+      color: var(--muted); cursor: pointer; transition: all .2s;
+    }
+    .filter-tab:hover { border-color: rgba(255,92,43,.4); color: var(--primary); }
+    .filter-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      background: #fff; border-radius: var(--card-radius);
+      box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    }
+    .empty-state .empty-icon {
+      font-size: 3rem; color: #e5e7eb; margin-bottom: 16px;
+    }
+    .empty-state h5 {
+      font-family: var(--font-head); font-weight: 700; font-size: 1.05rem;
+      color: var(--dark); margin-bottom: 6px;
+    }
+    .empty-state p {
+      font-family: var(--font-body); font-size: .88rem; color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .btn-explorar {
+      background: var(--primary); color: #fff;
+      font-family: var(--font-body); font-weight: 700; font-size: .88rem;
+      border: none; border-radius: 10px; padding: 10px 24px;
+      text-decoration: none; transition: background .2s; display: inline-block;
+    }
+    .btn-explorar:hover { background: var(--primary-dark); color: #fff; }
+
+    /* Stats bar */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px; margin-bottom: 28px;
+    }
+    .stat-item {
+      background: #fff; border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .stat-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; flex-shrink: 0;
+    }
+    .stat-icon.orange { background: rgba(255,92,43,.1); color: var(--primary); }
+    .stat-icon.green  { background: rgba(34,197,94,.1);  color: #16a34a; }
+    .stat-icon.yellow { background: rgba(234,179,8,.1);  color: #b45309; }
+    .stat-icon.gray   { background: rgba(107,114,128,.1);color: var(--muted); }
+    .stat-num {
+      font-family: var(--font-head); font-weight: 800; font-size: 1.5rem;
+      color: var(--dark); line-height: 1;
+    }
+    .stat-desc {
+      font-family: var(--font-body); font-size: .75rem; color: var(--muted); margin-top: 2px;
+    }
+
+    /* Modal cancelamento */
+    .modal-cancel .modal-content { border-radius: 16px; border: none; }
+    .modal-cancel .modal-header  { border: none; padding: 24px 24px 0; }
+    .modal-cancel .modal-body    { padding: 16px 24px; }
+    .modal-cancel .modal-footer  { border: none; padding: 0 24px 24px; }
+
+    /* ===== SEGURANÇA — Excluir conta ===== */
+    .danger-zone {
+      border: 1.5px solid rgba(239,68,68,.25);
+      border-radius: var(--card-radius);
+      padding: 22px; background: rgba(239,68,68,.02);
+    }
+    .danger-zone h6 {
+      font-family: var(--font-head); font-weight: 700; font-size: .9rem;
+      color: #dc2626; margin-bottom: 6px;
+    }
+    .danger-zone p {
+      font-family: var(--font-body); font-size: .83rem; color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .btn-danger-delete {
+      font-family: var(--font-body); font-weight: 700; font-size: .83rem;
+      color: #dc2626; background: transparent;
+      border: 1.5px solid rgba(239,68,68,.4); border-radius: 8px;
+      padding: 7px 18px; cursor: pointer; transition: all .2s;
+    }
+    .btn-danger-delete:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--dark); color: rgba(255,255,255,.4);
+      font-family: var(--font-body); font-size: .78rem;
+      padding: 18px 0; border-top: 3px solid var(--primary); text-align: center;
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+
+    /* Responsivo sidebar em mobile */
+    @media (max-width: 767px) {
+      .profile-name { font-size: 1.25rem; }
+      .eventos-grid { grid-template-columns: 1fr; }
+      .stats-bar    { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <i class="bi bi-calendar-event-fill me-1"></i>Evento<span>Com</span>
+    </a>
+    <button class="navbar-toggler" type="button"
+      data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Explorar</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#">Meu Perfil</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <span style="font-family:var(--font-body);font-size:.85rem;color:rgba(255,255,255,.65);">
+          <i class="bi bi-person-circle me-1" style="color:var(--accent);"></i>
+          <strong id="navNome" style="color:#fff;"></strong>
+        </span>
+        <button class="btn-logout" onclick="Auth.logout()">
+          <i class="bi bi-box-arrow-right me-1"></i>Sair
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO DO PERFIL ===== -->
+<div class="profile-hero">
+  <div class="profile-hero-inner">
+    <div class="container">
+      <div class="d-flex align-items-end gap-4 flex-wrap">
+
+        <!-- Avatar -->
+        <div class="avatar-wrap">
+          <div class="avatar-circle" id="avatarCircle" onclick="document.getElementById('avatarInput').click()">
+            <span id="avatarInitials"></span>
+            <img id="avatarImg" src="" alt=""/>
+          </div>
+          <div class="avatar-edit-btn" onclick="document.getElementById('avatarInput').click()">
+            <i class="bi bi-camera-fill"></i>
+          </div>
+          <input type="file" accept="image/*" class="avatar-input" id="avatarInput" onchange="trocarAvatar(this)"/>
+        </div>
+
+        <!-- Info -->
+        <div class="pb-1">
+          <p class="profile-name" id="profileName">—</p>
+          <p class="profile-email" id="profileEmail">—</p>
+          <span class="profile-badge">
+            <i class="bi bi-person-fill"></i> Pessoa Física
+          </span>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <ul class="nav profile-tabs mt-0" id="profileTabs">
+        <li class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabDados">
+            <i class="bi bi-person-lines-fill"></i>Meus Dados
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabEventos">
+            <i class="bi bi-ticket-perforated-fill"></i>Meus Eventos
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSenha">
+            <i class="bi bi-shield-lock-fill"></i>Segurança
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONTEÚDO ===== -->
+<div class="page-content">
+  <div class="container">
+    <div class="tab-content" id="profileTabContent">
+
+      <!-- ========== ABA: MEUS DADOS ========== -->
+      <div class="tab-pane fade show active" id="tabDados">
+        <div class="row g-4">
+          <div class="col-12 col-lg-8">
+
+            <!-- Dados Pessoais -->
+            <div class="info-card" id="cardPessoal">
+              <div class="info-card-header">
+                <p class="info-card-title"><i class="bi bi-person-vcard-fill"></i>Dados Pessoais</p>
+                <div class="edit-btns">
+                  <button class="btn-cancel-section" id="cancelPessoal" onclick="cancelarEdicao('cardPessoal','cancelPessoal','savePessoal','editPessoal')">
+                    <i class="bi bi-x-lg"></i>Cancelar
+                  </button>
+                  <button class="btn-save-section" id="savePessoal" onclick="salvarSecao('cardPessoal','cancelPessoal','savePessoal','editPessoal','pessoal')">
+                    <i class="bi bi-check-lg"></i>Salvar
+                  </button>
+                  <button class="btn-edit-section" id="editPessoal" onclick="ativarEdicao('cardPessoal','cancelPessoal','savePessoal','editPessoal')">
+                    <i class="bi bi-pencil-fill"></i>Editar
+                  </button>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <!-- Nome -->
+                <div class="field-item" id="fi-nome">
+                  <span class="field-label">Nome</span>
+                  <span class="field-value" id="fv-nome">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-person-fill fi-icon"></i>
+                    <input type="text" class="field-input" id="fi-nome-input" placeholder="Seu nome"/>
+                  </div>
+                </div>
+                <!-- Sobrenome -->
+                <div class="field-item" id="fi-sobrenome">
+                  <span class="field-label">Sobrenome</span>
+                  <span class="field-value" id="fv-sobrenome">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-person-fill fi-icon"></i>
+                    <input type="text" class="field-input" id="fi-sobrenome-input" placeholder="Seu sobrenome"/>
+                  </div>
+                </div>
+                <!-- CPF — bloqueado -->
+                <div class="field-item locked-field">
+                  <span class="field-label">CPF</span>
+                  <span class="field-value locked" id="fv-cpf">
+                    <span id="fv-cpf-val">—</span>
+                    <span class="lock-badge"><i class="bi bi-lock-fill"></i>Não editável</span>
+                  </span>
+                </div>
+                <!-- Data de Nascimento -->
+                <div class="field-item" id="fi-nascimento">
+                  <span class="field-label">Data de Nascimento</span>
+                  <span class="field-value" id="fv-nascimento">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-calendar3 fi-icon"></i>
+                    <input type="date" class="field-input" id="fi-nascimento-input"/>
+                  </div>
+                </div>
+                <!-- Telefone -->
+                <div class="field-item" id="fi-telefone">
+                  <span class="field-label">Telefone</span>
+                  <span class="field-value" id="fv-telefone">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-telephone-fill fi-icon"></i>
+                    <input type="tel" class="field-input" id="fi-telefone-input" placeholder="(00) 00000-0000" maxlength="15"
+                      oninput="maskTel(this)"/>
+                  </div>
+                </div>
+                <!-- Gênero -->
+                <div class="field-item" id="fi-genero">
+                  <span class="field-label">Gênero</span>
+                  <span class="field-value" id="fv-genero">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-gender-ambiguous fi-icon"></i>
+                    <select class="field-input" id="fi-genero-input">
+                      <option value="">Selecione</option>
+                      <option>Masculino</option>
+                      <option>Feminino</option>
+                      <option>Não-binário</option>
+                      <option>Prefiro não informar</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Localização -->
+            <div class="info-card" id="cardLocalizacao">
+              <div class="info-card-header">
+                <p class="info-card-title"><i class="bi bi-geo-alt-fill"></i>Localização</p>
+                <div class="edit-btns">
+                  <button class="btn-cancel-section" id="cancelLoc" onclick="cancelarEdicao('cardLocalizacao','cancelLoc','saveLoc','editLoc')">
+                    <i class="bi bi-x-lg"></i>Cancelar
+                  </button>
+                  <button class="btn-save-section" id="saveLoc" onclick="salvarSecao('cardLocalizacao','cancelLoc','saveLoc','editLoc','localizacao')">
+                    <i class="bi bi-check-lg"></i>Salvar
+                  </button>
+                  <button class="btn-edit-section" id="editLoc" onclick="ativarEdicao('cardLocalizacao','cancelLoc','saveLoc','editLoc')">
+                    <i class="bi bi-pencil-fill"></i>Editar
+                  </button>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-item" id="fi-cep">
+                  <span class="field-label">CEP</span>
+                  <span class="field-value" id="fv-cep">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-pin-map-fill fi-icon"></i>
+                    <input type="text" class="field-input" id="fi-cep-input" placeholder="00000-000" maxlength="9"
+                      oninput="maskCEP(this)"/>
+                  </div>
+                </div>
+                <div class="field-item" id="fi-cidade">
+                  <span class="field-label">Cidade</span>
+                  <span class="field-value" id="fv-cidade">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-buildings-fill fi-icon"></i>
+                    <input type="text" class="field-input" id="fi-cidade-input" placeholder="Cidade"/>
+                  </div>
+                </div>
+                <div class="field-item" id="fi-estado">
+                  <span class="field-label">Estado</span>
+                  <span class="field-value" id="fv-estado">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-map-fill fi-icon"></i>
+                    <select class="field-input" id="fi-estado-input">
+                      <option value="">UF</option>
+                      <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+                      <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+                      <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+                      <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+                      <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                      <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+                      <option>SP</option><option>SE</option><option>TO</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-item" id="fi-bairro">
+                  <span class="field-label">Bairro</span>
+                  <span class="field-value" id="fv-bairro">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-house-fill fi-icon"></i>
+                    <input type="text" class="field-input" id="fi-bairro-input" placeholder="Bairro"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- E-mail -->
+            <div class="info-card" id="cardEmail">
+              <div class="info-card-header">
+                <p class="info-card-title"><i class="bi bi-envelope-fill"></i>E-mail</p>
+                <div class="edit-btns">
+                  <button class="btn-cancel-section" id="cancelEmail" onclick="cancelarEdicao('cardEmail','cancelEmail','saveEmail','editEmail')">
+                    <i class="bi bi-x-lg"></i>Cancelar
+                  </button>
+                  <button class="btn-save-section" id="saveEmail" onclick="salvarSecao('cardEmail','cancelEmail','saveEmail','editEmail','email')">
+                    <i class="bi bi-check-lg"></i>Salvar
+                  </button>
+                  <button class="btn-edit-section" id="editEmail" onclick="ativarEdicao('cardEmail','cancelEmail','saveEmail','editEmail')">
+                    <i class="bi bi-pencil-fill"></i>Editar
+                  </button>
+                </div>
+              </div>
+              <div class="field-row" style="grid-template-columns:1fr;">
+                <div class="field-item" id="fi-email">
+                  <span class="field-label">Endereço de E-mail</span>
+                  <span class="field-value" id="fv-email">—</span>
+                  <div class="field-input-wrap">
+                    <i class="bi bi-envelope-fill fi-icon"></i>
+                    <input type="email" class="field-input" id="fi-email-input" placeholder="seu@email.com"/>
+                  </div>
+                </div>
+              </div>
+              <p style="font-family:var(--font-body);font-size:.75rem;color:var(--muted);margin-top:10px;">
+                <i class="bi bi-info-circle me-1"></i>
+                Ao alterar o e-mail, você receberá um link de confirmação no novo endereço.
+              </p>
+            </div>
+
+          </div><!-- /col -->
+
+          <!-- Sidebar direita -->
+          <div class="col-12 col-lg-4">
+            <div class="info-card">
+              <p class="info-card-title mb-4"><i class="bi bi-bar-chart-fill"></i>&nbsp;Resumo</p>
+              <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center justify-content-between p-3"
+                  style="background:#f9fafb;border-radius:10px;">
+                  <div class="d-flex align-items-center gap-10">
+                    <i class="bi bi-ticket-perforated-fill" style="color:var(--primary);font-size:1.1rem;margin-right:10px;"></i>
+                    <span style="font-family:var(--font-body);font-size:.85rem;color:var(--mid);">Eventos inscritos</span>
+                  </div>
+                  <strong style="font-family:var(--font-head);font-size:1.1rem;" id="totalInscritos">4</strong>
+                </div>
+                <div class="d-flex align-items-center justify-content-between p-3"
+                  style="background:#f9fafb;border-radius:10px;">
+                  <div class="d-flex align-items-center gap-10">
+                    <i class="bi bi-calendar-check-fill" style="color:#16a34a;font-size:1.1rem;margin-right:10px;"></i>
+                    <span style="font-family:var(--font-body);font-size:.85rem;color:var(--mid);">Confirmados</span>
+                  </div>
+                  <strong style="font-family:var(--font-head);font-size:1.1rem;" id="totalConfirmados">2</strong>
+                </div>
+                <div class="d-flex align-items-center justify-content-between p-3"
+                  style="background:#f9fafb;border-radius:10px;">
+                  <div class="d-flex align-items-center gap-10">
+                    <i class="bi bi-clock-history" style="color:#b45309;font-size:1.1rem;margin-right:10px;"></i>
+                    <span style="font-family:var(--font-body);font-size:.85rem;color:var(--mid);">Próximos</span>
+                  </div>
+                  <strong style="font-family:var(--font-head);font-size:1.1rem;" id="totalProximos">2</strong>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <p style="font-family:var(--font-body);font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Membro desde</p>
+                <p style="font-family:var(--font-head);font-weight:700;font-size:.95rem;color:var(--dark);" id="membroDesde">—</p>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /row -->
+      </div><!-- /tabDados -->
+
+      <!-- ========== ABA: MEUS EVENTOS ========== -->
+      <div class="tab-pane fade" id="tabEventos">
+
+        <div class="stats-bar" id="statsBar">
+          <div class="stat-item">
+            <div class="stat-icon orange"><i class="bi bi-ticket-perforated-fill"></i></div>
+            <div>
+              <p class="stat-num" id="st-total">4</p>
+              <p class="stat-desc">Total inscritos</p>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+            <div>
+              <p class="stat-num" id="st-conf">2</p>
+              <p class="stat-desc">Confirmados</p>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon yellow"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+              <p class="stat-num" id="st-pend">1</p>
+              <p class="stat-desc">Pendentes</p>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon gray"><i class="bi bi-calendar-x"></i></div>
+            <div>
+              <p class="stat-num" id="st-conc">1</p>
+              <p class="stat-desc">Concluídos</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="filtrarEventos('todos', this)">Todos (4)</button>
+          <button class="filter-tab" onclick="filtrarEventos('confirmado', this)">Confirmados (2)</button>
+          <button class="filter-tab" onclick="filtrarEventos('pendente', this)">Pendentes (1)</button>
+          <button class="filter-tab" onclick="filtrarEventos('concluido', this)">Concluídos (1)</button>
+          <button class="filter-tab" onclick="filtrarEventos('cancelado', this)">Cancelados (0)</button>
+        </div>
+
+        <!-- Grid de eventos -->
+        <div class="eventos-grid" id="eventosGrid">
+          <!-- Renderizado pelo JS -->
+        </div>
+
+        <div class="empty-state d-none" id="emptyState">
+          <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+          <h5>Nenhum evento encontrado</h5>
+          <p>Você ainda não tem inscrições nesta categoria.</p>
+          <a href="index.html" class="btn-explorar">
+            <i class="bi bi-search me-2"></i>Explorar eventos
+          </a>
+        </div>
+
+      </div><!-- /tabEventos -->
+
+      <!-- ========== ABA: SEGURANÇA ========== -->
+      <div class="tab-pane fade" id="tabSenha">
+        <div class="row g-4">
+          <div class="col-12 col-lg-7">
+
+            <!-- Alterar senha -->
+            <div class="info-card">
+              <div class="info-card-header">
+                <p class="info-card-title"><i class="bi bi-lock-fill"></i>Alterar Senha</p>
+              </div>
+
+              <div class="d-flex flex-column gap-3">
+                <div>
+                  <label class="field-label d-block mb-1">Senha Atual</label>
+                  <div class="field-input-wrap" style="display:block;">
+                    <i class="bi bi-lock-fill fi-icon"></i>
+                    <input type="password" class="field-input" id="senhaAtual" placeholder="••••••••" style="padding-right:40px;"/>
+                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaAtual','iconSA')">
+                      <i class="bi bi-eye-fill" id="iconSA"></i>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label class="field-label d-block mb-1">Nova Senha</label>
+                  <div class="field-input-wrap" style="display:block;">
+                    <i class="bi bi-lock-fill fi-icon"></i>
+                    <input type="password" class="field-input" id="senhaNova" placeholder="Mínimo 8 caracteres"
+                      style="padding-right:40px;" oninput="avaliarSenha(this)" minlength="8"/>
+                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaNova','iconSN')">
+                      <i class="bi bi-eye-fill" id="iconSN"></i>
+                    </button>
+                  </div>
+                  <div class="strength-row mt-1">
+                    <div class="s-bar" id="sb1"></div>
+                    <div class="s-bar" id="sb2"></div>
+                    <div class="s-bar" id="sb3"></div>
+                    <div class="s-bar" id="sb4"></div>
+                    <span class="s-label" id="slabel"></span>
+                  </div>
+                </div>
+                <div>
+                  <label class="field-label d-block mb-1">Confirmar Nova Senha</label>
+                  <div class="field-input-wrap" style="display:block;">
+                    <i class="bi bi-lock-fill fi-icon"></i>
+                    <input type="password" class="field-input" id="senhaConf" placeholder="Repita a nova senha"
+                      style="padding-right:40px;"/>
+                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaConf','iconSC')">
+                      <i class="bi bi-eye-fill" id="iconSC"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn-save-section" style="display:flex;" onclick="salvarSenha()">
+                  <i class="bi bi-check-lg"></i>Atualizar Senha
+                </button>
+              </div>
+            </div>
+
+            <!-- Zona de perigo -->
+            <div class="info-card">
+              <p class="info-card-title mb-4"><i class="bi bi-exclamation-triangle-fill" style="color:#ef4444;"></i>&nbsp;Zona de Perigo</p>
+              <div class="danger-zone">
+                <h6><i class="bi bi-trash3-fill me-2"></i>Excluir minha conta</h6>
+                <p>Esta ação é permanente e irreversível. Todos os seus dados e inscrições serão removidos da plataforma.</p>
+                <button class="btn-danger-delete" data-bs-toggle="modal" data-bs-target="#modalExcluir">
+                  <i class="bi bi-trash3-fill me-2"></i>Excluir minha conta
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="col-12 col-lg-5">
+            <div class="info-card">
+              <p class="info-card-title mb-4"><i class="bi bi-shield-check-fill"></i>&nbsp;Dicas de Segurança</p>
+              <div class="d-flex flex-column gap-3">
+                <div class="d-flex gap-3 align-items-start">
+                  <div style="width:34px;height:34px;background:rgba(34,197,94,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="bi bi-check2-circle" style="color:#16a34a;"></i>
+                  </div>
+                  <div>
+                    <p style="font-family:var(--font-body);font-size:.85rem;font-weight:700;color:var(--dark);margin-bottom:2px;">Use uma senha forte</p>
+                    <p style="font-family:var(--font-body);font-size:.78rem;color:var(--muted);">Combine letras maiúsculas, minúsculas, números e símbolos.</p>
+                  </div>
+                </div>
+                <div class="d-flex gap-3 align-items-start">
+                  <div style="width:34px;height:34px;background:rgba(255,92,43,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="bi bi-eye-slash-fill" style="color:var(--primary);"></i>
+                  </div>
+                  <div>
+                    <p style="font-family:var(--font-body);font-size:.85rem;font-weight:700;color:var(--dark);margin-bottom:2px;">Não compartilhe sua senha</p>
+                    <p style="font-family:var(--font-body);font-size:.78rem;color:var(--muted);">Nunca informe sua senha a terceiros, mesmo que se identifiquem como EventoCom.</p>
+                  </div>
+                </div>
+                <div class="d-flex gap-3 align-items-start">
+                  <div style="width:34px;height:34px;background:rgba(234,179,8,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="bi bi-arrow-repeat" style="color:#b45309;"></i>
+                  </div>
+                  <div>
+                    <p style="font-family:var(--font-body);font-size:.85rem;font-weight:700;color:var(--dark);margin-bottom:2px;">Troque periodicamente</p>
+                    <p style="font-family:var(--font-body);font-size:.78rem;color:var(--muted);">Recomendamos atualizar sua senha a cada 6 meses.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabSenha -->
+
+    </div><!-- /tab-content -->
+  </div>
+</div>
+
+<!-- ===== MODAL: CANCELAR INSCRIÇÃO ===== -->
+<div class="modal fade modal-cancel" id="modalCancelar" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 style="font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--dark);">
+          Cancelar inscrição?
+        </h5>
+      </div>
+      <div class="modal-body">
+        <p style="font-family:var(--font-body);font-size:.9rem;color:var(--mid);">
+          Você está prestes a cancelar sua inscrição em <strong id="modalEvNome">—</strong>.
+          Esta ação não poderá ser desfeita.
+        </p>
+      </div>
+      <div class="modal-footer gap-2">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Voltar</button>
+        <button type="button" class="btn btn-sm"
+          style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;"
+          onclick="confirmarCancelamento()">
+          <i class="bi bi-x-circle me-1"></i>Confirmar cancelamento
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: EXCLUIR CONTA ===== -->
+<div class="modal fade modal-cancel" id="modalExcluir" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 style="font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:#dc2626;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Excluir conta permanentemente
+        </h5>
+      </div>
+      <div class="modal-body">
+        <p style="font-family:var(--font-body);font-size:.9rem;color:var(--mid);margin-bottom:14px;">
+          Tem certeza? Todos os seus dados, histórico de inscrições e informações pessoais serão <strong>removidos permanentemente</strong>.
+        </p>
+        <label style="font-family:var(--font-body);font-size:.8rem;font-weight:700;color:var(--mid);display:block;margin-bottom:6px;">
+          Digite <strong style="color:#dc2626;">EXCLUIR</strong> para confirmar:
+        </label>
+        <input type="text" class="field-input" id="inputConfExcluir" placeholder="EXCLUIR"
+          style="display:block;padding-left:14px !important;"/>
+      </div>
+      <div class="modal-footer gap-2">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-sm"
+          style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;"
+          onclick="excluirConta()">
+          Excluir minha conta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-custom" id="toast">
+  <i class="bi bi-check-circle-fill"></i>
+  <span id="toastMsg">Dados salvos com sucesso!</span>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <strong style="color:rgba(255,255,255,.6);font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;·&nbsp;<a href="privacidade.html">Privacidade</a>
+    &nbsp;·&nbsp;<a href="termos.html">Termos</a>
+    <br/><small class="mt-1 d-block" style="opacity:.6;">© 2025 EventoCom.</small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="auth.js"></script>
+<script>
+
+/* =====================================================
+   DADOS SIMULADOS DO USUÁRIO
+   Futuramente substituir por fetch à API
+   ===================================================== */
+const dadosUsuario = {
+  nome:        'João',
+  sobrenome:   'Silva',
+  cpf:         '123.456.789-00',
+  nascimento:  '1995-06-15',
+  telefone:    '(31) 99887-6655',
+  genero:      'Masculino',
+  email:       'pessoa@teste.com',
+  cep:         '36880-000',
+  cidade:      'Muriaé',
+  estado:      'MG',
+  bairro:      'Centro',
+  membro:      'Março de 2025',
+};
+
+const eventosUsuario = [
+  {
+    id: 1, nome: 'Festival Verão Sonoro 2025', categoria: 'Música',
+    data: '12', mes: 'Jul', dataFull: '12 de Julho de 2025',
+    hora: '16h às 23h', local: 'Parque Municipal, São Paulo – SP',
+    status: 'confirmado',
+    img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&q=80',
+  },
+  {
+    id: 2, nome: 'Corrida Solidária 5K & 10K', categoria: 'Esportes',
+    data: '26', mes: 'Jul', dataFull: '26 de Julho de 2025',
+    hora: '07h às 12h', local: 'Aterro do Flamengo, Rio de Janeiro – RJ',
+    status: 'confirmado',
+    img: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&q=80',
+  },
+  {
+    id: 3, nome: 'Hackathon Comunidade Tech 2025', categoria: 'Tecnologia',
+    data: '09', mes: 'Ago', dataFull: '09 de Agosto de 2025',
+    hora: '08h às 22h', local: 'Hub de Inovação, Recife – PE',
+    status: 'pendente',
+    img: 'https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=600&q=80',
+  },
+  {
+    id: 4, nome: 'Sabores da Cidade – Edição Especial', categoria: 'Gastronomia',
+    data: '10', mes: 'Mar', dataFull: '10 de Março de 2025',
+    hora: '11h às 20h', local: 'Praça Central, Belo Horizonte – MG',
+    status: 'concluido',
+    img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80',
+  },
+];
+
+/* =====================================================
+   INICIALIZAÇÃO
+   ===================================================== */
+;(function init() {
+  /* Proteção: requer login como PF */
+  Auth.restore();
+  const user = Auth.getUser();
+  if (!user) { window.location.href = 'login.html'; return; }
+  /* Permite PF ou, se quiser testar, qualquer usuário */
+
+  /* Preenche navbar */
+  document.getElementById('navNome').textContent = dadosUsuario.nome + ' ' + dadosUsuario.sobrenome;
+
+  /* Hero */
+  document.getElementById('profileName').textContent  = dadosUsuario.nome + ' ' + dadosUsuario.sobrenome;
+  document.getElementById('profileEmail').textContent = dadosUsuario.email;
+  document.getElementById('avatarInitials').textContent =
+    (dadosUsuario.nome[0] + dadosUsuario.sobrenome[0]).toUpperCase();
+
+  /* Sidebar resumo */
+  document.getElementById('membroDesde').textContent = dadosUsuario.membro;
+
+  /* Campos de dados */
+  setField('fv-nome',       dadosUsuario.nome);
+  setField('fv-sobrenome',  dadosUsuario.sobrenome);
+  document.getElementById('fv-cpf-val').textContent = dadosUsuario.cpf;
+  setField('fv-nascimento', formatarData(dadosUsuario.nascimento));
+  setField('fv-telefone',   dadosUsuario.telefone);
+  setField('fv-genero',     dadosUsuario.genero);
+  setField('fv-email',      dadosUsuario.email);
+  setField('fv-cep',        dadosUsuario.cep);
+  setField('fv-cidade',     dadosUsuario.cidade);
+  setField('fv-estado',     dadosUsuario.estado);
+  setField('fv-bairro',     dadosUsuario.bairro);
+
+  /* Inputs de edição — preencher com valores atuais */
+  val('fi-nome-input',       dadosUsuario.nome);
+  val('fi-sobrenome-input',  dadosUsuario.sobrenome);
+  val('fi-nascimento-input', dadosUsuario.nascimento);
+  val('fi-telefone-input',   dadosUsuario.telefone);
+  selOpt('fi-genero-input',  dadosUsuario.genero);
+  val('fi-email-input',      dadosUsuario.email);
+  val('fi-cep-input',        dadosUsuario.cep);
+  val('fi-cidade-input',     dadosUsuario.cidade);
+  selOpt('fi-estado-input',  dadosUsuario.estado);
+  val('fi-bairro-input',     dadosUsuario.bairro);
+
+  /* Renderiza eventos */
+  renderEventos(eventosUsuario);
+})();
+
+function setField(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val || '—';
+}
+function val(id, v)    { const el = document.getElementById(id); if (el) el.value = v || ''; }
+function selOpt(id, v) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  for (const opt of sel.options) { if (opt.value === v || opt.text === v) { sel.value = opt.value; break; } }
+}
+function formatarData(iso) {
+  if (!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return `${d} de ${meses[parseInt(m)-1]} de ${y}`;
+}
+
+/* =====================================================
+   MODO EDIÇÃO
+   ===================================================== */
+function ativarEdicao(cardId, cancelId, saveId, editId) {
+  document.getElementById(cardId).classList.add('editing');
+  document.getElementById(cancelId).style.display = 'flex';
+  document.getElementById(saveId).style.display   = 'flex';
+  document.getElementById(editId).style.display   = 'none';
+}
+
+function cancelarEdicao(cardId, cancelId, saveId, editId) {
+  document.getElementById(cardId).classList.remove('editing');
+  document.getElementById(cancelId).style.display = 'none';
+  document.getElementById(saveId).style.display   = 'none';
+  document.getElementById(editId).style.display   = 'flex';
+}
+
+function salvarSecao(cardId, cancelId, saveId, editId, secao) {
+  /* Lê os valores dos inputs e atualiza os displays */
+  if (secao === 'pessoal') {
+    const nome      = document.getElementById('fi-nome-input').value.trim();
+    const sobrenome = document.getElementById('fi-sobrenome-input').value.trim();
+    const nasc      = document.getElementById('fi-nascimento-input').value;
+    const tel       = document.getElementById('fi-telefone-input').value.trim();
+    const gen       = document.getElementById('fi-genero-input').value;
+
+    setField('fv-nome',       nome      || '—');
+    setField('fv-sobrenome',  sobrenome || '—');
+    setField('fv-nascimento', nasc ? formatarData(nasc) : '—');
+    setField('fv-telefone',   tel  || '—');
+    setField('fv-genero',     gen  || '—');
+
+    /* Atualiza nome no hero */
+    document.getElementById('profileName').textContent = (nome + ' ' + sobrenome).trim();
+    document.getElementById('navNome').textContent     = (nome + ' ' + sobrenome).trim();
+    if (nome && sobrenome)
+      document.getElementById('avatarInitials').textContent = (nome[0]+sobrenome[0]).toUpperCase();
+  }
+
+  if (secao === 'localizacao') {
+    setField('fv-cep',    document.getElementById('fi-cep-input').value    || '—');
+    setField('fv-cidade', document.getElementById('fi-cidade-input').value || '—');
+    setField('fv-estado', document.getElementById('fi-estado-input').value || '—');
+    setField('fv-bairro', document.getElementById('fi-bairro-input').value || '—');
+  }
+
+  if (secao === 'email') {
+    const email = document.getElementById('fi-email-input').value.trim();
+    setField('fv-email', email || '—');
+    document.getElementById('profileEmail').textContent = email || '—';
+  }
+
+  cancelarEdicao(cardId, cancelId, saveId, editId);
+  showToast('Dados salvos com sucesso!');
+}
+
+/* =====================================================
+   AVATAR
+   ===================================================== */
+function trocarAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('avatarImg');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById('avatarInitials').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* =====================================================
+   EVENTOS
+   ===================================================== */
+const statusLabels = {
+  confirmado: 'Confirmado',
+  pendente:   'Pendente',
+  cancelado:  'Cancelado',
+  concluido:  'Concluído',
+};
+const statusClasses = {
+  confirmado: 'status-confirmado',
+  pendente:   'status-pendente',
+  cancelado:  'status-cancelado',
+  concluido:  'status-concluido',
+};
+
+let cancelTarget = null;
+
+function renderEventos(lista) {
+  const grid  = document.getElementById('eventosGrid');
+  const empty = document.getElementById('emptyState');
+
+  if (!lista.length) {
+    grid.innerHTML = '';
+    empty.classList.remove('d-none');
+    return;
+  }
+  empty.classList.add('d-none');
+
+  grid.innerHTML = lista.map(ev => `
+    <div class="ev-card" data-status="${ev.status}" data-id="${ev.id}">
+      <div class="ev-card-img">
+        <img src="${ev.img}" alt="${ev.nome}" loading="lazy"/>
+        <div class="ev-date-badge">
+          <span class="day">${ev.data}</span>
+          <span class="mon">${ev.mes}</span>
+        </div>
+        <span class="ev-status-badge ${statusClasses[ev.status]}">${statusLabels[ev.status]}</span>
+      </div>
+      <div class="ev-card-body">
+        <h6 class="ev-name">${ev.nome}</h6>
+        <p class="ev-meta"><i class="bi bi-calendar3"></i>${ev.dataFull}</p>
+        <p class="ev-meta"><i class="bi bi-clock-fill"></i>${ev.hora}</p>
+        <p class="ev-meta"><i class="bi bi-geo-alt-fill"></i>${ev.local}</p>
+      </div>
+      <div class="ev-card-footer">
+        <span class="btn-ev-detalhe">
+          <i class="bi bi-eye me-1"></i>Detalhes
+        </span>
+        ${ev.status === 'confirmado' || ev.status === 'pendente' ? `
+        <button class="btn-ev-cancelar" onclick="pedirCancelamento(${ev.id}, '${ev.nome.replace(/'/g,"\\'")}')">
+          Cancelar
+        </button>` : `<span></span>`}
+      </div>
+    </div>`).join('');
+}
+
+function filtrarEventos(status, btn) {
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const todos = eventosUsuario;
+  const filtrados = status === 'todos' ? todos : todos.filter(e => e.status === status);
+  renderEventos(filtrados);
+}
+
+function pedirCancelamento(id, nome) {
+  cancelTarget = id;
+  document.getElementById('modalEvNome').textContent = nome;
+  new bootstrap.Modal(document.getElementById('modalCancelar')).show();
+}
+
+function confirmarCancelamento() {
+  if (!cancelTarget) return;
+  const ev = eventosUsuario.find(e => e.id === cancelTarget);
+  if (ev) ev.status = 'cancelado';
+  bootstrap.Modal.getInstance(document.getElementById('modalCancelar'))?.hide();
+  renderEventos(eventosUsuario);
+  cancelTarget = null;
+  showToast('Inscrição cancelada.');
+  atualizarStats();
+}
+
+function atualizarStats() {
+  const conf = eventosUsuario.filter(e=>e.status==='confirmado').length;
+  const pend = eventosUsuario.filter(e=>e.status==='pendente').length;
+  const conc = eventosUsuario.filter(e=>e.status==='concluido').length;
+  const tot  = eventosUsuario.length;
+  document.getElementById('st-total').textContent = tot;
+  document.getElementById('st-conf').textContent  = conf;
+  document.getElementById('st-pend').textContent  = pend;
+  document.getElementById('st-conc').textContent  = conc;
+  document.getElementById('totalInscritos').textContent   = tot;
+  document.getElementById('totalConfirmados').textContent = conf;
+  document.getElementById('totalProximos').textContent    = pend;
+}
+
+/* =====================================================
+   SENHA
+   ===================================================== */
+function togglePass(inputId, iconId) {
+  const inp  = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+  const vis  = inp.type === 'text';
+  inp.type   = vis ? 'password' : 'text';
+  icon.className = vis ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill';
+}
+
+function avaliarSenha(inp) {
+  const v = inp.value;
+  let pts = 0;
+  if (v.length >= 8)           pts++;
+  if (/[A-Z]/.test(v))         pts++;
+  if (/[0-9]/.test(v))         pts++;
+  if (/[^a-zA-Z0-9]/.test(v))  pts++;
+  const cores  = ['#ef4444','#f97316','#eab308','#22c55e'];
+  const labels = ['Fraca','Regular','Boa','Forte'];
+  for (let i=1;i<=4;i++) {
+    document.getElementById(`sb${i}`).style.background = i<=pts ? cores[pts-1] : '#e5e7eb';
+  }
+  const lbl = document.getElementById('slabel');
+  lbl.textContent = pts>0 ? labels[pts-1] : '';
+  lbl.style.color = pts>0 ? cores[pts-1] : 'var(--muted)';
+}
+
+function salvarSenha() {
+  const atual = document.getElementById('senhaAtual').value;
+  const nova  = document.getElementById('senhaNova').value;
+  const conf  = document.getElementById('senhaConf').value;
+
+  if (!atual || !nova || !conf) { showToast('Preencha todos os campos.', true); return; }
+  if (nova.length < 8)          { showToast('A nova senha deve ter no mínimo 8 caracteres.', true); return; }
+  if (nova !== conf)             { showToast('As senhas não coincidem.', true); return; }
+
+  document.getElementById('senhaAtual').value = '';
+  document.getElementById('senhaNova').value  = '';
+  document.getElementById('senhaConf').value  = '';
+  showToast('Senha atualizada com sucesso!');
+}
+
+/* =====================================================
+   EXCLUIR CONTA
+   ===================================================== */
+function excluirConta() {
+  const inp = document.getElementById('inputConfExcluir').value.trim();
+  if (inp !== 'EXCLUIR') { showToast('Digite EXCLUIR para confirmar.', true); return; }
+  Auth.logout();
+}
+
+/* =====================================================
+   MÁSCARAS
+   ===================================================== */
+function maskTel(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if (v.length<=10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  else              v = v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+  el.value = v;
+}
+function maskCEP(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,8);
+  el.value = v.replace(/(\d{5})(\d{1,3})/,'$1-$2');
+}
+
+/* =====================================================
+   TOAST
+   ===================================================== */
+let toastTimer;
+function showToast(msg, erro=false) {
+  const t = document.getElementById('toast');
+  const i = t.querySelector('i');
+  document.getElementById('toastMsg').textContent = msg;
+  t.style.borderLeftColor = erro ? '#ef4444' : '#22c55e';
+  i.className = erro ? 'bi bi-x-circle-fill' : 'bi bi-check-circle-fill';
+  i.style.color = erro ? '#ef4444' : '#22c55e';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>
