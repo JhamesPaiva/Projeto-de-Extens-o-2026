@@ -34,10 +34,18 @@ function updateNavbarAuthState() {
     return;
   }
 
+  const userTipo = String(user.tipo || '').trim().toLowerCase();
+
   const firstName = String(user.nome || user.email || 'Usuário').split(' ')[0];
-  const areaLink = user.tipo === 'pj'
+  const areaLink = userTipo === 'pj'
     ? '../areausuarioinstituição/areausuarioinst.html'
     : '../areausuariofisico/areausuario.html';
+
+  const createEventButton = userTipo === 'pj'
+    ? `<a href="../criarevento.html/evento.html" class="btn btn-nav-create">
+      <i class="bi bi-plus-circle me-1"></i>Crie seu Evento
+    </a>`
+    : '';
 
   navActions.innerHTML = `
     <span class="me-2 d-flex align-items-center text-white">Olá, ${escapeHtml(firstName)}!</span>
@@ -47,9 +55,7 @@ function updateNavbarAuthState() {
     <button type="button" class="btn btn-nav-login" onclick="Auth.logout()">
       <i class="bi bi-box-arrow-right me-1"></i>Sair
     </button>
-    <a href="../criarevento.html/evento.html" class="btn btn-nav-create">
-      <i class="bi bi-plus-circle me-1"></i>Crie seu Evento
-    </a>
+    ${createEventButton}
   `;
 }
 

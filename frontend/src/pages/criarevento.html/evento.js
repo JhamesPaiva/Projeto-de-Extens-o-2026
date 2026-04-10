@@ -234,6 +234,9 @@
       return;
     }
 
+    const previewSrc = document.getElementById('previewImg')?.src || '';
+    const imagemUrl = previewSrc.startsWith('data:') ? '' : previewSrc;
+
     const payload = {
       nome: document.getElementById('ev-nome')?.value.trim(),
       categoria: document.getElementById('ev-categoria')?.value,
@@ -247,7 +250,7 @@
       cidade: document.getElementById('ev-cidade')?.value.trim(),
       estado: document.getElementById('ev-estado')?.value,
       idade: document.getElementById('ev-idade')?.value,
-      imagem_url: document.getElementById('previewImg')?.src || '',
+      imagem_url: imagemUrl,
     };
 
     if (!payload.nome || !payload.data_inicio) {
@@ -263,6 +266,14 @@
       const modal = new bootstrap.Modal(document.getElementById('modalSucesso'));
       modal.show();
     } catch (error) {
-      alert(error.payload?.message || 'Não foi possível publicar o evento. Tente novamente.');
+      const msg = error?.payload?.message || error?.payload?.msg || error?.message || 'Não foi possível publicar o evento. Tente novamente.';
+
+      if (/subject must be a string|token inválido|token invalid|expired|jwt/i.test(String(msg).toLowerCase())) {
+        alert('Sua sessão expirou ou está inválida. Faça login novamente para publicar o evento.');
+        Auth.logout();
+        return;
+      }
+
+      alert(msg);
     }
   }
