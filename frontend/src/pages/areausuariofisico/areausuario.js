@@ -1,22 +1,3 @@
-/* =====================================================
-   DADOS SIMULADOS DO USUÁRIO
-   Futuramente substituir por fetch à API
-   ===================================================== */
-const dadosUsuario = {
-  nome:        'João',
-  sobrenome:   'Silva',
-  cpf:         '123.456.789-00',
-  nascimento:  '1995-06-15',
-  telefone:    '(31) 99887-6655',
-  genero:      'Masculino',
-  email:       'pessoa@teste.com',
-  cep:         '36880-000',
-  cidade:      'Muriaé',
-  estado:      'MG',
-  bairro:      'Centro',
-  membro:      'Março de 2025',
-};
-
 const eventosUsuario = [
   {
     id: 1, nome: 'Festival Verão Sonoro 2025', categoria: 'Música',
@@ -51,49 +32,51 @@ const eventosUsuario = [
 /* =====================================================
    INICIALIZAÇÃO
    ===================================================== */
-;(function init() {
-  /* Proteção: requer login como PF */
-  Auth.restore();
-  const user = Auth.getUser();
-  if (!user) { window.location.href = 'login.html'; return; }
-  /* Permite PF ou, se quiser testar, qualquer usuário */
+;(async function init() {
+  if (!Auth.requireAuth()) return;
+  const user = Auth.getUser() || {};
+  const nome = user.nome || 'Usuário';
+  const [primeiroNome, ...rest] = nome.split(' ');
+  const sobrenome = rest.join(' ') || '—';
+  const membroDesde = user.criado_em ? formatarData(user.criado_em) : '—';
 
   /* Preenche navbar */
-  document.getElementById('navNome').textContent = dadosUsuario.nome + ' ' + dadosUsuario.sobrenome;
+  document.getElementById('navNome').textContent = nome;
 
   /* Hero */
-  document.getElementById('profileName').textContent  = dadosUsuario.nome + ' ' + dadosUsuario.sobrenome;
-  document.getElementById('profileEmail').textContent = dadosUsuario.email;
+  document.getElementById('profileName').textContent  = nome;
+  document.getElementById('profileEmail').textContent = user.email || '—';
   document.getElementById('avatarInitials').textContent =
-    (dadosUsuario.nome[0] + dadosUsuario.sobrenome[0]).toUpperCase();
+    `${(primeiroNome[0] || '').toUpperCase()}${(sobrenome[0] || '').toUpperCase()}`;
 
   /* Sidebar resumo */
-  document.getElementById('membroDesde').textContent = dadosUsuario.membro;
+  document.getElementById('membroDesde').textContent = membroDesde;
 
   /* Campos de dados */
-  setField('fv-nome',       dadosUsuario.nome);
-  setField('fv-sobrenome',  dadosUsuario.sobrenome);
-  document.getElementById('fv-cpf-val').textContent = dadosUsuario.cpf;
-  setField('fv-nascimento', formatarData(dadosUsuario.nascimento));
-  setField('fv-telefone',   dadosUsuario.telefone);
-  setField('fv-genero',     dadosUsuario.genero);
-  setField('fv-email',      dadosUsuario.email);
-  setField('fv-cep',        dadosUsuario.cep);
-  setField('fv-cidade',     dadosUsuario.cidade);
-  setField('fv-estado',     dadosUsuario.estado);
-  setField('fv-bairro',     dadosUsuario.bairro);
+  setField('fv-nome',       nome);
+  setField('fv-sobrenome',  sobrenome);
+  document.getElementById('fv-cpf-val').textContent = user.cpf || '—';
+  setField('fv-nascimento', '—');
+  setField('fv-telefone',   user.telefone || '—');
+  setField('fv-genero',     'Não informado');
+  setField('fv-email',      user.email || '—');
+  setField('fv-cep',        user.cep || '—');
+  setField('fv-cidade',     user.cidade || '—');
+  setField('fv-estado',     user.estado || '—');
+  setField('fv-bairro',     '—');
 
   /* Inputs de edição — preencher com valores atuais */
-  val('fi-nome-input',       dadosUsuario.nome);
-  val('fi-sobrenome-input',  dadosUsuario.sobrenome);
-  val('fi-nascimento-input', dadosUsuario.nascimento);
-  val('fi-telefone-input',   dadosUsuario.telefone);
-  selOpt('fi-genero-input',  dadosUsuario.genero);
-  val('fi-email-input',      dadosUsuario.email);
-  val('fi-cep-input',        dadosUsuario.cep);
-  val('fi-cidade-input',     dadosUsuario.cidade);
-  selOpt('fi-estado-input',  dadosUsuario.estado);
-  val('fi-bairro-input',     dadosUsuario.bairro);
+  val('fi-nome-input',       nome);
+  val('fi-sobrenome-input',  sobrenome !== '—' ? sobrenome : '');
+  document.getElementById('fv-cpf-val').textContent = user.cpf || '—';
+  val('fi-nascimento-input', '');
+  val('fi-telefone-input',   user.telefone || '');
+  selOpt('fi-genero-input',  '');
+  val('fi-email-input',      user.email || '');
+  val('fi-cep-input',        user.cep || '');
+  val('fi-cidade-input',     user.cidade || '');
+  selOpt('fi-estado-input',  user.estado || '');
+  val('fi-bairro-input',     '');
 
   /* Renderiza eventos */
   renderEventos(eventosUsuario);
