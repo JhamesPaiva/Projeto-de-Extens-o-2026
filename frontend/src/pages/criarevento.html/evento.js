@@ -227,11 +227,42 @@
   }
 
   /* === Publicar === */
-  function publicarEvento() {
+  async function publicarEvento() {
+    if (!Auth.requireInstituicao()) return;
     if (!document.getElementById('chkPublicar').checked) {
       alert('Por favor, confirme os Termos para Organizadores antes de publicar.');
       return;
     }
-    const modal = new bootstrap.Modal(document.getElementById('modalSucesso'));
-    modal.show();
+
+    const payload = {
+      nome: document.getElementById('ev-nome')?.value.trim(),
+      categoria: document.getElementById('ev-categoria')?.value,
+      idade: document.getElementById('ev-idade')?.value,
+      descricao: document.getElementById('ev-desc-completa')?.value.trim(),
+      data_inicio: document.getElementById('ev-data-ini')?.value,
+      hora_inicio: document.getElementById('ev-hora-ini')?.value,
+      hora_fim: document.getElementById('ev-hora-fim')?.value,
+      formato: document.getElementById('ev-formato')?.value,
+      local_nome: document.getElementById('ev-local-nome')?.value.trim(),
+      cidade: document.getElementById('ev-cidade')?.value.trim(),
+      estado: document.getElementById('ev-estado')?.value,
+      idade: document.getElementById('ev-idade')?.value,
+      imagem_url: document.getElementById('previewImg')?.src || '',
+    };
+
+    if (!payload.nome || !payload.data_inicio) {
+      alert('Nome do evento e data são obrigatórios.');
+      return;
+    }
+
+    try {
+      await apiFetch('/events', {
+        method: 'POST',
+        body: payload,
+      });
+      const modal = new bootstrap.Modal(document.getElementById('modalSucesso'));
+      modal.show();
+    } catch (error) {
+      alert(error.payload?.message || 'Não foi possível publicar o evento. Tente novamente.');
+    }
   }

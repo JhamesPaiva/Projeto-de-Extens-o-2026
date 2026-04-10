@@ -576,13 +576,13 @@
 
       <!-- Ações -->
       <div class="d-flex flex-column flex-lg-row gap-2 mt-2 mt-lg-0">
-        <a href="/frontend/src/pages/login/login.html" class="btn btn-nav-login">
+        <a href="../login/login.html" class="btn btn-nav-login">
           <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
         </a>
-        <a href="/frontend/src/pages/cadastro/cadastro.html" class="btn btn-nav-register">
+        <a href="../cadastro/cadastro.html" class="btn btn-nav-register">
           <i class="bi bi-person-plus me-1"></i>Cadastrar
         </a>
-        <a href="/frontend/src/pages/criarevento.html/evento.html" class="btn btn-nav-create">
+        <a href="../criarevento.html/evento.html" class="btn btn-nav-create">
           <i class="bi bi-plus-circle me-1"></i>Crie seu Evento
         </a>
       </div>
@@ -764,12 +764,10 @@
         <h2 class="section-title">Eventos em <span>Destaque</span></h2>
         <p class="section-sub">Confira os próximos eventos da sua região</p>
       </div>
-      <small class="text-muted mb-3 mb-sm-0">24 eventos encontrados</small>
+      <small id="eventCount" class="text-muted mb-3 mb-sm-0">24 eventos encontrados</small>
     </div>
 
-    <div class="row g-4">
-
-      <!-- CARD 1 -->
+    <div class="row g-4" id="eventsGrid">
       <div class="col-12 col-sm-6 col-lg-4">
         <div class="event-card card">
           <div class="card-img-wrap">
@@ -1060,6 +1058,9 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../services/api.js"></script>
+<script src="../../auth.js"></script>
+<script src="home.js"></script>
 
 <script>
   let modalInstance = null;
