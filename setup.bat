@@ -1,4 +1,6 @@
 @echo off
+chcp 65001 >nul
+setlocal enabledelayedexpansion
 REM EventoCom - Quick Setup Script for Windows
 REM Este script configura rapidamente o ambiente para rodar o projeto
 
@@ -29,10 +31,30 @@ echo ✅ Python OK
 
 REM Verificar MySQL
 echo Verificando MySQL...
-mysql --version >nul 2>&1
+set "MYSQL_CMD=mysql"
+where mysql >nul 2>&1
+if errorlevel 1 (
+    REM Tentar localizar automaticamente em instalacoes comuns
+    for /d %%D in ("C:\Program Files\MySQL\*") do (
+        if exist "%%D\bin\mysql.exe" (
+            set "MYSQL_CMD=%%D\bin\mysql.exe"
+            goto mysql_found
+        )
+    )
+    for /d %%D in ("C:\Program Files (x86)\MySQL\*") do (
+        if exist "%%D\bin\mysql.exe" (
+            set "MYSQL_CMD=%%D\bin\mysql.exe"
+            goto mysql_found
+        )
+    )
+)
+
+:mysql_found
+"!MYSQL_CMD!" --version >nul 2>&1
 if errorlevel 1 (
     echo ❌ MySQL não encontrado!
     echo    Instale em: https://dev.mysql.com/downloads/mysql/
+    echo    Ou execute find-mysql.bat para localizar e configurar o PATH.
     pause
     exit /b 1
 )
@@ -43,13 +65,11 @@ echo 📋 Configurando Banco de Dados...
 echo    Criando database 'eventocom'...
 
 REM Definir caminho do MySQL
-set "MYSQL_PATH=C:\Program Files\MySQL\MySQL Server 9.6\bin"
-
 REM Limpar banco anterior (opcional)
-"%MYSQL_PATH%\mysql.exe" -u root -p12345678 -e "DROP DATABASE IF EXISTS eventocom;" 2>nul
+"!MYSQL_CMD!" -u root -p12345678 -e "DROP DATABASE IF EXISTS eventocom;" 2>nul
 
 REM Criar banco
-"%MYSQL_PATH%\mysql.exe" -u root -p12345678 -e "CREATE DATABASE IF NOT EXISTS eventocom CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+"!MYSQL_CMD!" -u root -p12345678 -e "CREATE DATABASE IF NOT EXISTS eventocom CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 if errorlevel 1 (
     echo ❌ Erro ao criar banco!
     echo    Verifique se MySQL está rodando com credenciais root/sem-senha
@@ -60,7 +80,7 @@ echo ✅ Banco criado
 
 REM Importar schema
 echo    Importando schema...
-"%MYSQL_PATH%\mysql.exe" -u root -p12345678 eventocom < database\squema.sql
+"!MYSQL_CMD!" -u root -p12345678 eventocom < database\squema.sql
 if errorlevel 1 (
     echo ❌ Erro ao importar schema!
     pause
@@ -71,7 +91,22 @@ echo ✅ Schema importado
 echo.
 echo 📦 Instalando Dependências Python...
 cd backend
-pip install -q -r requirements.txt --disable-pip-version-check
+python -m pip --version >nul 2>&1
+if errorlevel 1 (
+    echo    pip não encontrado. Tentando habilitar com ensurepip...
+    python -m ensurepip --upgrade >nul 2>&1
+)
+
+python -m pip --version >nul 2>&1
+if errorlevel 1 (
+    echo ❌ pip não está disponível neste Python!
+    echo    Reinstale o Python marcando a opção "pip" no instalador.
+    cd ..
+    pause
+    exit /b 1
+)
+
+python -m pip install -q -r requirements.txt --disable-pip-version-check
 if errorlevel 1 (
     echo ❌ Erro ao instalar dependências!
     cd ..

@@ -1,7 +1,25 @@
 window.API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000/api';
 
+function parseJwtPayload(token) {
+  try {
+    const part = token.split('.')[1];
+    if (!part) return null;
+    const normalized = part.replace(/-/g, '+').replace(/_/g, '/');
+    const decoded = atob(normalized + '='.repeat((4 - normalized.length % 4) % 4));
+    return JSON.parse(decoded);
+  } catch (_) {
+    return null;
+  }
+}
+
 window.Auth = {
   LOGIN_PAGE: '../login/login.html',
+  HOME_PAGE: '../home/home.html',
+
+  clearSession() {
+    localStorage.removeItem('eventocom_token');
+    localStorage.removeItem('eventocom_user');
+  },
 
   setSession(user, token) {
     localStorage.setItem('eventocom_token', token);
@@ -18,13 +36,30 @@ window.Auth = {
   },
 
   logout() {
-    localStorage.removeItem('eventocom_token');
-    localStorage.removeItem('eventocom_user');
-    window.location.href = this.LOGIN_PAGE;
+    this.clearSession();
+    window.location.href = this.HOME_PAGE;
   },
 
   restore() {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) return false;
+
+    const payload = parseJwtPayload(token);
+    if (!payload) {
+      this.clearSession();
+      return false;
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const expired = typeof payload.exp === 'number' && payload.exp < now;
+    const invalidSubject = typeof payload.sub !== 'string';
+
+    if (expired || invalidSubject) {
+      this.clearSession();
+      return false;
+    }
+
+    return true;
   },
 
   requireAuth() {
@@ -36,8 +71,14 @@ window.Auth = {
   },
 
   requireInstituicao() {
+    if (!this.restore()) {
+      window.location.href = this.LOGIN_PAGE;
+      return false;
+    }
+
     const user = this.getUser();
-    if (!user || user.tipo !== 'pj') {
+    const tipo = String(user?.tipo || '').toLowerCase();
+    if (!user || tipo !== 'pj') {
       window.location.href = this.LOGIN_PAGE;
       return false;
     }

@@ -1,4 +1,5 @@
 ﻿from flask import Flask, request, jsonify
+import mysql.connector
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
@@ -17,6 +18,14 @@ app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 jwt = JWTManager(app)
+
+
+def get_current_user_id():
+    identity = get_jwt_identity()
+    try:
+        return int(identity)
+    except (TypeError, ValueError):
+        return None
 
 @app.route('/api/ping', methods=['GET'])
 def ping():
@@ -67,7 +76,7 @@ def login():
     if not user.check_password(senha):
         return jsonify({'message': 'E-mail ou senha incorretos.'}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
     return jsonify({
         'access_token': access_token,
         'user': user.to_public_dict(),
@@ -76,7 +85,9 @@ def login():
 @app.route('/api/profile', methods=['GET'])
 @jwt_required()
 def profile():
-    user_id = get_jwt_identity()
+    user_id = get_current_user_id()
+    if user_id is None:
+        return jsonify({'message': 'Token inválido.'}), 401
     user = get_user_by_id(user_id)
     if user is None:
         return jsonify({'message': 'Usuário não encontrado.'}), 404
@@ -85,7 +96,9 @@ def profile():
 @app.route('/api/profile', methods=['PUT'])
 @jwt_required()
 def profile_update():
-    user_id = get_jwt_identity()
+    user_id = get_current_user_id()
+    if user_id is None:
+        return jsonify({'message': 'Token inválido.'}), 401
     data = request.json or {}
     user = get_user_by_id(user_id)
     if user is None:
@@ -127,7 +140,9 @@ def event_detail(event_id):
 @app.route('/api/events', methods=['POST'])
 @jwt_required()
 def create_event_route():
-    user_id = get_jwt_identity()
+    user_id = get_current_user_id()
+    if user_id is None:
+        return jsonify({'message': 'Token inválido.'}), 401
     data = request.json or {}
 
     nome = (data.get('nome') or '').strip()
@@ -136,31 +151,51 @@ def create_event_route():
     data_inicio = data.get('data_inicio')
     hora_inicio = data.get('hora_inicio')
     hora_fim = data.get('hora_fim')
-    formato = (data.get('formato') or 'presencial').strip().lower()
+    formato_raw = (data.get('formato') or 'presencial').strip().lower()
+    formato_map = {
+        'presencial': 'presencial',
+        'online': 'online',
+        'hibrido': 'híbrido',
+        'híbrido': 'híbrido',
+    }
+    formato = formato_map.get(formato_raw)
     local_nome = data.get('local_nome')
     cidade = data.get('cidade')
     estado = data.get('estado')
     idade = data.get('idade')
     imagem_url = data.get('imagem_url')
 
+    if isinstance(imagem_url, str):
+        imagem_url = imagem_url.strip()
+        if imagem_url.startswith('data:'):
+            imagem_url = None
+        elif len(imagem_url) > 255:
+            return jsonify({'message': 'URL da imagem muito longa. Use um link público de imagem.'}), 400
+
     if not nome or not data_inicio:
         return jsonify({'message': 'Nome do evento e data de início são obrigatórios.'}), 400
 
-    event_id = create_event(
-        organizador_id=user_id,
-        nome=nome,
-        descricao=descricao,
-        categoria=categoria,
-        data_inicio=data_inicio,
-        hora_inicio=hora_inicio,
-        hora_fim=hora_fim,
-        formato=formato,
-        local_nome=local_nome,
-        cidade=cidade,
-        estado=estado,
-        idade=idade,
-        imagem_url=imagem_url,
-    )
+    if formato is None:
+        return jsonify({'message': 'Formato do evento inválido.'}), 400
+
+    try:
+        event_id = create_event(
+            organizador_id=user_id,
+            nome=nome,
+            descricao=descricao,
+            categoria=categoria,
+            data_inicio=data_inicio,
+            hora_inicio=hora_inicio,
+            hora_fim=hora_fim,
+            formato=formato,
+            local_nome=local_nome,
+            cidade=cidade,
+            estado=estado,
+            idade=idade,
+            imagem_url=imagem_url,
+        )
+    except mysql.connector.Error:
+        return jsonify({'message': 'Não foi possível salvar o evento com os dados informados.'}), 400
 
     return jsonify({'message': 'Evento criado com sucesso.', 'event_id': event_id}), 201
 
