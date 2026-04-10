@@ -9,7 +9,7 @@
     iconeSenha.className = visivel ? 'bi bi-eye-fill' : 'bi bi-eye-slash-fill';
   });
 
-  /* === Validação + simulação de submit === */
+  /* === Validação + submit real === */
   const form      = document.getElementById('formLogin');
   const btnEntrar = document.getElementById('btnEntrar');
   const alertaEl  = document.getElementById('alertaErro');
@@ -24,22 +24,23 @@
       return;
     }
 
-    // Estado de carregando
+    const email = document.getElementById('inputEmail').value.trim().toLowerCase();
+    const senha = inputSenha.value;
+
     btnEntrar.disabled = true;
     btnEntrar.innerHTML = `
       <span class="spinner-border spinner-border-sm" role="status"></span>
       Entrando...
     `;
 
-    // Simulação de requisição (substituir pelo fetch real futuramente)
-    await new Promise(r => setTimeout(r, 1400));
-
-    // Exemplo: redireciona para home após login bem-sucedido
-    // window.location.href = 'index.html';
-
-    // Simulação de erro para demonstração
-    btnEntrar.disabled = false;
-    btnEntrar.innerHTML = `<i class="bi bi-box-arrow-in-right"></i> Entrar`;
-    alertaEl.classList.remove('d-none');
-    msgErroEl.textContent = 'E-mail ou senha incorretos. Verifique seus dados e tente novamente.';
+    try {
+      const result = await Auth.login(email, senha);
+      Auth.setSession(result.user, result.access_token);
+      window.location.href = '../home/home.html';
+    } catch (error) {
+      btnEntrar.disabled = false;
+      btnEntrar.innerHTML = `<i class="bi bi-box-arrow-in-right"></i> Entrar`;
+      alertaEl.classList.remove('d-none');
+      msgErroEl.textContent = error.payload?.message || 'E-mail ou senha incorretos. Verifique seus dados e tente novamente.';
+    }
   });

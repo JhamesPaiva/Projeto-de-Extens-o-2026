@@ -1,27 +1,4 @@
-/* =====================================================
-   DADOS SIMULADOS
-   ===================================================== */
-const dadosInst = {
-  razaoSocial: 'Instituto Cultural BH LTDA',
-  fantasia:    'Instituto Cultural BH',
-  cnpj:        '12.345.678/0001-99',
-  tipo:        'ONG / Associação',
-  area:        'Cultura & Arte',
-  site:        'https://institutocultural.com.br',
-  desc:        'Organização dedicada à promoção da cultura, arte e eventos comunitários em Belo Horizonte e região. Realizamos eventos educativos, shows, feiras e muito mais.',
-  respNome:    'Carlos Mendes',
-  respCpf:     '987.654.321-00',
-  respCargo:   'Diretor Executivo',
-  respTel:     '(31) 98765-4321',
-  cep:         '30112-000',
-  logradouro:  'Av. Afonso Pena',
-  numero:      '1500',
-  cidade:      'Belo Horizonte',
-  estado:      'MG',
-  email:       'instituicao@teste.com',
-};
-
-let eventosInst = [
+const eventosInst = [
   {
     id: 1, nome: 'Festival Verão Sonoro 2025', categoria: 'Música', status: 'publicado',
     data: '2025-07-12', horaIni: '16:00', horaFim: '23:00',
@@ -55,52 +32,52 @@ let eventosInst = [
    INIT
    ===================================================== */
 ;(function init() {
-  Auth.restore();
-  const user = Auth.getUser();
-  if (!user || user.tipo !== 'pj') { window.location.href = 'login.html'; return; }
+  if (!Auth.requireInstituicao()) return;
+  const user = Auth.getUser() || {};
+  const nome = user.nome || 'Instituição';
 
-  document.getElementById('navNome').textContent = dadosInst.fantasia || dadosInst.razaoSocial;
+  document.getElementById('navNome').textContent = nome;
 
   // Hero
-  document.getElementById('instName').textContent    = dadosInst.razaoSocial;
-  document.getElementById('instFantasia').textContent = dadosInst.fantasia;
+  document.getElementById('instName').textContent    = nome;
+  document.getElementById('instFantasia').textContent = nome;
   document.getElementById('logoInitials').textContent =
-    dadosInst.fantasia.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
 
   // Preenche campos de exibição
-  document.getElementById('fv-razao-val').textContent = dadosInst.razaoSocial;
-  document.getElementById('fv-cnpj-val').textContent  = dadosInst.cnpj;
-  document.getElementById('fv-resp-cpf-val').textContent = dadosInst.respCpf;
+  document.getElementById('fv-razao-val').textContent = nome;
+  document.getElementById('fv-cnpj-val').textContent  = user.cnpj || '—';
+  document.getElementById('fv-resp-cpf-val').textContent = '—';
 
-  setFV('fv-fantasia',   dadosInst.fantasia);
-  setFV('fv-tipo',       dadosInst.tipo);
-  setFV('fv-area',       dadosInst.area);
-  setFV('fv-site',       dadosInst.site);
-  setFV('fv-desc',       dadosInst.desc);
-  setFV('fv-resp-nome',  dadosInst.respNome);
-  setFV('fv-resp-cargo', dadosInst.respCargo);
-  setFV('fv-resp-tel',   dadosInst.respTel);
-  setFV('fv-cep',        dadosInst.cep);
-  setFV('fv-logr',       dadosInst.logradouro);
-  setFV('fv-num',        dadosInst.numero);
-  setFV('fv-cidade',     dadosInst.cidade);
-  setFV('fv-estado',     dadosInst.estado);
-  setFV('fv-email',      dadosInst.email);
+  setFV('fv-fantasia',   nome);
+  setFV('fv-tipo',       'Instituição');
+  setFV('fv-area',       '—');
+  setFV('fv-site',       '—');
+  setFV('fv-desc',       '—');
+  setFV('fv-resp-nome',  '—');
+  setFV('fv-resp-cargo', '—');
+  setFV('fv-resp-tel',   user.telefone || '—');
+  setFV('fv-cep',        user.cep || '—');
+  setFV('fv-logr',       '—');
+  setFV('fv-num',        '—');
+  setFV('fv-cidade',     user.cidade || '—');
+  setFV('fv-estado',     user.estado || '—');
+  setFV('fv-email',      user.email || '—');
 
   // Inputs de edição
-  setVal('fi-fantasia-input',  dadosInst.fantasia);
-  setVal('fi-desc-input',      dadosInst.desc);
-  setVal('fi-resp-nome-input', dadosInst.respNome);
-  setVal('fi-resp-cargo-input',dadosInst.respCargo);
-  setVal('fi-resp-tel-input',  dadosInst.respTel);
-  setVal('fi-cep-input',       dadosInst.cep);
-  setVal('fi-logr-input',      dadosInst.logradouro);
-  setVal('fi-num-input',       dadosInst.numero);
-  setVal('fi-cidade-input',    dadosInst.cidade);
-  setVal('fi-email-input',     dadosInst.email);
-  setSel('fi-tipo-input',      dadosInst.tipo);
-  setSel('fi-area-input',      dadosInst.area);
-  setSel('fi-estado-input',    dadosInst.estado);
+  setVal('fi-fantasia-input',  nome);
+  setVal('fi-desc-input',      '');
+  setVal('fi-resp-nome-input', '');
+  setVal('fi-resp-cargo-input','');
+  setVal('fi-resp-tel-input',  user.telefone || '');
+  setVal('fi-cep-input',       user.cep || '');
+  setVal('fi-logr-input',      '');
+  setVal('fi-num-input',       '');
+  setVal('fi-cidade-input',    user.cidade || '');
+  setVal('fi-email-input',     user.email || '');
+  setSel('fi-tipo-input',      '');
+  setSel('fi-area-input',      '');
+  setSel('fi-estado-input',    user.estado || '');
 
   renderEventos(eventosInst);
 })();
@@ -136,8 +113,9 @@ function salvarSecao(cId, canId, savId, edId, sec) {
     const dsc = document.getElementById('fi-desc-input').value.trim();
     setFV('fv-fantasia',fan||'—'); setFV('fv-tipo',tip); setFV('fv-area',are);
     setFV('fv-site',sit||'—');     setFV('fv-desc',dsc||'—');
-    document.getElementById('instFantasia').textContent = fan || dadosInst.razaoSocial;
-    document.getElementById('navNome').textContent      = fan || dadosInst.razaoSocial;
+    const fallbackName = document.getElementById('instName').textContent || 'Instituição';
+    document.getElementById('instFantasia').textContent = fan || fallbackName;
+    document.getElementById('navNome').textContent      = fan || fallbackName;
   }
   if(sec==='resp') {
     setFV('fv-resp-nome',  document.getElementById('fi-resp-nome-input').value  ||'—');
