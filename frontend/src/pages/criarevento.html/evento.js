@@ -1,9 +1,62 @@
+import { authService } from '../../core/auth/auth-service.js';
+import { apiFetch } from '../../core/api/client.js';
+
   /* === Proteção da página === */
   (function() {
-    if (!Auth.requireInstituicao()) return;
-    const user = Auth.getUser();
+    if (!authService.requireInstituicao()) return;
+    const user = authService.getUser();
     document.getElementById('nomeUsuario').textContent = user.nome;
+    bindEvents();
+    updatePreview();
   })();
+
+  function bindEvents() {
+    document.getElementById('btnLogout')?.addEventListener('click', logout);
+    document.querySelectorAll('[data-step-target]').forEach((btn) => {
+      btn.addEventListener('click', () => goStep(Number(btn.getAttribute('data-step-target'))));
+    });
+
+    document.getElementById('btnAddIngresso')?.addEventListener('click', addIngresso);
+    document.getElementById('btnRemoveImagem')?.addEventListener('click', removeImagem);
+    document.getElementById('btnPublicarEvento')?.addEventListener('click', publicarEvento);
+
+    document.getElementById('uploadImageInput')?.addEventListener('change', (event) => {
+      previewImagem(event.target);
+    });
+
+    const previewFields = ['ev-nome', 'ev-categoria', 'ev-data-ini', 'ev-hora-ini', 'ev-formato', 'ev-entrada', 'ev-local-nome', 'ev-cidade', 'ev-estado'];
+    previewFields.forEach((id) => {
+      document.getElementById(id)?.addEventListener('input', updatePreview);
+      document.getElementById(id)?.addEventListener('change', updatePreview);
+    });
+
+    document.getElementById('ev-formato')?.addEventListener('change', toggleFormato);
+
+    document.getElementById('ev-nome')?.addEventListener('input', (event) => charCount(event.target, 'cc-nome'));
+    document.getElementById('ev-desc-curta')?.addEventListener('input', (event) => charCount(event.target, 'cc-curta'));
+    document.getElementById('ev-desc-completa')?.addEventListener('input', (event) => charCount(event.target, 'cc-completa'));
+
+    document.getElementById('listaIngressos')?.addEventListener('click', (event) => {
+      const removeBtn = event.target.closest('[data-remove-ingresso]');
+      if (removeBtn) {
+        removeIngresso(Number(removeBtn.getAttribute('data-remove-ingresso')));
+      }
+    });
+
+    document.getElementById('listaIngressos')?.addEventListener('input', (event) => {
+      const input = event.target.closest('[data-toggle-gratuito]');
+      if (input) {
+        toggleGratuito(Number(input.getAttribute('data-toggle-gratuito')));
+      }
+    });
+
+    document.getElementById('listaIngressos')?.addEventListener('change', (event) => {
+      const checkbox = event.target.closest('[data-set-gratuito]');
+      if (checkbox) {
+        setGratuito(Number(checkbox.getAttribute('data-set-gratuito')));
+      }
+    });
+  }
 
   /* === Steps === */
   let currentStep = 1;
@@ -62,7 +115,7 @@
   }
 
   /* === Char counter === */
-  function charCount(el, countId, max) {
+  function charCount(el, countId) {
     document.getElementById(countId).textContent = el.value.length;
   }
 
@@ -83,7 +136,7 @@
     div.className = 'ingresso-item';
     div.id = `ingresso-${id}`;
     div.innerHTML = `
-      <button class="btn-remove-ingresso" type="button" onclick="removeIngresso(${id})">
+      <button class="btn-remove-ingresso" type="button" data-remove-ingresso="${id}">
         <i class="bi bi-trash3-fill"></i>
       </button>
       <div class="row g-2 align-items-center">
@@ -99,7 +152,7 @@
           <div class="input-wrap">
             <i class="bi bi-currency-dollar input-icon"></i>
             <input type="number" class="form-control input-custom" placeholder="0,00" min="0" step="0.01"
-              id="preco-${id}" oninput="toggleGratuito(${id})"/>
+              id="preco-${id}" data-toggle-gratuito="${id}"/>
           </div>
         </div>
         <div class="col-6 col-sm-3">
@@ -111,7 +164,7 @@
         </div>
         <div class="col-12 col-sm-2 d-flex align-items-end pb-1">
           <div class="form-check form-switch ms-1">
-            <input class="form-check-input" type="checkbox" id="gratis-${id}" onchange="setGratuito(${id})"/>
+            <input class="form-check-input" type="checkbox" id="gratis-${id}" data-set-gratuito="${id}"/>
             <label class="form-check-label" for="gratis-${id}" style="font-size:.78rem;color:var(--muted);">Gratuito</label>
           </div>
         </div>
@@ -232,7 +285,7 @@
 
   /* === Publicar === */
   async function publicarEvento() {
-    if (!Auth.requireInstituicao()) return;
+    if (!authService.requireInstituicao()) return;
     if (!document.getElementById('chkPublicar').checked) {
       alert('Por favor, confirme os Termos para Organizadores antes de publicar.');
       return;
@@ -277,10 +330,14 @@
 
       if (/subject must be a string|token inválido|token invalid|expired|jwt/i.test(String(msg).toLowerCase())) {
         alert('Sua sessão expirou ou está inválida. Faça login novamente para publicar o evento.');
-        Auth.logout();
+        authService.logout();
         return;
       }
 
       alert(msg);
     }
+  }
+
+  function logout() {
+    authService.logout();
   }

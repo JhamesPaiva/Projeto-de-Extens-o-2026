@@ -33,7 +33,7 @@
           <i class="bi bi-building-fill me-1" style="color:var(--accent);"></i>
           Olá, <strong id="nomeUsuario">—</strong>
         </span>
-        <button class="btn-logout" onclick="Auth.logout()">
+        <button id="btnLogout" class="btn-logout" type="button">
           <i class="bi bi-box-arrow-right me-1"></i>Sair
         </button>
       </div>
@@ -107,7 +107,7 @@
               <i class="bi bi-stars input-icon"></i>
               <input type="text" class="form-control input-custom" id="ev-nome"
                 placeholder="Ex: Festival de Verão 2025" maxlength="80"
-                oninput="updatePreview(); charCount(this,'cc-nome',80)"/>
+              />
             </div>
             <p class="char-count"><span id="cc-nome">0</span>/80</p>
           </div>
@@ -116,7 +116,7 @@
             <label class="form-label-custom">Categoria *</label>
             <div class="input-wrap">
               <i class="bi bi-tags-fill input-icon"></i>
-              <select class="form-select input-custom" id="ev-categoria" onchange="updatePreview()">
+              <select class="form-select input-custom" id="ev-categoria">
                 <option value="" disabled selected>Selecione</option>
                 <option>Música</option>
                 <option>Gastronomia</option>
@@ -152,7 +152,7 @@
               <i class="bi bi-text-left input-icon-top"></i>
               <textarea class="form-control input-custom" id="ev-desc-curta" rows="2"
                 placeholder="Resumo atrativo em até 140 caracteres..." maxlength="140"
-                oninput="charCount(this,'cc-curta',140)"></textarea>
+              ></textarea>
             </div>
             <p class="char-count"><span id="cc-curta">0</span>/140</p>
           </div>
@@ -163,7 +163,7 @@
               <i class="bi bi-text-paragraph input-icon-top"></i>
               <textarea class="form-control input-custom" id="ev-desc-completa" rows="5"
                 placeholder="Descreva o evento com detalhes: atrações, programação, o que o público pode esperar..." maxlength="2000"
-                oninput="charCount(this,'cc-completa',2000)"></textarea>
+              ></textarea>
             </div>
             <p class="char-count"><span id="cc-completa">0</span>/2000</p>
           </div>
@@ -186,7 +186,7 @@
         </div>
 
         <div class="nav-btns">
-          <button class="btn-next" onclick="goStep(2)">
+          <button class="btn-next" type="button" data-step-target="2">
             Próximo <i class="bi bi-arrow-right"></i>
           </button>
         </div>
@@ -203,14 +203,14 @@
             <label class="form-label-custom">Data de Início *</label>
             <div class="input-wrap">
               <i class="bi bi-calendar-event input-icon"></i>
-              <input type="date" class="form-control input-custom" id="ev-data-ini" onchange="updatePreview()"/>
+              <input type="date" class="form-control input-custom" id="ev-data-ini"/>
             </div>
           </div>
           <div class="col-12 col-sm-4">
             <label class="form-label-custom">Hora de Início *</label>
             <div class="input-wrap">
               <i class="bi bi-clock-fill input-icon"></i>
-              <input type="time" class="form-control input-custom" id="ev-hora-ini" onchange="updatePreview()"/>
+              <input type="time" class="form-control input-custom" id="ev-hora-ini"/>
             </div>
           </div>
           <div class="col-12 col-sm-4">
@@ -247,7 +247,7 @@
             <label class="form-label-custom">Formato do Evento *</label>
             <div class="input-wrap">
               <i class="bi bi-display input-icon"></i>
-              <select class="form-select input-custom" id="ev-formato" onchange="toggleFormato(); updatePreview()">
+              <select class="form-select input-custom" id="ev-formato">
                 <option value="" disabled selected>Selecione</option>
                 <option value="presencial">Presencial</option>
                 <option value="online">Online</option>
@@ -265,7 +265,7 @@
               <div class="input-wrap">
                 <i class="bi bi-building input-icon"></i>
                 <input type="text" class="form-control input-custom" id="ev-local-nome"
-                  placeholder="Ex: Parque Municipal, Teatro Carlos Gomes..." onchange="updatePreview()"/>
+                  placeholder="Ex: Parque Municipal, Teatro Carlos Gomes..."/>
               </div>
             </div>
             <div class="col-12 col-sm-4">
@@ -308,14 +308,14 @@
               <div class="input-wrap">
                 <i class="bi bi-buildings-fill input-icon"></i>
                 <input type="text" class="form-control input-custom" id="ev-cidade"
-                  placeholder="Cidade" onchange="updatePreview()"/>
+                  placeholder="Cidade"/>
               </div>
             </div>
             <div class="col-12 col-sm-6">
               <label class="form-label-custom">Estado *</label>
               <div class="input-wrap">
                 <i class="bi bi-map-fill input-icon"></i>
-                <select class="form-select input-custom" id="ev-estado" onchange="updatePreview()">
+                <select class="form-select input-custom" id="ev-estado">
                   <option value="" disabled selected>UF</option>
                   <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
                   <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
@@ -360,8 +360,8 @@
         </div>
 
         <div class="nav-btns">
-          <button class="btn-prev" onclick="goStep(1)"><i class="bi bi-arrow-left me-1"></i>Anterior</button>
-          <button class="btn-next" onclick="goStep(3)">Próximo <i class="bi bi-arrow-right"></i></button>
+          <button class="btn-prev" type="button" data-step-target="1"><i class="bi bi-arrow-left me-1"></i>Anterior</button>
+          <button class="btn-next" type="button" data-step-target="3">Próximo <i class="bi bi-arrow-right"></i></button>
         </div>
       </div>
 
@@ -375,7 +375,7 @@
             <label class="form-label-custom">Entrada do Evento *</label>
             <div class="input-wrap">
               <i class="bi bi-ticket-perforated-fill input-icon"></i>
-              <select class="form-select input-custom" id="ev-entrada" onchange="updatePreview()">
+              <select class="form-select input-custom" id="ev-entrada">
                 <option value="gratuito" selected>Gratuito</option>
                 <option value="pago">Pago</option>
               </select>
@@ -415,7 +415,7 @@
                 <div class="input-wrap">
                   <i class="bi bi-currency-dollar input-icon"></i>
                   <input type="number" class="form-control input-custom" placeholder="0,00" min="0" step="0.01"
-                    id="preco-1" oninput="toggleGratuito(1)"/>
+                    id="preco-1" data-toggle-gratuito="1"/>
                 </div>
               </div>
               <div class="col-6 col-sm-3">
@@ -427,7 +427,7 @@
               </div>
               <div class="col-12 col-sm-2 d-flex align-items-end pb-1">
                 <div class="form-check form-switch ms-1">
-                  <input class="form-check-input" type="checkbox" id="gratis-1" onchange="setGratuito(1)"/>
+                  <input class="form-check-input" type="checkbox" id="gratis-1" data-set-gratuito="1"/>
                   <label class="form-check-label" for="gratis-1" style="font-size:.78rem;color:var(--muted);">Gratuito</label>
                 </div>
               </div>
@@ -435,13 +435,13 @@
           </div>
         </div>
 
-        <button class="btn-add-ingresso mt-1" onclick="addIngresso()">
+        <button id="btnAddIngresso" class="btn-add-ingresso mt-1" type="button">
           <i class="bi bi-plus-circle-fill"></i> Adicionar outro tipo de ingresso
         </button>
 
         <div class="nav-btns">
-          <button class="btn-prev" onclick="goStep(2)"><i class="bi bi-arrow-left me-1"></i>Anterior</button>
-          <button class="btn-next" onclick="goStep(4)">Próximo <i class="bi bi-arrow-right"></i></button>
+          <button class="btn-prev" type="button" data-step-target="2"><i class="bi bi-arrow-left me-1"></i>Anterior</button>
+          <button class="btn-next" type="button" data-step-target="4">Próximo <i class="bi bi-arrow-right"></i></button>
         </div>
       </div>
 
@@ -452,14 +452,14 @@
 
         <label class="form-label-custom">Imagem de Capa * <small style="text-transform:none;">(recomendado: 1200×630px)</small></label>
         <div class="upload-area" id="uploadArea">
-          <input type="file" accept="image/*" onchange="previewImagem(this)"/>
+          <input id="uploadImageInput" type="file" accept="image/*"/>
           <div class="upload-icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
           <p><strong>Clique para enviar</strong> ou arraste a imagem aqui</p>
           <p style="font-size:.75rem;margin-top:4px;">PNG, JPG, WEBP — máx. 5MB</p>
         </div>
         <div class="upload-preview mt-2" id="uploadPreview">
           <img id="previewImg" src="" alt="Preview"/>
-          <button class="btn-remove-img" onclick="removeImagem()" type="button">
+          <button id="btnRemoveImagem" class="btn-remove-img" type="button">
             <i class="bi bi-x"></i>
           </button>
         </div>
@@ -478,8 +478,8 @@
         </div>
 
         <div class="nav-btns">
-          <button class="btn-prev" onclick="goStep(3)"><i class="bi bi-arrow-left me-1"></i>Anterior</button>
-          <button class="btn-next" onclick="goStep(5)">Revisão <i class="bi bi-arrow-right"></i></button>
+          <button class="btn-prev" type="button" data-step-target="3"><i class="bi bi-arrow-left me-1"></i>Anterior</button>
+          <button class="btn-next" type="button" data-step-target="5">Revisão <i class="bi bi-arrow-right"></i></button>
         </div>
       </div>
 
@@ -503,8 +503,8 @@
         </div>
 
         <div class="nav-btns">
-          <button class="btn-prev" onclick="goStep(4)"><i class="bi bi-arrow-left me-1"></i>Editar</button>
-          <button class="btn-publish" onclick="publicarEvento()">
+          <button class="btn-prev" type="button" data-step-target="4"><i class="bi bi-arrow-left me-1"></i>Editar</button>
+          <button id="btnPublicarEvento" class="btn-publish" type="button">
             <i class="bi bi-rocket-takeoff-fill"></i> Publicar Evento
           </button>
         </div>
@@ -581,8 +581,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../../services/api.js?v=20260410e"></script>
-<script src="../../auth.js?v=20260410e"></script>
-<script src="evento.js?v=20260410e"></script>
+<script type="module" src="evento.js?v=20260410e"></script>
 </body>
 </html>

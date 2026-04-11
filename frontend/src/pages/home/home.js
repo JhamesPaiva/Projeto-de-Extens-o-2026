@@ -1,38 +1,48 @@
-document.addEventListener('DOMContentLoaded', function() {
-  updateNavbarAuthState();
-  setupSearchControls();
-  loadEvents();
-  loadMySubscribedEventIds();
+import { authService } from '../../core/auth/auth-service.js';
+import { apiFetch } from '../../core/api/client.js';
+import { HOME_DEMO_EVENTS } from './demo-events.js';
 
-  const eventModal = document.getElementById('eventModal');
-  if (eventModal) {
-    eventModal.addEventListener('show.bs.modal', function (event) {
-      const button = event.relatedTarget;
-      const nome = button.getAttribute('data-nome');
-      const data = button.getAttribute('data-data');
-      const hora = button.getAttribute('data-hora');
-      const local = button.getAttribute('data-local');
-      const inst = button.getAttribute('data-inst');
-      const desc = button.getAttribute('data-desc');
-      const cardImg = button.closest('.card').querySelector('.event-card-img').src;
+let selectedEventId = null;
+let selectedEventIsDemo = false;
+let modalInstance = null;
+let searchDebounceTimer = null;
 
-      document.getElementById('modalNome').textContent = nome;
-      document.getElementById('modalData').textContent = data;
-      document.getElementById('modalHora').textContent = hora;
-      document.getElementById('modalLocal').textContent = local;
-      document.getElementById('modalInst').textContent = inst;
-      document.getElementById('modalDesc').textContent = desc;
-      document.getElementById('modalImg').src = cardImg;
-    });
-  }
-});
-
-window.selectedEventId = null;
-window.selectedEventIsDemo = false;
 const subscribedEventIds = new Set();
 const subscriptionStatusByEvent = new Map();
-let searchDebounceTimer = null;
-const DEMO_EVENTS = Array.isArray(window.HOME_DEMO_EVENTS) ? window.HOME_DEMO_EVENTS : [];
+const renderedEventsByKey = new Map();
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupModalControls();
+  setupSearchControls();
+  updateNavbarAuthState();
+  loadEvents();
+  loadMySubscribedEventIds();
+});
+
+function setupModalControls() {
+  const modalEl = document.getElementById('modalEvento');
+  if (!modalEl) return;
+
+  modalInstance = new bootstrap.Modal(modalEl);
+
+  document.getElementById('m-btn-fechar-top')?.addEventListener('click', closeModal);
+  document.getElementById('m-btn-fechar-footer')?.addEventListener('click', closeModal);
+  document.getElementById('m-btn-inscricao')?.addEventListener('click', handleSubscribeClick);
+
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    selectedEventId = null;
+    selectedEventIsDemo = false;
+  });
+
+  document.getElementById('eventsGrid')?.addEventListener('click', (event) => {
+    const trigger = event.target.closest('[data-open-event]');
+    if (!trigger) return;
+    const key = trigger.getAttribute('data-event-key');
+    const eventData = renderedEventsByKey.get(key);
+    if (!eventData) return;
+    openEventModal(eventData);
+  });
+}
 
 function setupSearchControls() {
   const searchInput = document.getElementById('searchInput');
@@ -83,9 +93,9 @@ function getSearchFilters() {
 }
 
 async function loadMySubscribedEventIds() {
-  const user = Auth.getUser();
+  const user = authService.getUser();
   const tipo = String(user?.tipo || '').toLowerCase();
-  if (!user || tipo !== 'pf' || !Auth.restore()) return;
+  if (!user || tipo !== 'pf' || !authService.restore()) return;
 
   try {
     const data = await apiFetch('/my-subscriptions');
@@ -105,14 +115,14 @@ async function loadMySubscribedEventIds() {
       }
     }
     await loadEvents();
-    window.atualizarBotaoInscricao?.();
+    updateSubscribeButtonState();
   } catch (error) {
     console.warn('Não foi possível carregar inscrições do usuário na Home.', error);
   }
 }
 
 function updateNavbarAuthState() {
-  const user = Auth.getUser();
+  const user = authService.getUser();
   const navActions = document.querySelector('.navbar .d-flex');
   if (!navActions) return;
 
@@ -148,11 +158,13 @@ function updateNavbarAuthState() {
     <a href="${areaLink}" class="btn btn-nav-register">
       <i class="bi bi-person-circle me-1"></i>Minha Área
     </a>
-    <button type="button" class="btn btn-nav-login" onclick="Auth.logout()">
+    <button type="button" id="homeLogoutBtn" class="btn btn-nav-login">
       <i class="bi bi-box-arrow-right me-1"></i>Sair
     </button>
     ${createEventButton}
   `;
+
+  document.getElementById('homeLogoutBtn')?.addEventListener('click', () => authService.logout());
 }
 
 
@@ -190,6 +202,7 @@ async function loadEvents() {
       return;
     }
 
+    renderedEventsByKey.clear();
     grid.innerHTML = events.map(eventToCard).join('');
   } catch (error) {
     const filters = getSearchFilters();
@@ -198,6 +211,7 @@ async function loadEvents() {
       if (countEl) {
         countEl.textContent = `${demoEvents.length} evento${demoEvents.length === 1 ? '' : 's'} encontrados (modo demonstração)`;
       }
+      renderedEventsByKey.clear();
       grid.innerHTML = sortEventsByDateAsc(demoEvents).map(eventToCard).join('');
     } else {
       if (countEl) countEl.textContent = 'Falha ao carregar eventos';
@@ -222,7 +236,6 @@ function eventToCard(event) {
   const desc = event.descricao || 'Veja mais detalhes do evento.';
   const subscriptionStatus = subscriptionStatusByEvent.get(eventId) || '';
   const inscrito = subscribedEventIds.has(eventId);
-  const pendentePagamento = subscriptionStatus === 'pendente_pagamento';
   const organizadorNome = event.organizador_nome || 'Instituição';
   const organizadorIniciais = String(organizadorNome)
     .split(' ')
@@ -236,6 +249,26 @@ function eventToCard(event) {
     : `<span class="event-org-avatar">${escapeHtml(organizadorIniciais)}</span>`;
   const perfilInstituicaoUrl = `../areapublicainst/areapublicainst.html?inst=${encodeURIComponent(Number(event.organizador_id) || 0)}`;
   const entradaTexto = event.entrada_label || formatEntrada(event.entrada);
+
+  const key = `${isDemo ? 'd' : 'r'}:${eventId}`;
+  renderedEventsByKey.set(key, {
+    id: eventId,
+    isDemo,
+    img: imagem,
+    nome: event.nome,
+    cat,
+    catCor,
+    data: dataFull,
+    hora,
+    local,
+    formato: event.formato || 'Presencial',
+    entrada: entradaTexto || 'Informação indisponível',
+    idade: event.idade || 'Livre',
+    desc,
+    orgNome: organizadorNome,
+    orgAvatar: event.organizador_avatar_data || '',
+    orgId: Number(event.organizador_id) || 0,
+  });
 
   return `
     <div class="col-12 col-sm-6 col-lg-4">
@@ -256,7 +289,7 @@ function eventToCard(event) {
         </div>
         <div class="card-footer-custom">
           <span class="badge badge-categoria text-bg-${catCor}">${escapeHtml(cat)}</span>
-          <button class="btn-ver-mais" onclick="abrirModal({ id:${eventId}, isDemo:${isDemo ? 'true' : 'false'}, img:'${escapeHtml(imagem)}', nome:'${escapeHtml(event.nome)}', cat:'${escapeHtml(cat)}', catCor:'${catCor}', data:'${escapeHtml(dataFull)}', hora:'${escapeHtml(hora)}', local:'${escapeHtml(local)}', formato:'${escapeHtml(event.formato || 'Presencial')}', entrada:'${escapeHtml(entradaTexto || 'Informação indisponível')}', idade:'${escapeHtml(event.idade || 'Livre')}', desc:'${escapeHtml(desc)}', orgNome:'${escapeHtml(organizadorNome)}', orgAvatar:'${escapeHtml(event.organizador_avatar_data || '')}', orgId:${Number(event.organizador_id) || 0} })">
+          <button class="btn-ver-mais" data-open-event="1" data-event-key="${key}">
             Ver mais <i class="bi bi-arrow-right-short"></i>
           </button>
         </div>
@@ -264,18 +297,18 @@ function eventToCard(event) {
     </div>`;
 }
 
-window.atualizarBotaoInscricao = function atualizarBotaoInscricao() {
+function updateSubscribeButtonState() {
   const btn = document.getElementById('m-btn-inscricao');
   if (!btn) return;
 
-  const user = Auth.getUser();
+  const user = authService.getUser();
   const tipo = String(user?.tipo || '').toLowerCase();
 
   btn.disabled = false;
   btn.classList.remove('btn-cancelar-inscricao');
   btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Quero participar';
 
-  if (window.selectedEventIsDemo) {
+  if (selectedEventIsDemo) {
     btn.disabled = true;
     btn.innerHTML = '<i class="bi bi-info-circle me-2"></i>Evento demonstrativo';
     return;
@@ -292,14 +325,14 @@ window.atualizarBotaoInscricao = function atualizarBotaoInscricao() {
     return;
   }
 
-  if (window.selectedEventId && subscribedEventIds.has(Number(window.selectedEventId))) {
+  if (selectedEventId && subscribedEventIds.has(Number(selectedEventId))) {
     btn.disabled = false;
     btn.classList.add('btn-cancelar-inscricao');
     btn.innerHTML = '<i class="bi bi-x-circle me-2"></i>Cancelar inscrição';
     return;
   }
 
-  const statusAtual = subscriptionStatusByEvent.get(Number(window.selectedEventId));
+  const statusAtual = subscriptionStatusByEvent.get(Number(selectedEventId));
   if (statusAtual === 'pendente_pagamento') {
     btn.disabled = false;
     btn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Concluir pagamento';
@@ -309,7 +342,7 @@ window.atualizarBotaoInscricao = function atualizarBotaoInscricao() {
 async function cancelarInscricaoNoEvento() {
   const btn = document.getElementById('m-btn-inscricao');
 
-  if (!window.selectedEventId) {
+  if (!selectedEventId) {
     showMiniFeedback('Não foi possível identificar o evento.', true);
     return;
   }
@@ -324,23 +357,23 @@ async function cancelarInscricaoNoEvento() {
       btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Cancelando...';
     }
 
-    await apiFetch(`/events/${window.selectedEventId}/subscribe`, { method: 'DELETE' });
-    subscribedEventIds.delete(Number(window.selectedEventId));
-    subscriptionStatusByEvent.delete(Number(window.selectedEventId));
+    await apiFetch(`/events/${selectedEventId}/subscribe`, { method: 'DELETE' });
+    subscribedEventIds.delete(Number(selectedEventId));
+    subscriptionStatusByEvent.delete(Number(selectedEventId));
     showMiniFeedback('Inscrição cancelada com sucesso!');
-    window.atualizarBotaoInscricao();
+    updateSubscribeButtonState();
     await loadEvents();
   } catch (error) {
     const msg = error?.payload?.message || error?.message || 'Não foi possível cancelar sua inscrição.';
     showMiniFeedback(msg, true);
-    window.atualizarBotaoInscricao();
+    updateSubscribeButtonState();
   }
 }
 
 async function confirmarPagamentoNoEvento() {
   const btn = document.getElementById('m-btn-inscricao');
 
-  if (!window.selectedEventId) {
+  if (!selectedEventId) {
     showMiniFeedback('Não foi possível identificar o evento.', true);
     return;
   }
@@ -351,24 +384,24 @@ async function confirmarPagamentoNoEvento() {
       btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Confirmando pagamento...';
     }
 
-    await apiFetch(`/events/${window.selectedEventId}/subscribe/confirm-payment`, { method: 'POST' });
-    subscriptionStatusByEvent.set(Number(window.selectedEventId), 'confirmado');
-    subscribedEventIds.add(Number(window.selectedEventId));
+    await apiFetch(`/events/${selectedEventId}/subscribe/confirm-payment`, { method: 'POST' });
+    subscriptionStatusByEvent.set(Number(selectedEventId), 'confirmado');
+    subscribedEventIds.add(Number(selectedEventId));
     showMiniFeedback('Pagamento confirmado e inscrição efetivada!');
-    window.atualizarBotaoInscricao();
+    updateSubscribeButtonState();
     await loadEvents();
   } catch (error) {
     const msg = error?.payload?.message || error?.message || 'Não foi possível confirmar o pagamento.';
     showMiniFeedback(msg, true);
-    window.atualizarBotaoInscricao();
+    updateSubscribeButtonState();
   }
 }
 
-window.inscreverNoEvento = async function inscreverNoEvento() {
+async function handleSubscribeClick() {
   const btn = document.getElementById('m-btn-inscricao');
-  const user = Auth.getUser();
+  const user = authService.getUser();
 
-  if (window.selectedEventIsDemo) {
+  if (selectedEventIsDemo) {
     showMiniFeedback('Este é um evento demonstrativo. A inscrição não está disponível.', true);
     return;
   }
@@ -379,7 +412,7 @@ window.inscreverNoEvento = async function inscreverNoEvento() {
     return;
   }
 
-  if (!Auth.restore()) {
+  if (!authService.restore()) {
     showMiniFeedback('Sua sessão expirou. Faça login novamente.', true);
     window.location.href = '../login/login.html';
     return;
@@ -390,17 +423,17 @@ window.inscreverNoEvento = async function inscreverNoEvento() {
     return;
   }
 
-  if (!window.selectedEventId) {
+  if (!selectedEventId) {
     showMiniFeedback('Não foi possível identificar o evento.', true);
     return;
   }
 
-  if (subscribedEventIds.has(Number(window.selectedEventId))) {
+  if (subscribedEventIds.has(Number(selectedEventId))) {
     await cancelarInscricaoNoEvento();
     return;
   }
 
-  if (subscriptionStatusByEvent.get(Number(window.selectedEventId)) === 'pendente_pagamento') {
+  if (subscriptionStatusByEvent.get(Number(selectedEventId)) === 'pendente_pagamento') {
     await confirmarPagamentoNoEvento();
     return;
   }
@@ -411,20 +444,20 @@ window.inscreverNoEvento = async function inscreverNoEvento() {
       btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Inscrevendo...';
     }
 
-    const response = await apiFetch(`/events/${window.selectedEventId}/subscribe`, { method: 'POST' });
+    const response = await apiFetch(`/events/${selectedEventId}/subscribe`, { method: 'POST' });
     const status = String(response?.status || '').toLowerCase();
 
     if (status === 'pendente_pagamento') {
-      subscriptionStatusByEvent.set(Number(window.selectedEventId), 'pendente_pagamento');
+      subscriptionStatusByEvent.set(Number(selectedEventId), 'pendente_pagamento');
       showMiniFeedback('Inscrição pendente. Clique novamente para confirmar o pagamento.');
     } else {
-      subscriptionStatusByEvent.set(Number(window.selectedEventId), 'confirmado');
-      subscribedEventIds.add(Number(window.selectedEventId));
+      subscriptionStatusByEvent.set(Number(selectedEventId), 'confirmado');
+      subscribedEventIds.add(Number(selectedEventId));
       showMiniFeedback('Inscrição confirmada com sucesso!');
     }
 
     if (btn) {
-      window.atualizarBotaoInscricao();
+      updateSubscribeButtonState();
     }
 
     await loadEvents();
@@ -435,17 +468,67 @@ window.inscreverNoEvento = async function inscreverNoEvento() {
     if (status === 409) {
       const subscriptionStatus = String(error?.payload?.status || '').toLowerCase();
       if (subscriptionStatus === 'pendente_pagamento') {
-        subscriptionStatusByEvent.set(Number(window.selectedEventId), 'pendente_pagamento');
+        subscriptionStatusByEvent.set(Number(selectedEventId), 'pendente_pagamento');
       } else {
-        subscriptionStatusByEvent.set(Number(window.selectedEventId), 'confirmado');
-        subscribedEventIds.add(Number(window.selectedEventId));
+        subscriptionStatusByEvent.set(Number(selectedEventId), 'confirmado');
+        subscribedEventIds.add(Number(selectedEventId));
       }
     }
 
-    if (btn) window.atualizarBotaoInscricao();
+    if (btn) updateSubscribeButtonState();
     showMiniFeedback(msg, true);
   }
-};
+}
+
+function openEventModal(ev) {
+  selectedEventIsDemo = Boolean(ev?.isDemo);
+  selectedEventId = selectedEventIsDemo ? null : (Number(ev?.id) || null);
+
+  document.getElementById('m-img').src = ev.img;
+  document.getElementById('m-nome').textContent = ev.nome;
+  document.getElementById('m-data').textContent = ev.data;
+  document.getElementById('m-hora').textContent = ev.hora;
+  document.getElementById('m-local').textContent = ev.local;
+  document.getElementById('m-formato').textContent = ev.formato;
+  document.getElementById('m-entrada').textContent = ev.entrada;
+  document.getElementById('m-idade').textContent = ev.idade;
+  document.getElementById('m-desc').textContent = ev.desc;
+
+  const orgNome = String(ev.orgName || ev.orgNome || 'Instituição');
+  const orgIniciais = orgNome
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((piece) => piece[0] || '')
+    .join('')
+    .toUpperCase() || 'IN';
+
+  const orgAvatarEl = document.getElementById('m-org-avatar');
+  const orgLinkEl = document.getElementById('m-org-link');
+  orgLinkEl.textContent = orgNome;
+
+  const orgId = Number(ev.orgId) || 0;
+  orgLinkEl.href = orgId > 0
+    ? `../areapublicainst/areapublicainst.html?inst=${encodeURIComponent(orgId)}`
+    : '#';
+
+  if (ev.orgAvatar) {
+    orgAvatarEl.innerHTML = `<img src="${escapeHtml(ev.orgAvatar)}" alt="Instituição ${escapeHtml(orgNome)}"/>`;
+  } else {
+    orgAvatarEl.textContent = orgIniciais;
+  }
+
+  const catEl = document.getElementById('m-cat');
+  catEl.textContent = ev.cat;
+  catEl.className = `badge position-absolute bottom-0 start-0 m-3 fs-6 text-bg-${ev.catCor}`;
+
+  modalInstance?.show();
+  updateSubscribeButtonState();
+}
+
+function closeModal() {
+  modalInstance?.hide();
+}
 
 function showMiniFeedback(message, isError = false) {
   let el = document.getElementById('home-mini-feedback');
@@ -515,7 +598,7 @@ function formatEntrada(entrada) {
 }
 
 function applyFiltersToDemoEvents(filters) {
-  return DEMO_EVENTS.filter((event) => {
+  return HOME_DEMO_EVENTS.filter((event) => {
     if (filters.search) {
       const q = normalizeStr(filters.search);
       const haystack = normalizeStr([

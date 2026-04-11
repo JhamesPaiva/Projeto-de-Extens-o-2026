@@ -161,15 +161,15 @@ python -m http.server 8000  # <- Mude para porta 8000
 Projeto-de-Extensão-2026/
 ├── backend/
 │   ├── app.py              ✅ Backend Flask (porta 5000)
-│   ├── models.py           ✅ Modelos de dados
-│   ├── config.py           ✅ Configurações
-│   ├── database.py         ✅ Conexão MySQL
-│   ├── requirements.txt    ✅ Dependências
-│   └── .env                ✅ Variáveis de ambiente
+│   ├── models.py           ✅ Acesso a dados e entidades atuais
+│   ├── config.py           ✅ Configuracoes
+│   ├── database.py         ✅ Conexao MySQL
+│   ├── requirements.txt    ✅ Dependencias
+│   └── .env                ✅ Variaveis de ambiente
 │
 ├── frontend/
-│   ├── src/                ✅ Código JavaScript/HTML/CSS
-│   ├── public/index.html   ⚠️ Vazio (frontend em HTML puro)
+│   ├── src/                ✅ Codigo JavaScript/HTML/CSS
+│   ├── public/index.html   ✅ Redirecionamento para a pagina inicial
 │   └── (rodando em porta 3000)
 │
 ├── database/
@@ -178,8 +178,13 @@ Projeto-de-Extensão-2026/
 │
 ├── setup.bat               🎯 Use este! (Windows)
 ├── setup.ps1               (PowerShell - alternativa)
-└── README.md               (este arquivo)
+└── README.md               ✅ Visao geral do projeto
 ```
+
+## Observacao Importante
+
+O backend oficial do projeto e o backend Flask em `backend/app.py`.
+Artefatos antigos de uma estrutura Node.js nao fazem parte do fluxo atual de execucao.
 
 ---
 

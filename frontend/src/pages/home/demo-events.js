@@ -1,4 +1,4 @@
-window.HOME_DEMO_EVENTS = [
+export const HOME_DEMO_EVENTS = [
   {
     id: -1,
     is_demo: true,

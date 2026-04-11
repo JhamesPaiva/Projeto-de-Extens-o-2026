@@ -1,4 +1,4 @@
-window.API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000/api';
+import { apiFetch } from '../api/client.js';
 
 function parseJwtPayload(token) {
   try {
@@ -12,7 +12,7 @@ function parseJwtPayload(token) {
   }
 }
 
-window.Auth = {
+export const authService = {
   LOGIN_PAGE: '../login/login.html',
   HOME_PAGE: '../home/home.html',
 
@@ -42,9 +42,9 @@ window.Auth = {
     return updated;
   },
 
-  logout() {
+  logout(redirectTo = this.HOME_PAGE) {
     this.clearSession();
-    window.location.href = this.HOME_PAGE;
+    window.location.href = redirectTo;
   },
 
   restore() {
@@ -69,40 +69,38 @@ window.Auth = {
     return true;
   },
 
-  requireAuth() {
+  requireAuth(redirectTo = this.LOGIN_PAGE) {
     if (!this.restore()) {
-      window.location.href = this.LOGIN_PAGE;
+      window.location.href = redirectTo;
       return false;
     }
     return true;
   },
 
-  requireInstituicao() {
+  requireInstituicao(redirectTo = this.LOGIN_PAGE) {
     if (!this.restore()) {
-      window.location.href = this.LOGIN_PAGE;
+      window.location.href = redirectTo;
       return false;
     }
 
     const user = this.getUser();
     const tipo = String(user?.tipo || '').toLowerCase();
     if (!user || tipo !== 'pj') {
-      window.location.href = this.LOGIN_PAGE;
+      window.location.href = redirectTo;
       return false;
     }
     return true;
   },
 
   async login(email, senha) {
-    console.log('[auth.js] login', { email, senha });
-    return await apiFetch('/login', {
+    return apiFetch('/login', {
       method: 'POST',
       body: { email, senha },
     });
   },
 
   async register(data) {
-    console.log('[auth.js] register', data);
-    return await apiFetch('/register', {
+    return apiFetch('/register', {
       method: 'POST',
       body: data,
     });
