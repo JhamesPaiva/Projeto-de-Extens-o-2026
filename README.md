@@ -30,12 +30,12 @@ A proposta é conectar organizadores e participantes de forma simples, rápida e
 * Bootstrap
 * JavaScript
 
-### Backend *(em desenvolvimento)*
+### Backend 
 
 * Node.js
 * Express
 
-### Banco de Dados *(planejado)*
+### Banco de Dados 
 
 * MySQL
 
@@ -69,7 +69,7 @@ frontend/
 
 ---
 
-### 🔹 Backend (futuro)
+### 🔹 Backend 
 
 ```bash
 npm install
@@ -78,7 +78,7 @@ npm start
 
 ---
 
-## 📸 Screenshots *(adicione depois)*
+## 📸 Screenshots
 
 * Página inicial
 * Lista de eventos
@@ -95,11 +95,8 @@ npm start
 
 ## 💡 Melhorias futuras
 
-* Sistema de login e cadastro de usuários
 * Integração com mapa (Google Maps)
 * Notificações de novos eventos
-* Sistema de inscrição em eventos
-* Painel administrativo
 
 ---
 
