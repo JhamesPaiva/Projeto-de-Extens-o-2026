@@ -21,12 +21,12 @@
     </button>
     <div class="collapse navbar-collapse" id="navMain">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+        <li class="nav-item"><a class="nav-link" href="/frontend/src/pages/home/home.html">Início</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Explorar</a></li>
         <li class="nav-item"><a class="nav-link active" href="#">Meu Painel</a></li>
       </ul>
       <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
-        <a href="criar-evento.html" class="btn-nav-create">
+        <a href="../criarevento.html/evento.html" class="btn-nav-create">
           <i class="bi bi-plus-circle me-1"></i>Novo Evento
         </a>
         <span style="font-family:var(--font-body);font-size:.82rem;color:rgba(255,255,255,.55);">
@@ -292,7 +292,7 @@
             <h5 style="font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--dark);margin:0;">Eventos da Instituição</h5>
             <p style="font-family:var(--font-body);font-size:.82rem;color:var(--muted);margin:3px 0 0;">Gerencie todos os seus eventos publicados e rascunhos.</p>
           </div>
-          <a href="criar-evento.html" class="btn-novo-evento">
+          <a href="../criarevento.html/evento.html" class="btn-novo-evento">
             <i class="bi bi-plus-circle-fill"></i>Novo Evento
           </a>
         </div>
@@ -309,7 +309,7 @@
           <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
           <h5>Nenhum evento aqui</h5>
           <p>Crie seu primeiro evento e comece a receber inscrições!</p>
-          <a href="criar-evento.html" class="btn-novo-evento d-inline-flex mt-2"><i class="bi bi-plus-circle-fill"></i>Criar evento</a>
+          <a href="../criarevento.html/evento.html" class="btn-novo-evento d-inline-flex mt-2"><i class="bi bi-plus-circle-fill"></i>Criar evento</a>
         </div>
 
       </div><!-- /tabEventos -->
@@ -396,11 +396,11 @@
           <div class="col-12 col-sm-6">
             <div class="modal-info-row"><i class="bi bi-geo-alt-fill"></i><span id="mv-local"></span></div>
             <div class="modal-info-row"><i class="bi bi-display"></i><span id="mv-formato"></span></div>
-            <div class="modal-info-row"><i class="bi bi-ticket-perforated-fill"></i><span id="mv-entrada"></span></div>
+            <div class="modal-info-row" id="mv-row-entrada"><i class="bi bi-ticket-perforated-fill"></i><span id="mv-entrada"></span></div>
             <div class="modal-info-row"><i class="bi bi-person-fill"></i>Faixa etária: <strong id="mv-idade" class="ms-1"></strong></div>
           </div>
         </div>
-        <div class="modal-info-row mt-1"><i class="bi bi-people-fill"></i>Inscritos: <strong id="mv-inscritos" class="ms-1" style="color:var(--primary);"></strong></div>
+        <div class="modal-info-row mt-1" id="mv-row-inscritos"><i class="bi bi-people-fill"></i>Inscritos: <strong id="mv-inscritos" class="ms-1" style="color:var(--primary);"></strong></div>
         <p class="modal-desc-label">Sobre o evento</p>
         <p class="modal-desc-text" id="mv-desc"></p>
       </div>
@@ -481,6 +481,15 @@
             </div>
           </div>
           <div class="col-12 col-sm-6">
+            <label class="medit-label">Entrada</label>
+            <div class="medit-wrap"><i class="bi bi-ticket-perforated-fill medit-icon"></i>
+              <select class="medit-input" id="me-entrada">
+                <option value="gratuito">Gratuito</option>
+                <option value="pago">Pago</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6">
             <label class="medit-label">Local / Estabelecimento</label>
             <div class="medit-wrap"><i class="bi bi-building medit-icon"></i><input type="text" class="medit-input" id="me-local-nome"/></div>
           </div>
@@ -496,35 +505,25 @@
               </select>
             </div>
           </div>
-        </div>
-
-        <p class="medit-section"><i class="bi bi-ticket-perforated-fill"></i>Ingresso & Capacidade</p>
-        <div class="row g-3">
-          <div class="col-12 col-sm-4">
-            <label class="medit-label">Tipo de Entrada</label>
-            <div class="medit-wrap"><i class="bi bi-ticket-fill medit-icon"></i>
-              <select class="medit-input" id="me-entrada">
-                <option>Gratuito</option><option>Pago</option>
-              </select>
+          <div class="col-12">
+            <label class="medit-label">Imagem de Capa</label>
+            <div class="me-edit-image-box">
+              <input type="file" id="me-img-input" accept="image/*" style="display:none;" onchange="carregarImagemEdicao(this)"/>
+              <div class="me-edit-image-actions">
+                <button type="button" class="btn-me-img" onclick="document.getElementById('me-img-input').click()">
+                  <i class="bi bi-image-fill"></i>Trocar imagem
+                </button>
+                <button type="button" class="btn-me-img btn-me-img-remove" onclick="removerImagemEdicao()">
+                  <i class="bi bi-trash3-fill"></i>Remover
+                </button>
+                <span class="me-edit-image-note">PNG, JPG ou WEBP</span>
+              </div>
+              <div class="me-edit-image-preview d-none" id="me-img-preview-wrap">
+                <img id="me-img-preview" src="" alt="Prévia da capa do evento"/>
+              </div>
+              <p class="me-edit-image-placeholder" id="me-img-placeholder">Nenhuma imagem cadastrada para este evento.</p>
             </div>
           </div>
-          <div class="col-12 col-sm-4">
-            <label class="medit-label">Valor (se pago)</label>
-            <div class="medit-wrap"><i class="bi bi-currency-dollar medit-icon"></i><input type="text" class="medit-input" id="me-valor" placeholder="R$ 0,00"/></div>
-          </div>
-          <div class="col-12 col-sm-4">
-            <label class="medit-label">Capacidade</label>
-            <div class="medit-wrap"><i class="bi bi-people-fill medit-icon"></i><input type="number" class="medit-input" id="me-capacidade" placeholder="Ex: 500"/></div>
-          </div>
-        </div>
-
-        <p class="medit-section"><i class="bi bi-flag-fill"></i>Status</p>
-        <div class="medit-wrap"><i class="bi bi-flag-fill medit-icon"></i>
-          <select class="medit-input" id="me-status">
-            <option value="publicado">Publicado</option>
-            <option value="rascunho">Rascunho</option>
-            <option value="encerrado">Encerrado</option>
-          </select>
         </div>
 
       </div>
@@ -587,6 +586,7 @@
 <footer>
   <div class="container">
     <strong style="color:rgba(255,255,255,.6);font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;·&nbsp;<a href="../sobre/sobre.html">Sobre</a>
     &nbsp;·&nbsp;<a href="privacidade.html">Privacidade</a> &nbsp;·&nbsp;<a href="termos.html">Termos</a>
     <br/><small class="mt-1 d-block" style="opacity:.6;">© 2025 EventoCom.</small>
   </div>

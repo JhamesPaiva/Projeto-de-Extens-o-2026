@@ -1,33 +1,6 @@
-const eventosUsuario = [
-  {
-    id: 1, nome: 'Festival Verão Sonoro 2025', categoria: 'Música',
-    data: '12', mes: 'Jul', dataFull: '12 de Julho de 2025',
-    hora: '16h às 23h', local: 'Parque Municipal, São Paulo – SP',
-    status: 'confirmado',
-    img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&q=80',
-  },
-  {
-    id: 2, nome: 'Corrida Solidária 5K & 10K', categoria: 'Esportes',
-    data: '26', mes: 'Jul', dataFull: '26 de Julho de 2025',
-    hora: '07h às 12h', local: 'Aterro do Flamengo, Rio de Janeiro – RJ',
-    status: 'confirmado',
-    img: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&q=80',
-  },
-  {
-    id: 3, nome: 'Hackathon Comunidade Tech 2025', categoria: 'Tecnologia',
-    data: '09', mes: 'Ago', dataFull: '09 de Agosto de 2025',
-    hora: '08h às 22h', local: 'Hub de Inovação, Recife – PE',
-    status: 'pendente',
-    img: 'https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=600&q=80',
-  },
-  {
-    id: 4, nome: 'Sabores da Cidade – Edição Especial', categoria: 'Gastronomia',
-    data: '10', mes: 'Mar', dataFull: '10 de Março de 2025',
-    hora: '11h às 20h', local: 'Praça Central, Belo Horizonte – MG',
-    status: 'concluido',
-    img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80',
-  },
-];
+let eventosUsuario = [];
+let filtroAtualEventos = 'todos';
+const EVENTO_IMG_PADRAO = 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80';
 
 /* =====================================================
    INICIALIZAÇÃO
@@ -48,6 +21,12 @@ const eventosUsuario = [
   document.getElementById('profileEmail').textContent = user.email || '—';
   document.getElementById('avatarInitials').textContent =
     `${(primeiroNome[0] || '').toUpperCase()}${(sobrenome[0] || '').toUpperCase()}`;
+  if (user.avatar_data) {
+    const avatarImg = document.getElementById('avatarImg');
+    avatarImg.src = user.avatar_data;
+    avatarImg.style.display = 'block';
+    document.getElementById('avatarInitials').style.display = 'none';
+  }
 
   /* Sidebar resumo */
   document.getElementById('membroDesde').textContent = membroDesde;
@@ -79,7 +58,7 @@ const eventosUsuario = [
   val('fi-bairro-input',     '');
 
   /* Renderiza eventos */
-  renderEventos(eventosUsuario);
+  await carregarMinhasInscricoes();
 })();
 
 function setField(id, val) {
@@ -97,6 +76,91 @@ function formatarData(iso) {
   const [y,m,d] = iso.split('-');
   const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   return `${d} de ${meses[parseInt(m)-1]} de ${y}`;
+}
+
+function getStatusEvento(dataIso) {
+  if (!dataIso) return 'confirmado';
+  const data = new Date(`${String(dataIso).slice(0, 10)}T00:00:00`);
+  if (Number.isNaN(data.getTime())) return 'confirmado';
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  return data < hoje ? 'concluido' : 'confirmado';
+}
+
+function formatarDataBadge(dataIso) {
+  const data = new Date(`${String(dataIso || '').slice(0, 10)}T00:00:00`);
+  if (Number.isNaN(data.getTime())) return { dia: '—', mes: '—', dataFull: 'Data não informada' };
+
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+  const dataFull = data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  return { dia, mes: mes.charAt(0).toUpperCase() + mes.slice(1), dataFull };
+}
+
+function normalizarEventoInscrito(ev) {
+  const dataInfo = formatarDataBadge(ev?.data_inicio);
+  const horaInicio = String(ev?.hora_inicio || '').slice(0, 5);
+  const horaFim = String(ev?.hora_fim || '').slice(0, 5);
+  const local = String(ev?.formato || '').toLowerCase() === 'online'
+    ? 'Online'
+    : [ev?.local_nome, ev?.cidade, ev?.estado].filter(Boolean).join(', ') || 'Local a definir';
+
+  return {
+    id: Number(ev?.id) || Date.now(),
+    nome: ev?.nome || 'Evento sem título',
+    categoria: ev?.categoria || 'Evento',
+    data: dataInfo.dia,
+    mes: dataInfo.mes,
+    dataFull: dataInfo.dataFull,
+    hora: horaInicio ? `${horaInicio}${horaFim ? ` às ${horaFim}` : ''}` : 'Horário não informado',
+    local,
+    status: getStatusEvento(ev?.data_inicio),
+    img: ev?.imagem_url || EVENTO_IMG_PADRAO,
+    formato: ev?.formato || 'Presencial',
+    idade: ev?.idade || 'Livre',
+    desc: ev?.descricao || 'Descrição não informada.',
+  };
+}
+
+async function carregarMinhasInscricoes() {
+  try {
+    const data = await apiFetch('/my-subscriptions');
+    const events = Array.isArray(data?.events) ? data.events : [];
+    eventosUsuario = events.map(normalizarEventoInscrito);
+    aplicarFiltroAtual();
+    atualizarStats();
+    atualizarRotulosFiltros();
+  } catch (error) {
+    console.error('Erro ao carregar inscrições do usuário PF:', error);
+    eventosUsuario = [];
+    aplicarFiltroAtual();
+    atualizarStats();
+    atualizarRotulosFiltros();
+    showToast('Não foi possível carregar seus eventos inscritos.', true);
+  }
+}
+
+function aplicarFiltroAtual() {
+  const filtrados = filtroAtualEventos === 'todos'
+    ? eventosUsuario
+    : eventosUsuario.filter(e => e.status === filtroAtualEventos);
+  renderEventos(filtrados);
+}
+
+function atualizarRotulosFiltros() {
+  const contagens = {
+    todos: eventosUsuario.length,
+    confirmado: eventosUsuario.filter(e => e.status === 'confirmado').length,
+    pendente: eventosUsuario.filter(e => e.status === 'pendente').length,
+    concluido: eventosUsuario.filter(e => e.status === 'concluido').length,
+    cancelado: eventosUsuario.filter(e => e.status === 'cancelado').length,
+  };
+
+  document.querySelectorAll('.filter-tab[data-filter]').forEach((btn) => {
+    const status = btn.getAttribute('data-filter');
+    btn.textContent = `${btn.getAttribute('data-label')} (${contagens[status] || 0})`;
+  });
 }
 
 /* =====================================================
@@ -162,11 +226,25 @@ function trocarAvatar(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
+    const avatarData = e.target.result;
     const img = document.getElementById('avatarImg');
-    img.src = e.target.result;
+    img.src = avatarData;
     img.style.display = 'block';
     document.getElementById('avatarInitials').style.display = 'none';
+
+    try {
+      const response = await apiFetch('/profile/avatar', {
+        method: 'PUT',
+        body: { avatar_data: avatarData },
+      });
+      const updatedUser = response?.user || {};
+      Auth.updateUser({ avatar_data: updatedUser.avatar_data || avatarData });
+      showToast('Foto de perfil atualizada!');
+    } catch (error) {
+      const msg = error?.payload?.message || error?.message || 'Não foi possível salvar a foto de perfil.';
+      showToast(msg, true);
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -217,13 +295,12 @@ function renderEventos(lista) {
         <p class="ev-meta"><i class="bi bi-geo-alt-fill"></i>${ev.local}</p>
       </div>
       <div class="ev-card-footer">
-        <span class="btn-ev-detalhe">
+        <button class="btn-ev-detalhe" onclick="verDetalhesEvento(${ev.id})">
           <i class="bi bi-eye me-1"></i>Detalhes
-        </span>
-        ${ev.status === 'confirmado' || ev.status === 'pendente' ? `
+        </button>
         <button class="btn-ev-cancelar" onclick="pedirCancelamento(${ev.id}, '${ev.nome.replace(/'/g,"\\'")}')">
           Cancelar
-        </button>` : `<span></span>`}
+        </button>
       </div>
     </div>`).join('');
 }
@@ -231,10 +308,8 @@ function renderEventos(lista) {
 function filtrarEventos(status, btn) {
   document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-
-  const todos = eventosUsuario;
-  const filtrados = status === 'todos' ? todos : todos.filter(e => e.status === status);
-  renderEventos(filtrados);
+  filtroAtualEventos = status;
+  aplicarFiltroAtual();
 }
 
 function pedirCancelamento(id, nome) {
@@ -243,15 +318,18 @@ function pedirCancelamento(id, nome) {
   new bootstrap.Modal(document.getElementById('modalCancelar')).show();
 }
 
-function confirmarCancelamento() {
+async function confirmarCancelamento() {
   if (!cancelTarget) return;
-  const ev = eventosUsuario.find(e => e.id === cancelTarget);
-  if (ev) ev.status = 'cancelado';
-  bootstrap.Modal.getInstance(document.getElementById('modalCancelar'))?.hide();
-  renderEventos(eventosUsuario);
-  cancelTarget = null;
-  showToast('Inscrição cancelada.');
-  atualizarStats();
+  try {
+    await apiFetch(`/events/${cancelTarget}/subscribe`, { method: 'DELETE' });
+    bootstrap.Modal.getInstance(document.getElementById('modalCancelar'))?.hide();
+    cancelTarget = null;
+    await carregarMinhasInscricoes();
+    showToast('Inscrição cancelada.');
+  } catch (error) {
+    const msg = error?.payload?.message || error?.message || 'Não foi possível cancelar a inscrição.';
+    showToast(msg, true);
+  }
 }
 
 function atualizarStats() {
@@ -348,4 +426,52 @@ function showToast(msg, erro=false) {
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+let detalhesModalInstance = null;
+
+async function verDetalhesEvento(id) {
+  const evento = eventosUsuario.find(e => e.id === id);
+  if (!evento) return;
+
+  let detalhes = null;
+  try {
+    detalhes = await apiFetch(`/events/${id}`);
+  } catch (error) {
+    console.warn('Não foi possível atualizar detalhes do evento em tempo real.', error);
+  }
+
+  const nome = detalhes?.nome || evento.nome;
+  const categoria = detalhes?.categoria || evento.categoria;
+  const dataFull = detalhes?.data_inicio ? formatarDataBadge(detalhes.data_inicio).dataFull : evento.dataFull;
+  const horaIni = String(detalhes?.hora_inicio || '').slice(0, 5);
+  const horaFim = String(detalhes?.hora_fim || '').slice(0, 5);
+  const hora = horaIni ? `${horaIni}${horaFim ? ` às ${horaFim}` : ''}` : evento.hora;
+  const local = String(detalhes?.formato || '').toLowerCase() === 'online'
+    ? 'Online'
+    : [detalhes?.local_nome, detalhes?.cidade, detalhes?.estado].filter(Boolean).join(', ') || evento.local;
+  const formato = detalhes?.formato || evento.formato;
+  const idade = detalhes?.idade || evento.idade;
+  const desc = detalhes?.descricao || evento.desc;
+  const img = detalhes?.imagem_url || evento.img;
+
+  document.getElementById('mdet-img').src = img;
+  document.getElementById('mdet-nome').textContent = nome;
+  document.getElementById('mdet-cat').textContent = categoria;
+  document.getElementById('mdet-data').textContent = dataFull;
+  document.getElementById('mdet-hora').textContent = hora;
+  document.getElementById('mdet-local').textContent = local;
+  document.getElementById('mdet-formato').textContent = formato;
+  document.getElementById('mdet-idade').textContent = idade;
+  document.getElementById('mdet-desc').textContent = desc;
+
+  const modalEl = document.getElementById('modalDetalhesEvento');
+  detalhesModalInstance = new bootstrap.Modal(modalEl);
+  detalhesModalInstance.show();
+}
+
+function fecharDetalhesEvento() {
+  if (detalhesModalInstance) {
+    detalhesModalInstance.hide();
+  }
 }
