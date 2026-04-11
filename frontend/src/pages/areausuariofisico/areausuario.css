@@ -419,6 +419,33 @@
     .modal-cancel .modal-body    { padding: 16px 24px; }
     .modal-cancel .modal-footer  { border: none; padding: 0 24px 24px; }
 
+    .modal-evento-pf { border-radius: 16px; border: none; overflow: hidden; }
+    .modal-evento-pf-hero { width: 100%; height: 250px; object-fit: cover; display: block; }
+    .modal-evento-pf-titulo {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: var(--dark);
+      margin-bottom: 12px;
+    }
+    .btn-close-float {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-close-float:hover { background: rgba(0,0,0,.8); }
+
     /* ===== SEGURANÇA — Excluir conta ===== */
     .danger-zone {
       border: 1.5px solid rgba(239,68,68,.25);

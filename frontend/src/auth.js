@@ -35,6 +35,13 @@ window.Auth = {
     return data ? JSON.parse(data) : null;
   },
 
+  updateUser(partialUser = {}) {
+    const current = this.getUser() || {};
+    const updated = { ...current, ...partialUser };
+    localStorage.setItem('eventocom_user', JSON.stringify(updated));
+    return updated;
+  },
+
   logout() {
     this.clearSession();
     window.location.href = this.HOME_PAGE;

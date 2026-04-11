@@ -35,6 +35,7 @@
     const cat      = document.getElementById('ev-categoria')?.value || '';
     const dataVal  = document.getElementById('ev-data-ini')?.value || '';
     const formato  = document.getElementById('ev-formato')?.value || '';
+    const entrada  = document.getElementById('ev-entrada')?.value || '';
     const localNome= document.getElementById('ev-local-nome')?.value || '';
     const cidade   = document.getElementById('ev-cidade')?.value || '';
     const estado   = document.getElementById('ev-estado')?.value || '';
@@ -42,6 +43,7 @@
     set('prev-nome',   nome   || 'Não preenchido', !nome);
     set('prev-cat',    cat    || '—', !cat);
     set('prev-formato', formato ? formato.charAt(0).toUpperCase() + formato.slice(1) : '—', !formato);
+    set('prev-entrada', entrada ? (entrada === 'gratuito' ? 'Gratuito' : 'Pago') : '—', !entrada);
 
     if (dataVal) {
       const d = new Date(dataVal + 'T00:00:00');
@@ -191,6 +193,7 @@
     const horaIni  = document.getElementById('ev-hora-ini')?.value || '—';
     const horaFim  = document.getElementById('ev-hora-fim')?.value || '';
     const formato  = document.getElementById('ev-formato')?.value || '—';
+    const entrada  = document.getElementById('ev-entrada')?.value || 'gratuito';
     const cidade   = document.getElementById('ev-cidade')?.value || '—';
     const estado   = document.getElementById('ev-estado')?.value || '';
     const local    = document.getElementById('ev-local-nome')?.value || '—';
@@ -209,6 +212,7 @@
       { icon:'bi-calendar3',       label:'Data',        val: dataFmt },
       { icon:'bi-clock-fill',      label:'Horário',     val: horaFim ? `${horaIni} às ${horaFim}` : horaIni },
       { icon:'bi-display',         label:'Formato',     val: formato },
+      { icon:'bi-ticket-perforated-fill', label:'Entrada', val: entrada === 'gratuito' ? 'Gratuito' : 'Pago' },
       { icon:'bi-building',        label:'Local',       val: local },
       { icon:'bi-geo-alt-fill',    label:'Cidade',      val: estado ? `${cidade} – ${estado}` : cidade },
       { icon:'bi-chat-left-text',  label:'Descrição',   val: desc },
@@ -235,7 +239,10 @@
     }
 
     const previewSrc = document.getElementById('previewImg')?.src || '';
-    const imagemUrl = previewSrc.startsWith('data:') ? '' : previewSrc;
+    const imagemUrl = previewSrc || null;
+
+    const entradaSelecionada = (document.getElementById('ev-entrada')?.value || '').trim().toLowerCase();
+    const entrada = entradaSelecionada === 'pago' ? 'pago' : 'gratuito';
 
     const payload = {
       nome: document.getElementById('ev-nome')?.value.trim(),
@@ -246,10 +253,10 @@
       hora_inicio: document.getElementById('ev-hora-ini')?.value,
       hora_fim: document.getElementById('ev-hora-fim')?.value,
       formato: document.getElementById('ev-formato')?.value,
+      entrada,
       local_nome: document.getElementById('ev-local-nome')?.value.trim(),
       cidade: document.getElementById('ev-cidade')?.value.trim(),
       estado: document.getElementById('ev-estado')?.value,
-      idade: document.getElementById('ev-idade')?.value,
       imagem_url: imagemUrl,
     };
 

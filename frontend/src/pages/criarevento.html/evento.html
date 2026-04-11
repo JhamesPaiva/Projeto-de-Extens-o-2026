@@ -372,6 +372,16 @@
 
         <div class="row g-3 mb-3">
           <div class="col-12 col-sm-6">
+            <label class="form-label-custom">Entrada do Evento *</label>
+            <div class="input-wrap">
+              <i class="bi bi-ticket-perforated-fill input-icon"></i>
+              <select class="form-select input-custom" id="ev-entrada" onchange="updatePreview()">
+                <option value="gratuito" selected>Gratuito</option>
+                <option value="pago">Pago</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6">
             <label class="form-label-custom">Capacidade Total</label>
             <div class="input-wrap">
               <i class="bi bi-people-fill input-icon"></i>
@@ -534,6 +544,10 @@
             <p class="pf-label">Formato</p>
             <p class="pf-val empty" id="prev-formato">—</p>
           </div>
+          <div class="preview-field">
+            <p class="pf-label">Entrada</p>
+            <p class="pf-val empty" id="prev-entrada">—</p>
+          </div>
         </div>
       </div>
     </div>
@@ -548,7 +562,7 @@
       <div class="success-icon"><i class="bi bi-check-lg"></i></div>
       <h4>Evento publicado!</h4>
       <p>Seu evento foi enviado para análise e em breve estará visível na plataforma.</p>
-      <a href="index.html" class="btn-modal-home">
+      <a href="../home/home.html" class="btn-modal-home">
         <i class="bi bi-house-fill me-2"></i>Ir para a página inicial
       </a>
     </div>
@@ -559,6 +573,7 @@
 <footer>
   <div class="container">
     <strong style="color:rgba(255,255,255,.6);font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;·&nbsp;<a href="../sobre/sobre.html">Sobre</a>
     &nbsp;·&nbsp;<a href="privacidade.html">Privacidade</a>
     &nbsp;·&nbsp;<a href="termos.html">Termos</a>
     <br/><small class="mt-1 d-block" style="opacity:.6;">© 2025 EventoCom.</small>
