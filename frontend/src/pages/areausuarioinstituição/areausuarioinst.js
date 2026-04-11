@@ -1,3 +1,6 @@
+import { authService } from '../../core/auth/auth-service.js';
+import { apiFetch } from '../../core/api/client.js';
+
 let eventosInst = [];
 let filtroAtual = 'todos';
 let usuarioInstituicaoId = null;
@@ -8,8 +11,9 @@ const EVENTO_IMG_PADRAO = 'https://images.unsplash.com/photo-1511795409834-ef04b
    INIT
    ===================================================== */
 ;(async function init() {
-  if (!Auth.requireInstituicao()) return;
-  const user = Auth.getUser() || {};
+  if (!authService.requireInstituicao()) return;
+  bindEvents();
+  const user = authService.getUser() || {};
   usuarioInstituicaoId = user.id || null;
   const nome = user.nome || 'Instituição';
 
@@ -64,6 +68,74 @@ const EVENTO_IMG_PADRAO = 'https://images.unsplash.com/photo-1511795409834-ef04b
 
   await carregarEventosDaApi(usuarioInstituicaoId);
 })();
+
+function bindEvents() {
+  document.getElementById('btnLogout')?.addEventListener('click', logout);
+
+  const triggerLogoPicker = () => document.getElementById('logoInput')?.click();
+  document.getElementById('instLogo')?.addEventListener('click', triggerLogoPicker);
+  document.getElementById('logoEditBtn')?.addEventListener('click', triggerLogoPicker);
+  document.getElementById('logoInput')?.addEventListener('change', (event) => trocarLogo(event.target));
+
+  document.getElementById('editInst')?.addEventListener('click', () => ativarEdicao('cardInst','cancelInst','saveInst','editInst'));
+  document.getElementById('cancelInst')?.addEventListener('click', () => cancelarEdicao('cardInst','cancelInst','saveInst','editInst'));
+  document.getElementById('saveInst')?.addEventListener('click', () => salvarSecao('cardInst','cancelInst','saveInst','editInst','inst'));
+
+  document.getElementById('editResp')?.addEventListener('click', () => ativarEdicao('cardResp','cancelResp','saveResp','editResp'));
+  document.getElementById('cancelResp')?.addEventListener('click', () => cancelarEdicao('cardResp','cancelResp','saveResp','editResp'));
+  document.getElementById('saveResp')?.addEventListener('click', () => salvarSecao('cardResp','cancelResp','saveResp','editResp','resp'));
+
+  document.getElementById('editEnd')?.addEventListener('click', () => ativarEdicao('cardEnd','cancelEnd','saveEnd','editEnd'));
+  document.getElementById('cancelEnd')?.addEventListener('click', () => cancelarEdicao('cardEnd','cancelEnd','saveEnd','editEnd'));
+  document.getElementById('saveEnd')?.addEventListener('click', () => salvarSecao('cardEnd','cancelEnd','saveEnd','editEnd','end'));
+
+  document.getElementById('editEmail')?.addEventListener('click', () => ativarEdicao('cardEmail','cancelEmail','saveEmail','editEmail'));
+  document.getElementById('cancelEmail')?.addEventListener('click', () => cancelarEdicao('cardEmail','cancelEmail','saveEmail','editEmail'));
+  document.getElementById('saveEmail')?.addEventListener('click', () => salvarSecao('cardEmail','cancelEmail','saveEmail','editEmail','email'));
+
+  document.getElementById('fi-resp-tel-input')?.addEventListener('input', (event) => maskTel(event.target));
+  document.getElementById('fi-cep-input')?.addEventListener('input', (event) => maskCEP(event.target));
+
+  document.querySelectorAll('.filter-tab[data-filter]').forEach((button) => {
+    button.addEventListener('click', () => filtrar(button.dataset.filter, button));
+  });
+
+  document.getElementById('btnTogglePassAtual')?.addEventListener('click', () => togglePass('senhaAtual', 'iconSA'));
+  document.getElementById('btnTogglePassNova')?.addEventListener('click', () => togglePass('senhaNova', 'iconSN'));
+  document.getElementById('btnTogglePassConf')?.addEventListener('click', () => togglePass('senhaConf', 'iconSC'));
+  document.getElementById('senhaNova')?.addEventListener('input', (event) => avaliarSenha(event.target));
+  document.getElementById('btnSalvarSenha')?.addEventListener('click', salvarSenha);
+  document.getElementById('btnExcluirConta')?.addEventListener('click', excluirConta);
+
+  document.getElementById('btnFecharModalVerTop')?.addEventListener('click', fecharModalVerEvento);
+  document.getElementById('btnFecharModalVerFooter')?.addEventListener('click', fecharModalVerEvento);
+  document.getElementById('mv-btn-editar')?.addEventListener('click', abrirEditar);
+
+  document.getElementById('me-img-input')?.addEventListener('change', (event) => carregarImagemEdicao(event.target));
+  document.getElementById('btnTrocarImagemEvento')?.addEventListener('click', () => document.getElementById('me-img-input')?.click());
+  document.getElementById('btnRemoverImagemEvento')?.addEventListener('click', removerImagemEdicao);
+  document.getElementById('btnSalvarEdicaoEvento')?.addEventListener('click', salvarEdicaoEvento);
+  document.getElementById('btnConfirmarExclusaoEvento')?.addEventListener('click', confirmarExclusao);
+
+  document.getElementById('listaEventos')?.addEventListener('click', (event) => {
+    const detailBtn = event.target.closest('[data-ev-detail]');
+    if (detailBtn) {
+      verEvento(Number(detailBtn.getAttribute('data-ev-detail')));
+      return;
+    }
+
+    const editBtn = event.target.closest('[data-ev-edit]');
+    if (editBtn) {
+      abrirEditarDireto(Number(editBtn.getAttribute('data-ev-edit')));
+      return;
+    }
+
+    const deleteBtn = event.target.closest('[data-ev-delete]');
+    if (deleteBtn) {
+      pedirExclusao(Number(deleteBtn.getAttribute('data-ev-delete')), deleteBtn.getAttribute('data-ev-name') || 'Evento');
+    }
+  });
+}
 
 function setFV(id, v) { const el=document.getElementById(id); if(el) el.textContent=v||'—'; }
 function setVal(id,v) { const el=document.getElementById(id); if(el) el.value=v||''; }
@@ -251,7 +323,7 @@ function trocarLogo(input) {
         body: { avatar_data: avatarData },
       });
       const updatedUser = response?.user || {};
-      Auth.updateUser({ avatar_data: updatedUser.avatar_data || avatarData });
+      authService.updateUser({ avatar_data: updatedUser.avatar_data || avatarData });
       showToast('Foto da instituição atualizada!');
     } catch (error) {
       const msg = error?.payload?.message || error?.message || 'Não foi possível salvar a foto da instituição.';
@@ -307,9 +379,9 @@ function renderEventos(lista) {
         </div>
       </div>
       <div class="ev-actions">
-        <button class="btn-ev-ver" onclick="verEvento(${ev.id})"><i class="bi bi-eye"></i>Ver detalhes</button>
-        <button class="btn-ev-editar" onclick="abrirEditarDireto(${ev.id})"><i class="bi bi-pencil-fill"></i>Editar</button>
-        <button class="btn-ev-excluir" onclick="pedirExclusao(${ev.id},'${ev.nome.replace(/'/g,"\\'")}')"><i class="bi bi-trash3-fill"></i>Excluir</button>
+        <button class="btn-ev-ver" type="button" data-ev-detail="${ev.id}"><i class="bi bi-eye"></i>Ver detalhes</button>
+        <button class="btn-ev-editar" type="button" data-ev-edit="${ev.id}"><i class="bi bi-pencil-fill"></i>Editar</button>
+        <button class="btn-ev-excluir" type="button" data-ev-delete="${ev.id}" data-ev-name="${ev.nome.replace(/"/g, '&quot;')}"><i class="bi bi-trash3-fill"></i>Excluir</button>
       </div>
     </div>`; }).join('');
 }
@@ -325,6 +397,10 @@ function filtrar(status, btn) {
    VER EVENTO
    ===================================================== */
 let eventoAtual = null;
+
+function fecharModalVerEvento() {
+  bootstrap.Modal.getInstance(document.getElementById('modalVerEvento'))?.hide();
+}
 
 function verEvento(id) {
   const ev = eventosInst.find(e=>e.id===id); if(!ev) return;
@@ -544,7 +620,11 @@ function salvarSenha() {
 }
 function excluirConta() {
   if(document.getElementById('inputConfExcluir').value.trim()!=='EXCLUIR') { showToast('Digite EXCLUIR para confirmar.',true); return; }
-  Auth.logout();
+  authService.logout();
+}
+
+function logout() {
+  authService.logout();
 }
 
 /* =====================================================

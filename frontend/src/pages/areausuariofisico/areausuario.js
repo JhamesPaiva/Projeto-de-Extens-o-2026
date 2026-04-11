@@ -1,3 +1,6 @@
+import { authService } from '../../core/auth/auth-service.js';
+import { apiFetch } from '../../core/api/client.js';
+
 let eventosUsuario = [];
 let filtroAtualEventos = 'todos';
 const EVENTO_IMG_PADRAO = 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80';
@@ -6,8 +9,9 @@ const EVENTO_IMG_PADRAO = 'https://images.unsplash.com/photo-1511795409834-ef04b
    INICIALIZAÇÃO
    ===================================================== */
 ;(async function init() {
-  if (!Auth.requireAuth()) return;
-  const user = Auth.getUser() || {};
+  if (!authService.requireAuth()) return;
+  bindEvents();
+  const user = authService.getUser() || {};
   const nome = user.nome || 'Usuário';
   const [primeiroNome, ...rest] = nome.split(' ');
   const sobrenome = rest.join(' ') || '—';
@@ -60,6 +64,58 @@ const EVENTO_IMG_PADRAO = 'https://images.unsplash.com/photo-1511795409834-ef04b
   /* Renderiza eventos */
   await carregarMinhasInscricoes();
 })();
+
+function bindEvents() {
+  document.getElementById('btnLogout')?.addEventListener('click', logout);
+
+  const triggerAvatarPick = () => document.getElementById('avatarInput')?.click();
+  document.getElementById('avatarCircle')?.addEventListener('click', triggerAvatarPick);
+  document.getElementById('avatarEditBtn')?.addEventListener('click', triggerAvatarPick);
+  document.getElementById('avatarInput')?.addEventListener('change', (event) => trocarAvatar(event.target));
+
+  document.getElementById('editPessoal')?.addEventListener('click', () => ativarEdicao('cardPessoal','cancelPessoal','savePessoal','editPessoal'));
+  document.getElementById('cancelPessoal')?.addEventListener('click', () => cancelarEdicao('cardPessoal','cancelPessoal','savePessoal','editPessoal'));
+  document.getElementById('savePessoal')?.addEventListener('click', () => salvarSecao('cardPessoal','cancelPessoal','savePessoal','editPessoal','pessoal'));
+
+  document.getElementById('editLoc')?.addEventListener('click', () => ativarEdicao('cardLocalizacao','cancelLoc','saveLoc','editLoc'));
+  document.getElementById('cancelLoc')?.addEventListener('click', () => cancelarEdicao('cardLocalizacao','cancelLoc','saveLoc','editLoc'));
+  document.getElementById('saveLoc')?.addEventListener('click', () => salvarSecao('cardLocalizacao','cancelLoc','saveLoc','editLoc','localizacao'));
+
+  document.getElementById('editEmail')?.addEventListener('click', () => ativarEdicao('cardEmail','cancelEmail','saveEmail','editEmail'));
+  document.getElementById('cancelEmail')?.addEventListener('click', () => cancelarEdicao('cardEmail','cancelEmail','saveEmail','editEmail'));
+  document.getElementById('saveEmail')?.addEventListener('click', () => salvarSecao('cardEmail','cancelEmail','saveEmail','editEmail','email'));
+
+  document.getElementById('fi-telefone-input')?.addEventListener('input', (event) => maskTel(event.target));
+  document.getElementById('fi-cep-input')?.addEventListener('input', (event) => maskCEP(event.target));
+
+  document.querySelectorAll('.filter-tab[data-filter]').forEach((button) => {
+    button.addEventListener('click', () => filtrarEventos(button.dataset.filter, button));
+  });
+
+  document.getElementById('btnTogglePassAtual')?.addEventListener('click', () => togglePass('senhaAtual', 'iconSA'));
+  document.getElementById('btnTogglePassNova')?.addEventListener('click', () => togglePass('senhaNova', 'iconSN'));
+  document.getElementById('btnTogglePassConf')?.addEventListener('click', () => togglePass('senhaConf', 'iconSC'));
+  document.getElementById('senhaNova')?.addEventListener('input', (event) => avaliarSenha(event.target));
+  document.getElementById('btnSalvarSenha')?.addEventListener('click', salvarSenha);
+
+  document.getElementById('btnFecharDetalhesTop')?.addEventListener('click', fecharDetalhesEvento);
+  document.getElementById('btnFecharDetalhesFooter')?.addEventListener('click', fecharDetalhesEvento);
+  document.getElementById('btnConfirmarCancelamento')?.addEventListener('click', confirmarCancelamento);
+  document.getElementById('btnExcluirConta')?.addEventListener('click', excluirConta);
+
+  document.getElementById('eventosGrid')?.addEventListener('click', (event) => {
+    const detailBtn = event.target.closest('[data-event-detail]');
+    if (detailBtn) {
+      verDetalhesEvento(Number(detailBtn.getAttribute('data-event-detail')));
+      return;
+    }
+
+    const cancelBtn = event.target.closest('[data-event-cancel]');
+    if (cancelBtn) {
+      pedirCancelamento(Number(cancelBtn.getAttribute('data-event-cancel')), cancelBtn.getAttribute('data-event-name') || 'Evento');
+    }
+  });
+}
 
 function setField(id, val) {
   const el = document.getElementById(id);
@@ -239,7 +295,7 @@ function trocarAvatar(input) {
         body: { avatar_data: avatarData },
       });
       const updatedUser = response?.user || {};
-      Auth.updateUser({ avatar_data: updatedUser.avatar_data || avatarData });
+      authService.updateUser({ avatar_data: updatedUser.avatar_data || avatarData });
       showToast('Foto de perfil atualizada!');
     } catch (error) {
       const msg = error?.payload?.message || error?.message || 'Não foi possível salvar a foto de perfil.';
@@ -295,10 +351,10 @@ function renderEventos(lista) {
         <p class="ev-meta"><i class="bi bi-geo-alt-fill"></i>${ev.local}</p>
       </div>
       <div class="ev-card-footer">
-        <button class="btn-ev-detalhe" onclick="verDetalhesEvento(${ev.id})">
+        <button class="btn-ev-detalhe" type="button" data-event-detail="${ev.id}">
           <i class="bi bi-eye me-1"></i>Detalhes
         </button>
-        <button class="btn-ev-cancelar" onclick="pedirCancelamento(${ev.id}, '${ev.nome.replace(/'/g,"\\'")}')">
+        <button class="btn-ev-cancelar" type="button" data-event-cancel="${ev.id}" data-event-name="${ev.nome.replace(/"/g, '&quot;')}">
           Cancelar
         </button>
       </div>
@@ -395,7 +451,11 @@ function salvarSenha() {
 function excluirConta() {
   const inp = document.getElementById('inputConfExcluir').value.trim();
   if (inp !== 'EXCLUIR') { showToast('Digite EXCLUIR para confirmar.', true); return; }
-  Auth.logout();
+  authService.logout();
+}
+
+function logout() {
+  authService.logout();
 }
 
 /* =====================================================

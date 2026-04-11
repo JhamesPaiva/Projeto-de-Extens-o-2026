@@ -33,7 +33,7 @@
           <i class="bi bi-building-fill me-1" style="color:var(--accent);"></i>
           <strong id="navNome" style="color:#fff;"></strong>
         </span>
-        <button class="btn-logout" onclick="Auth.logout()">
+        <button class="btn-logout" id="btnLogout" type="button">
           <i class="bi bi-box-arrow-right me-1"></i>Sair
         </button>
       </div>
@@ -47,14 +47,14 @@
     <div class="container">
       <div class="d-flex align-items-end gap-4 flex-wrap">
         <div class="inst-logo-wrap">
-          <div class="inst-logo" id="instLogo" onclick="document.getElementById('logoInput').click()">
+          <div class="inst-logo" id="instLogo">
             <span id="logoInitials"></span>
             <img id="logoImg" src="" alt=""/>
           </div>
-          <div class="logo-edit-btn" onclick="document.getElementById('logoInput').click()">
+          <div class="logo-edit-btn" id="logoEditBtn">
             <i class="bi bi-camera-fill"></i>
           </div>
-          <input type="file" accept="image/*" style="display:none;" id="logoInput" onchange="trocarLogo(this)"/>
+          <input type="file" accept="image/*" style="display:none;" id="logoInput"/>
         </div>
         <div class="pb-1">
           <p class="inst-name" id="instName">—</p>
@@ -98,9 +98,9 @@
               <div class="info-card-header">
                 <p class="info-card-title"><i class="bi bi-building-fill"></i>Dados Institucionais</p>
                 <div class="edit-btns">
-                  <button class="btn-cancel-section" id="cancelInst" onclick="cancelarEdicao('cardInst','cancelInst','saveInst','editInst')"><i class="bi bi-x-lg"></i>Cancelar</button>
-                  <button class="btn-save-section"   id="saveInst"   onclick="salvarSecao('cardInst','cancelInst','saveInst','editInst','inst')"><i class="bi bi-check-lg"></i>Salvar</button>
-                  <button class="btn-edit-section"   id="editInst"   onclick="ativarEdicao('cardInst','cancelInst','saveInst','editInst')"><i class="bi bi-pencil-fill"></i>Editar</button>
+                  <button class="btn-cancel-section" id="cancelInst" type="button"><i class="bi bi-x-lg"></i>Cancelar</button>
+                  <button class="btn-save-section"   id="saveInst" type="button"><i class="bi bi-check-lg"></i>Salvar</button>
+                  <button class="btn-edit-section"   id="editInst" type="button"><i class="bi bi-pencil-fill"></i>Editar</button>
                 </div>
               </div>
               <div class="field-row">
@@ -170,9 +170,9 @@
               <div class="info-card-header">
                 <p class="info-card-title"><i class="bi bi-person-badge-fill"></i>Responsável Legal</p>
                 <div class="edit-btns">
-                  <button class="btn-cancel-section" id="cancelResp" onclick="cancelarEdicao('cardResp','cancelResp','saveResp','editResp')"><i class="bi bi-x-lg"></i>Cancelar</button>
-                  <button class="btn-save-section"   id="saveResp"   onclick="salvarSecao('cardResp','cancelResp','saveResp','editResp','resp')"><i class="bi bi-check-lg"></i>Salvar</button>
-                  <button class="btn-edit-section"   id="editResp"   onclick="ativarEdicao('cardResp','cancelResp','saveResp','editResp')"><i class="bi bi-pencil-fill"></i>Editar</button>
+                  <button class="btn-cancel-section" id="cancelResp" type="button"><i class="bi bi-x-lg"></i>Cancelar</button>
+                  <button class="btn-save-section"   id="saveResp" type="button"><i class="bi bi-check-lg"></i>Salvar</button>
+                  <button class="btn-edit-section"   id="editResp" type="button"><i class="bi bi-pencil-fill"></i>Editar</button>
                 </div>
               </div>
               <div class="field-row">
@@ -196,7 +196,7 @@
                 <div class="field-item" id="fi-resp-tel">
                   <span class="field-label">Telefone</span>
                   <span class="field-value" id="fv-resp-tel">—</span>
-                  <div class="field-input-wrap"><i class="bi bi-telephone-fill fi-icon"></i><input type="tel" class="field-input" id="fi-resp-tel-input" maxlength="15" oninput="maskTel(this)"/></div>
+                  <div class="field-input-wrap"><i class="bi bi-telephone-fill fi-icon"></i><input type="tel" class="field-input" id="fi-resp-tel-input" maxlength="15"/></div>
                 </div>
               </div>
             </div>
@@ -206,13 +206,13 @@
               <div class="info-card-header">
                 <p class="info-card-title"><i class="bi bi-geo-alt-fill"></i>Endereço</p>
                 <div class="edit-btns">
-                  <button class="btn-cancel-section" id="cancelEnd" onclick="cancelarEdicao('cardEnd','cancelEnd','saveEnd','editEnd')"><i class="bi bi-x-lg"></i>Cancelar</button>
-                  <button class="btn-save-section"   id="saveEnd"   onclick="salvarSecao('cardEnd','cancelEnd','saveEnd','editEnd','end')"><i class="bi bi-check-lg"></i>Salvar</button>
-                  <button class="btn-edit-section"   id="editEnd"   onclick="ativarEdicao('cardEnd','cancelEnd','saveEnd','editEnd')"><i class="bi bi-pencil-fill"></i>Editar</button>
+                  <button class="btn-cancel-section" id="cancelEnd" type="button"><i class="bi bi-x-lg"></i>Cancelar</button>
+                  <button class="btn-save-section"   id="saveEnd" type="button"><i class="bi bi-check-lg"></i>Salvar</button>
+                  <button class="btn-edit-section"   id="editEnd" type="button"><i class="bi bi-pencil-fill"></i>Editar</button>
                 </div>
               </div>
               <div class="field-row">
-                <div class="field-item" id="fi-cep"><span class="field-label">CEP</span><span class="field-value" id="fv-cep">—</span><div class="field-input-wrap"><i class="bi bi-pin-map-fill fi-icon"></i><input type="text" class="field-input" id="fi-cep-input" maxlength="9" oninput="maskCEP(this)"/></div></div>
+                <div class="field-item" id="fi-cep"><span class="field-label">CEP</span><span class="field-value" id="fv-cep">—</span><div class="field-input-wrap"><i class="bi bi-pin-map-fill fi-icon"></i><input type="text" class="field-input" id="fi-cep-input" maxlength="9"/></div></div>
                 <div class="field-item" id="fi-logr"><span class="field-label">Logradouro</span><span class="field-value" id="fv-logr">—</span><div class="field-input-wrap"><i class="bi bi-signpost-fill fi-icon"></i><input type="text" class="field-input" id="fi-logr-input"/></div></div>
                 <div class="field-item" id="fi-num"><span class="field-label">Número</span><span class="field-value" id="fv-num">—</span><div class="field-input-wrap"><i class="bi bi-hash fi-icon"></i><input type="text" class="field-input" id="fi-num-input"/></div></div>
                 <div class="field-item" id="fi-cidade"><span class="field-label">Cidade</span><span class="field-value" id="fv-cidade">—</span><div class="field-input-wrap"><i class="bi bi-buildings-fill fi-icon"></i><input type="text" class="field-input" id="fi-cidade-input"/></div></div>
@@ -232,9 +232,9 @@
               <div class="info-card-header">
                 <p class="info-card-title"><i class="bi bi-envelope-fill"></i>E-mail Institucional</p>
                 <div class="edit-btns">
-                  <button class="btn-cancel-section" id="cancelEmail" onclick="cancelarEdicao('cardEmail','cancelEmail','saveEmail','editEmail')"><i class="bi bi-x-lg"></i>Cancelar</button>
-                  <button class="btn-save-section"   id="saveEmail"   onclick="salvarSecao('cardEmail','cancelEmail','saveEmail','editEmail','email')"><i class="bi bi-check-lg"></i>Salvar</button>
-                  <button class="btn-edit-section"   id="editEmail"   onclick="ativarEdicao('cardEmail','cancelEmail','saveEmail','editEmail')"><i class="bi bi-pencil-fill"></i>Editar</button>
+                  <button class="btn-cancel-section" id="cancelEmail" type="button"><i class="bi bi-x-lg"></i>Cancelar</button>
+                  <button class="btn-save-section"   id="saveEmail" type="button"><i class="bi bi-check-lg"></i>Salvar</button>
+                  <button class="btn-edit-section"   id="editEmail" type="button"><i class="bi bi-pencil-fill"></i>Editar</button>
                 </div>
               </div>
               <div class="field-row" style="grid-template-columns:1fr;">
@@ -298,10 +298,10 @@
         </div>
 
         <div class="filter-tabs">
-          <button class="filter-tab active" onclick="filtrar('todos',this)">Todos (3)</button>
-          <button class="filter-tab" onclick="filtrar('publicado',this)">Publicados (2)</button>
-          <button class="filter-tab" onclick="filtrar('rascunho',this)">Rascunhos (1)</button>
-          <button class="filter-tab" onclick="filtrar('encerrado',this)">Encerrados (0)</button>
+          <button class="filter-tab active" type="button" data-filter="todos">Todos (3)</button>
+          <button class="filter-tab" type="button" data-filter="publicado">Publicados (2)</button>
+          <button class="filter-tab" type="button" data-filter="rascunho">Rascunhos (1)</button>
+          <button class="filter-tab" type="button" data-filter="encerrado">Encerrados (0)</button>
         </div>
 
         <div id="listaEventos"></div>
@@ -325,14 +325,14 @@
                   <div class="field-input-wrap" style="display:block;">
                     <i class="bi bi-lock-fill fi-icon"></i>
                     <input type="password" class="field-input" id="senhaAtual" placeholder="••••••••" style="padding-right:40px;"/>
-                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaAtual','iconSA')"><i class="bi bi-eye-fill" id="iconSA"></i></button>
+                    <button class="btn-toggle-pass" type="button" id="btnTogglePassAtual"><i class="bi bi-eye-fill" id="iconSA"></i></button>
                   </div>
                 </div>
                 <div><label class="field-label d-block mb-1">Nova Senha</label>
                   <div class="field-input-wrap" style="display:block;">
                     <i class="bi bi-lock-fill fi-icon"></i>
-                    <input type="password" class="field-input" id="senhaNova" placeholder="Mínimo 8 caracteres" style="padding-right:40px;" oninput="avaliarSenha(this)" minlength="8"/>
-                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaNova','iconSN')"><i class="bi bi-eye-fill" id="iconSN"></i></button>
+                    <input type="password" class="field-input" id="senhaNova" placeholder="Mínimo 8 caracteres" style="padding-right:40px;" minlength="8"/>
+                    <button class="btn-toggle-pass" type="button" id="btnTogglePassNova"><i class="bi bi-eye-fill" id="iconSN"></i></button>
                   </div>
                   <div class="strength-row mt-1"><div class="s-bar" id="sb1"></div><div class="s-bar" id="sb2"></div><div class="s-bar" id="sb3"></div><div class="s-bar" id="sb4"></div><span class="s-label" id="slabel"></span></div>
                 </div>
@@ -340,12 +340,12 @@
                   <div class="field-input-wrap" style="display:block;">
                     <i class="bi bi-lock-fill fi-icon"></i>
                     <input type="password" class="field-input" id="senhaConf" placeholder="Repita a nova senha" style="padding-right:40px;"/>
-                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaConf','iconSC')"><i class="bi bi-eye-fill" id="iconSC"></i></button>
+                    <button class="btn-toggle-pass" type="button" id="btnTogglePassConf"><i class="bi bi-eye-fill" id="iconSC"></i></button>
                   </div>
                 </div>
               </div>
               <div class="d-flex justify-content-end mt-4">
-                <button class="btn-save-section" style="display:flex;" onclick="salvarSenha()"><i class="bi bi-check-lg"></i>Atualizar Senha</button>
+                <button class="btn-save-section" style="display:flex;" id="btnSalvarSenha" type="button"><i class="bi bi-check-lg"></i>Atualizar Senha</button>
               </div>
             </div>
             <div class="info-card">
@@ -382,7 +382,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <img id="mv-img" class="modal-hero" src="" alt=""/>
-        <button class="btn-close-float" onclick="bootstrap.Modal.getInstance(document.getElementById('modalVerEvento')).hide()"><i class="bi bi-x-lg"></i></button>
+        <button class="btn-close-float" id="btnFecharModalVerTop" type="button"><i class="bi bi-x-lg"></i></button>
         <span id="mv-status" class="ev-status-pill position-absolute bottom-0 start-0 m-3"></span>
       </div>
       <div class="modal-body">
@@ -405,8 +405,8 @@
         <p class="modal-desc-text" id="mv-desc"></p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary btn-sm" onclick="bootstrap.Modal.getInstance(document.getElementById('modalVerEvento')).hide()">Fechar</button>
-        <button class="btn-ev-editar" style="border-radius:9px;padding:8px 20px;" id="mv-btn-editar" onclick="abrirEditar()">
+        <button class="btn btn-secondary btn-sm" id="btnFecharModalVerFooter" type="button">Fechar</button>
+        <button class="btn-ev-editar" style="border-radius:9px;padding:8px 20px;" id="mv-btn-editar" type="button">
           <i class="bi bi-pencil-fill"></i>Editar evento
         </button>
       </div>
@@ -508,12 +508,12 @@
           <div class="col-12">
             <label class="medit-label">Imagem de Capa</label>
             <div class="me-edit-image-box">
-              <input type="file" id="me-img-input" accept="image/*" style="display:none;" onchange="carregarImagemEdicao(this)"/>
+              <input type="file" id="me-img-input" accept="image/*" style="display:none;"/>
               <div class="me-edit-image-actions">
-                <button type="button" class="btn-me-img" onclick="document.getElementById('me-img-input').click()">
+                <button type="button" class="btn-me-img" id="btnTrocarImagemEvento">
                   <i class="bi bi-image-fill"></i>Trocar imagem
                 </button>
-                <button type="button" class="btn-me-img btn-me-img-remove" onclick="removerImagemEdicao()">
+                <button type="button" class="btn-me-img btn-me-img-remove" id="btnRemoverImagemEvento">
                   <i class="bi bi-trash3-fill"></i>Remover
                 </button>
                 <span class="me-edit-image-note">PNG, JPG ou WEBP</span>
@@ -529,7 +529,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn-salvar-evento" onclick="salvarEdicaoEvento()">
+        <button type="button" class="btn-salvar-evento" id="btnSalvarEdicaoEvento">
           <i class="bi bi-check-lg"></i>Salvar alterações
         </button>
       </div>
@@ -553,7 +553,7 @@
       </div>
       <div class="modal-footer gap-2">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-sm" style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;" onclick="confirmarExclusao()">
+        <button type="button" class="btn btn-sm" id="btnConfirmarExclusaoEvento" style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;">
           <i class="bi bi-trash3-fill me-1"></i>Excluir evento
         </button>
       </div>
@@ -573,7 +573,7 @@
       </div>
       <div class="modal-footer gap-2">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-sm" style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;" onclick="excluirConta()">Excluir conta</button>
+        <button type="button" class="btn btn-sm" id="btnExcluirConta" style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;">Excluir conta</button>
       </div>
     </div>
   </div>
@@ -593,8 +593,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../../services/api.js?v=20260410d"></script>
-<script src="../../auth.js?v=20260410d"></script>
-<script src="areausuarioinst.js"></script>
+<script type="module" src="areausuarioinst.js"></script>
 </body>
 </html>
