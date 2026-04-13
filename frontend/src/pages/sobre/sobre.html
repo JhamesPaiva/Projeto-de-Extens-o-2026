@@ -22,13 +22,14 @@
     </button>
     <div class="collapse navbar-collapse" id="navMain">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="/frontend/src/pages/home/home.html">Início</a></li>
-        <li class="nav-item"><a class="nav-link" href="/frontend/src/pages/home/home.html">Explorar</a></li>
-        <li class="nav-item"><a class="nav-link active" href="/frontend/src/pages/sobre/sobre.html">Sobre</a></li>
+        <li class="nav-item"><a class="nav-link" href="../home/home.html">Início</a></li>
+        <li class="nav-item"><a class="nav-link" href="../home/home.html">Explorar</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../sobre/sobre.html">Sobre</a></li>
       </ul>
-      <div class="d-flex gap-2 mt-2 mt-lg-0">
-        <a href="/frontend/src/pages/login/login.html" class="nav-link" style="border:1.5px solid rgba(255,255,255,.2);padding:7px 18px !important;font-size:.88rem;">Entrar</a>
-        <a href="/frontend/src/pages/cadastro/cadastro.html" class="btn-nav-home"><i class="bi bi-person-plus me-1"></i>Criar conta</a>
+      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 mt-2 mt-lg-0">
+        <a href="../login/login.html" class="btn btn-nav-login"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a>
+        <a href="../cadastro/cadastro.html" class="btn btn-nav-register"><i class="bi bi-person-plus me-1"></i>Cadastrar</a>
+        <a href="../criarevento.html/evento.html" class="btn btn-nav-create"><i class="bi bi-plus-circle me-1"></i>Crie seu Evento</a>
       </div>
     </div>
   </div>
@@ -352,21 +353,19 @@
 <!-- ===== FOOTER ===== -->
 <footer>
   <div class="container">
-    <div class="footer-inner">
-      <span class="footer-brand">Evento<span>Com</span></span>
-      <div class="footer-links">
-        <a href="sobre.html">Sobre</a>
-        <a href="/frontend/src/pages/home/home.html">Explorar</a>
-        <a href="contato.html">Contato</a>
-        <a href="privacidade.html">Privacidade</a>
-        <a href="termos.html">Termos</a>
-      </div>
-      <span>© 2025 EventoCom. Todos os direitos reservados.</span>
-    </div>
+    <strong style="color:#fff;font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;—&nbsp; Conectando pessoas através de eventos comunitários.
+    <br class="d-sm-none"/>
+    <span class="d-none d-sm-inline">&nbsp;|&nbsp;</span>
+    <a href="../sobre/sobre.html">Sobre</a> &nbsp;·&nbsp;
+    <a href="../contato/contato.html">Contato</a> &nbsp;·&nbsp;
+    <a href="../privacidade/privacidade.html">Privacidade</a> &nbsp;·&nbsp;
+    <a href="../termos/termos.html">Termos</a>
+    <br/><small class="mt-1 d-block">© 2025 EventoCom. Todos os direitos reservados.</small>
   </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="sobre.js"></script>
+<script type="module" src="sobre.js"></script>
 </body>
 </html>

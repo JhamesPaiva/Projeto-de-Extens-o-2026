@@ -268,6 +268,7 @@ function eventToCard(event) {
     orgNome: organizadorNome,
     orgAvatar: event.organizador_avatar_data || '',
     orgId: Number(event.organizador_id) || 0,
+    orgProfileUrl: perfilInstituicaoUrl,
   });
 
   return `
@@ -508,9 +509,8 @@ function openEventModal(ev) {
   orgLinkEl.textContent = orgNome;
 
   const orgId = Number(ev.orgId) || 0;
-  orgLinkEl.href = orgId > 0
-    ? `../areapublicainst/areapublicainst.html?inst=${encodeURIComponent(orgId)}`
-    : '#';
+  const fallbackProfileUrl = `../areapublicainst/areapublicainst.html?inst=${encodeURIComponent(orgId)}`;
+  orgLinkEl.href = ev.orgProfileUrl || fallbackProfileUrl;
 
   if (ev.orgAvatar) {
     orgAvatarEl.innerHTML = `<img src="${escapeHtml(ev.orgAvatar)}" alt="Instituição ${escapeHtml(orgNome)}"/>`;
