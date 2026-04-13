@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instituto Cultural BH – EventoCom</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="areapublicainst.css"/>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="../home/home.html"><i class="bi bi-calendar-event-fill me-1"></i>Evento<span>Com</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="../home/home.html">Início</a></li>
+        <li class="nav-item"><a class="nav-link" href="../home/home.html">Explorar</a></li>
+        <li class="nav-item"><a class="nav-link" href="../sobre/sobre.html">Sobre</a></li>
+      </ul>
+      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 mt-2 mt-lg-0" id="navAcoes"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO COVER ===== -->
+<div class="hero-cover">
+  <div class="hero-cover-bg"></div>
+  <div class="hero-cover-pattern"></div>
+  <div class="breadcrumb-wrap">
+    <div class="container">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="../home/home.html">Início</a></li>
+        <li class="breadcrumb-item"><a href="#">Instituições</a></li>
+        <li class="breadcrumb-item active" id="bcNome">Instituto Cultural BH</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROFILE HEADER ===== -->
+<div class="container">
+  <div class="profile-header-wrap">
+    <div class="profile-header-inner">
+
+      <!-- Logo -->
+      <div class="inst-logo-outer">
+        <div class="inst-logo-inner" id="instLogo">
+          <span id="logoInitials"></span>
+          <img id="logoImg" src="" alt=""/>
+        </div>
+      </div>
+
+      <!-- Info + botão -->
+      <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-end justify-content-between flex-fill gap-3 flex-wrap">
+        <div class="profile-header-info">
+          <h1 class="inst-fantasia" id="instFantasia">—</h1>
+          <p class="inst-razao" id="instRazao">—</p>
+          <div class="header-tags" id="headerTags"></div>
+        </div>
+        <button class="btn-contato" id="btnContatoHero" data-bs-toggle="modal" data-bs-target="#modalContato">
+          <i class="bi bi-envelope-fill"></i>Entrar em contato
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONTEÚDO ===== -->
+<div class="container">
+
+  <!-- Aviso para visitantes não logados -->
+  <div class="visitor-notice d-none" id="visitorNotice">
+    <i class="bi bi-info-circle-fill me-1" style="color:var(--primary);"></i>
+    <a href="../login/login.html">Faça login</a> ou <a href="../cadastro/cadastro.html">crie uma conta</a> para se inscrever nos eventos desta instituição.
+  </div>
+
+  <div class="page-layout">
+
+    <!-- ===== COLUNA PRINCIPAL ===== -->
+    <div class="main-col">
+
+      <!-- Sobre -->
+      <div class="info-card">
+        <p class="card-title-row"><i class="bi bi-building-fill"></i>Sobre a Instituição</p>
+        <p class="sobre-text" id="instDesc">—</p>
+      </div>
+
+      <!-- Links / Site e Redes -->
+      <div class="info-card" id="linksCard">
+        <p class="card-title-row"><i class="bi bi-link-45deg"></i>Site e Redes Sociais</p>
+        <div id="linksContainer"></div>
+      </div>
+
+      <!-- Eventos -->
+      <div class="info-card">
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+          <p class="card-title-row mb-0"><i class="bi bi-calendar-event-fill"></i>Eventos desta Instituição</p>
+          <span style="font-family:var(--font-body);font-size:.8rem;color:var(--muted);" id="contadorEventos"></span>
+        </div>
+        <div class="eventos-grid" id="eventosGrid"></div>
+        <div class="empty-eventos d-none" id="emptyEventos">
+          <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+          <p>Esta instituição ainda não publicou eventos.</p>
+        </div>
+      </div>
+
+    </div><!-- /main-col -->
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar-col">
+
+      <!-- Card contato -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h6><i class="bi bi-envelope-fill me-2"></i>Fale com a Instituição</h6>
+          <p>Envie uma mensagem diretamente</p>
+        </div>
+        <div class="sidebar-card-body">
+          <p style="font-family:var(--font-body);font-size:.83rem;color:var(--muted);margin-bottom:14px;">
+            Tem alguma dúvida sobre os eventos ou atividades desta instituição? Entre em contato.
+          </p>
+          <button class="btn-contato-sidebar" data-bs-toggle="modal" data-bs-target="#modalContato">
+            <i class="bi bi-envelope-fill"></i>Enviar mensagem
+          </button>
+        </div>
+      </div>
+
+      <!-- Card informações -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h6><i class="bi bi-info-circle-fill me-2"></i>Informações</h6>
+        </div>
+        <div class="sidebar-card-body">
+          <div class="info-item">
+            <div class="info-item-icon"><i class="bi bi-tags-fill"></i></div>
+            <div>
+              <span class="info-item-label">Tipo</span>
+              <span class="info-item-val" id="si-tipo">—</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-icon"><i class="bi bi-grid-fill"></i></div>
+            <div>
+              <span class="info-item-label">Área de Atuação</span>
+              <span class="info-item-val" id="si-area">—</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-icon"><i class="bi bi-geo-alt-fill"></i></div>
+            <div>
+              <span class="info-item-label">Localização</span>
+              <span class="info-item-val" id="si-local">—</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-icon"><i class="bi bi-calendar-check-fill"></i></div>
+            <div>
+              <span class="info-item-label">Membro desde</span>
+              <span class="info-item-val" id="si-membro">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card estatísticas -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h6><i class="bi bi-bar-chart-fill me-2"></i>Números</h6>
+        </div>
+        <div class="sidebar-card-body">
+          <div class="stat-row">
+            <div class="stat-row-left">
+              <div class="stat-icon-sm si-orange"><i class="bi bi-calendar-event-fill"></i></div>
+              <span class="stat-row-label">Eventos publicados</span>
+            </div>
+            <span class="stat-row-val" id="si-eventos">—</span>
+          </div>
+          <div class="stat-row">
+            <div class="stat-row-left">
+              <div class="stat-icon-sm si-blue"><i class="bi bi-people-fill"></i></div>
+              <span class="stat-row-label">Total de inscritos</span>
+            </div>
+            <span class="stat-row-val" id="si-inscritos">—</span>
+          </div>
+          <div class="stat-row">
+            <div class="stat-row-left">
+              <div class="stat-icon-sm si-green"><i class="bi bi-check-circle-fill"></i></div>
+              <span class="stat-row-label">Eventos realizados</span>
+            </div>
+            <span class="stat-row-val" id="si-realizados">—</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sidebar -->
+
+  </div><!-- /page-layout -->
+</div>
+
+<!-- ===== MODAL CONTATO ===== -->
+<div class="modal fade modal-contato" id="modalContato" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title"><i class="bi bi-envelope-fill me-2" style="color:var(--primary);"></i>Enviar mensagem</h5>
+          <p class="modal-subtitle">Para: <strong id="modalDestino">—</strong></p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Formulário -->
+        <div id="contatoForm">
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <label class="c-label">Seu nome</label>
+              <div class="c-wrap">
+                <i class="bi bi-person-fill c-icon"></i>
+                <input type="text" class="c-input" id="c-nome" placeholder="Nome completo"/>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="c-label">Seu e-mail</label>
+              <div class="c-wrap">
+                <i class="bi bi-envelope-fill c-icon"></i>
+                <input type="email" class="c-input" id="c-email" placeholder="seu@email.com"/>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="c-label">Assunto</label>
+              <div class="c-wrap">
+                <i class="bi bi-chat-left-text-fill c-icon"></i>
+                <input type="text" class="c-input" id="c-assunto" placeholder="Ex: Dúvida sobre inscrição"/>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="c-label">Mensagem</label>
+              <div class="c-wrap">
+                <i class="bi bi-text-paragraph c-icon-top"></i>
+                <textarea class="c-input" id="c-mensagem" rows="4"
+                  style="padding-left:38px!important;padding-top:12px;height:auto!important;"
+                  placeholder="Escreva sua mensagem aqui..."></textarea>
+              </div>
+            </div>
+          </div>
+          <p style="font-family:var(--font-body);font-size:.75rem;color:var(--muted);margin-top:12px;">
+            <i class="bi bi-lock-fill me-1"></i>Sua mensagem será enviada diretamente para o e-mail da instituição. Seus dados não serão compartilhados publicamente.
+          </p>
+        </div>
+
+        <!-- Sucesso -->
+        <div class="contato-success" id="contatoSuccess">
+          <div class="ok-icon"><i class="bi bi-check-lg"></i></div>
+          <h5>Mensagem enviada!</h5>
+          <p>A instituição receberá seu contato em breve e poderá responder pelo e-mail informado.</p>
+        </div>
+
+      </div>
+      <div class="modal-footer" id="contatoFooter">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn-enviar" id="btnEnviarContato">
+          <i class="bi bi-send-fill"></i>Enviar mensagem
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <strong style="color:#fff;font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;—&nbsp; Conectando pessoas através de eventos comunitários.
+    <br class="d-sm-none"/>
+    <span class="d-none d-sm-inline">&nbsp;|&nbsp;</span>
+    <a href="../sobre/sobre.html">Sobre</a> &nbsp;·&nbsp;
+    <a href="../contato/contato.html">Contato</a> &nbsp;·&nbsp;
+    <a href="../privacidade/privacidade.html">Privacidade</a> &nbsp;·&nbsp;
+    <a href="../termos/termos.html">Termos</a>
+    <br/><small class="mt-1 d-block">© 2025 EventoCom. Todos os direitos reservados.</small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="areapublicainst.js"></script>
+</body>
+</html>

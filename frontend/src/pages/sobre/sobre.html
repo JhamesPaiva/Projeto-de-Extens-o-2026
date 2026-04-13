@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sobre – EventoCom</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="sobre.css"/>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/frontend/src/pages/home/home.html"><i class="bi bi-calendar-event-fill me-1"></i>Evento<span>Com</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="../home/home.html">Início</a></li>
+        <li class="nav-item"><a class="nav-link" href="../home/home.html">Explorar</a></li>
+        <li class="nav-item"><a class="nav-link active" href="../sobre/sobre.html">Sobre</a></li>
+      </ul>
+      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 mt-2 mt-lg-0">
+        <a href="../login/login.html" class="btn btn-nav-login"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a>
+        <a href="../cadastro/cadastro.html" class="btn btn-nav-register"><i class="bi bi-person-plus me-1"></i>Cadastrar</a>
+        <a href="../criarevento.html/evento.html" class="btn btn-nav-create"><i class="bi bi-plus-circle me-1"></i>Crie seu Evento</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="hero-grid"></div>
+
+  <div class="container hero-content">
+    <div class="row align-items-center gy-5">
+
+      <div class="col-12 col-lg-6">
+        <span class="hero-eyebrow"><i class="bi bi-calendar-event-fill"></i>Sobre a Plataforma</span>
+        <h1 class="hero-title">
+          Onde a sua<br/>
+          <span class="line-accent">comunidade</span>
+          <span class="line-ghost">acontece.</span>
+        </h1>
+        <p class="hero-sub">
+          Criamos um espaço para que pessoas e instituições se encontrem através do que mais importa: experiências reais, eventos inesquecíveis e conexões que ficam.
+        </p>
+        <div class="hero-ctas">
+          <a href="index.html" class="btn-hero-primary">
+            <i class="bi bi-search"></i>Explorar eventos
+          </a>
+          <a href="#missao" class="btn-hero-ghost">
+            Nossa história <i class="bi bi-arrow-down"></i>
+          </a>
+        </div>
+        <div class="hero-numbers">
+          <div class="hero-num-item">
+            <p class="num">12<span>k+</span></p>
+            <p class="label">Usuários ativos</p>
+          </div>
+          <div class="hero-num-item">
+            <p class="num">840<span>+</span></p>
+            <p class="label">Eventos realizados</p>
+          </div>
+          <div class="hero-num-item">
+            <p class="num">230<span>+</span></p>
+            <p class="label">Instituições</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6 hero-visual">
+        <div class="hero-card-mockup">
+          <div class="mockup-header">
+            <div class="mockup-dot" style="background:#ef4444;"></div>
+            <div class="mockup-dot" style="background:#f59e0b;"></div>
+            <div class="mockup-dot" style="background:#22c55e;"></div>
+            <span class="mockup-title" style="margin-left:8px;">EventoCom — Eventos em destaque</span>
+          </div>
+
+          <div class="mockup-event-card">
+            <div class="mockup-event-date"><span class="d">12</span><span class="m">Jul</span></div>
+            <div class="mockup-event-info">
+              <p class="name">Festival Verão Sonoro 2025</p>
+              <p class="loc"><i class="bi bi-geo-alt-fill" style="font-size:.65rem;"></i> Parque Municipal, São Paulo</p>
+            </div>
+            <span class="mockup-pill">Música</span>
+          </div>
+
+          <div class="mockup-event-card">
+            <div class="mockup-event-date"><span class="d">19</span><span class="m">Jul</span></div>
+            <div class="mockup-event-info">
+              <p class="name">Sabores da Cidade — Edição Especial</p>
+              <p class="loc"><i class="bi bi-geo-alt-fill" style="font-size:.65rem;"></i> Praça Central, Belo Horizonte</p>
+            </div>
+            <span class="mockup-pill">Gastronomia</span>
+          </div>
+
+          <div class="mockup-event-card">
+            <div class="mockup-event-date"><span class="d">09</span><span class="m">Ago</span></div>
+            <div class="mockup-event-info">
+              <p class="name">Hackathon Comunidade Tech 2025</p>
+              <p class="loc"><i class="bi bi-geo-alt-fill" style="font-size:.65rem;"></i> Hub de Inovação, Recife</p>
+            </div>
+            <span class="mockup-pill">Tecnologia</span>
+          </div>
+
+          <!-- Barra de busca mockup -->
+          <div style="margin-top:16px;background:rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.08);">
+            <i class="bi bi-search" style="color:rgba(255,255,255,.3);font-size:.88rem;"></i>
+            <span style="font-family:var(--font-body);font-size:.8rem;color:rgba(255,255,255,.3);">Buscar eventos na sua cidade...</span>
+            <span style="margin-left:auto;background:var(--primary);color:#fff;font-family:var(--font-body);font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:7px;">Buscar</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <span>Role para baixo</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ===== MISSÃO ===== -->
+<section class="section-missao" id="missao">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+
+      <div class="col-12 col-lg-6 reveal">
+        <span class="missao-label">Nossa Missão</span>
+        <h2 class="missao-headline">
+          Conectar pessoas<br/>através de <em>experiências</em><br/>que importam.
+        </h2>
+        <div class="quote-block">
+          <p>"Acreditamos que eventos não são apenas momentos — são pontes entre pessoas, ideias e comunidades."</p>
+        </div>
+        <p class="missao-body">
+          O EventoCom nasceu da percepção de que bons eventos existem em todas as cidades, mas muitas vezes as pessoas simplesmente não ficam sabendo. Criamos uma plataforma que conecta quem organiza com quem quer participar — de forma simples, transparente e acessível para todos.
+        </p>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="row g-3">
+          <div class="col-6 reveal reveal-delay-1">
+            <div class="pilar-item">
+              <div class="pilar-icon pi-orange"><i class="bi bi-people-fill"></i></div>
+              <p class="pilar-title">Comunidade</p>
+              <p class="pilar-desc">Aproximamos pessoas que compartilham os mesmos interesses e valores.</p>
+            </div>
+          </div>
+          <div class="col-6 reveal reveal-delay-2">
+            <div class="pilar-item">
+              <div class="pilar-icon pi-yellow"><i class="bi bi-lightning-fill"></i></div>
+              <p class="pilar-title">Simplicidade</p>
+              <p class="pilar-desc">Publicar e se inscrever em eventos em poucos cliques, sem burocracia.</p>
+            </div>
+          </div>
+          <div class="col-6 reveal reveal-delay-3">
+            <div class="pilar-item">
+              <div class="pilar-icon pi-purple"><i class="bi bi-shield-check-fill"></i></div>
+              <p class="pilar-title">Confiança</p>
+              <p class="pilar-desc">Instituições verificadas e informações transparentes para todos.</p>
+            </div>
+          </div>
+          <div class="col-6 reveal reveal-delay-4">
+            <div class="pilar-item">
+              <div class="pilar-icon pi-green"><i class="bi bi-globe2"></i></div>
+              <p class="pilar-title">Acesso</p>
+              <p class="pilar-desc">Eventos gratuitos e pagos, para todos os perfis e cidades do Brasil.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== NÚMEROS ===== -->
+<section class="section-numeros">
+  <div class="container">
+    <div class="row g-0">
+      <div class="col-6 col-md-3">
+        <div class="numero-item reveal">
+          <p class="numero-val"><span class="count" data-target="12000">0</span><span>+</span></p>
+          <p class="numero-label">Usuários cadastrados</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="numero-item reveal reveal-delay-1">
+          <p class="numero-val"><span class="count" data-target="840">0</span><span>+</span></p>
+          <p class="numero-label">Eventos realizados</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="numero-item reveal reveal-delay-2">
+          <p class="numero-val"><span class="count" data-target="230">0</span><span>+</span></p>
+          <p class="numero-label">Instituições parceiras</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="numero-item reveal reveal-delay-3">
+          <p class="numero-val"><span class="count" data-target="95">0</span><span>%</span></p>
+          <p class="numero-label">Satisfação dos participantes</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COMO FUNCIONA ===== -->
+<section class="section-como">
+  <div class="container">
+    <div class="row gy-5 align-items-start">
+
+      <div class="col-12 col-lg-4 reveal">
+        <span class="section-eyebrow">Como funciona</span>
+        <h2 class="section-headline">Simples do<br/>início ao fim.</h2>
+        <p class="section-sub">Do cadastro à participação, tornamos cada etapa intuitiva para que você passe mais tempo vivendo experiências e menos tempo navegando.</p>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <div class="steps-container">
+          <div class="steps-line"></div>
+
+          <div class="step-row reveal reveal-delay-1">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <p class="step-title">Crie sua conta em segundos</p>
+              <p class="step-desc">Cadastre-se como Pessoa Física para participar de eventos ou como Instituição para organizá-los. O processo leva menos de 2 minutos.</p>
+            </div>
+          </div>
+
+          <div class="step-row reveal reveal-delay-2">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <p class="step-title">Descubra eventos perto de você</p>
+              <p class="step-desc">Use filtros por cidade, categoria, data e formato para encontrar exatamente o que você procura — shows, feiras, workshops, corridas e muito mais.</p>
+            </div>
+          </div>
+
+          <div class="step-row reveal reveal-delay-3">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <p class="step-title">Inscreva-se com um clique</p>
+              <p class="step-desc">Confirme sua presença diretamente pela plataforma. Você recebe tudo no seu perfil e pode acompanhar o status da inscrição a qualquer momento.</p>
+            </div>
+          </div>
+
+          <div class="step-row reveal reveal-delay-4">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <p class="step-title">Viva a experiência</p>
+              <p class="step-desc">Compareça, participe, conecte-se. E se quiser mais, explore novos eventos e continue expandindo os seus horizontes.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== TIPOS DE USUÁRIO ===== */
+<section class="section-tipos">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <span class="section-eyebrow">Para quem é</span>
+      <h2 class="section-headline">Feito para todo mundo.<br/>Do seu jeito.</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-12 col-md-6 reveal reveal-delay-1">
+        <div class="tipo-card tipo-card-pf">
+          <div class="tipo-icon tipo-icon-pf"><i class="bi bi-person-fill"></i></div>
+          <h3 class="tipo-title">Pessoa Física</h3>
+          <p class="tipo-sub">Para quem quer descobrir, participar e viver eventos incríveis perto de casa ou em qualquer lugar do Brasil.</p>
+          <ul class="tipo-features">
+            <li><i class="bi bi-check-circle-fill"></i>Explore centenas de eventos por categoria</li>
+            <li><i class="bi bi-check-circle-fill"></i>Inscreva-se e acompanhe no seu perfil</li>
+            <li><i class="bi bi-check-circle-fill"></i>Filtre por cidade, data, preço e formato</li>
+            <li><i class="bi bi-check-circle-fill"></i>Conheça as instituições organizadoras</li>
+          </ul>
+          <a href="cadastro.html" class="btn-tipo btn-tipo-pf">
+            Criar conta gratuita <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 reveal reveal-delay-2">
+        <div class="tipo-card tipo-card-pj">
+          <div class="tipo-icon tipo-icon-pj"><i class="bi bi-building-fill"></i></div>
+          <h3 class="tipo-title">Instituição</h3>
+          <p class="tipo-sub">Para empresas, ONGs, coletivos e organizações que querem publicar eventos e alcançar mais pessoas com muito menos esforço.</p>
+          <ul class="tipo-features">
+            <li><i class="bi bi-check-circle-fill"></i>Publique eventos em minutos</li>
+            <li><i class="bi bi-check-circle-fill"></i>Gerencie inscrições em um só lugar</li>
+            <li><i class="bi bi-check-circle-fill"></i>Perfil público da sua instituição</li>
+            <li><i class="bi bi-check-circle-fill"></i>Alcance uma comunidade engajada</li>
+          </ul>
+          <a href="cadastro.html" class="btn-tipo btn-tipo-pj">
+            Cadastrar instituição <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MANIFESTO ===== -->
+<section class="section-manifesto">
+  <div class="manifesto-bg-text">comunidade</div>
+  <div class="container reveal">
+    <p class="manifesto-text">
+      Toda cidade tem uma <span class="hl">história para contar.</span><br/>
+      Todo evento é um <span class="hl-acc">ponto de encontro.</span><br/>
+      E toda pessoa merece fazer <span class="hl">parte disso.</span>
+    </p>
+    <p style="font-family:var(--font-body);font-size:.88rem;color:rgba(255,255,255,.3);position:relative;z-index:2;">— A equipe EventoCom</p>
+  </div>
+</section>
+
+<!-- ===== CTA FINAL ===== -->
+<section class="section-cta">
+  <div class="cta-glow"></div>
+  <div class="container reveal">
+    <h2 class="cta-title">Pronto para<br/><span>fazer parte?</span></h2>
+    <p class="cta-sub">Junte-se a milhares de pessoas que já descobriram sua próxima experiência favorita.</p>
+    <div class="cta-btns">
+      <a href="/frontend/src/pages/cadastro/cadastro.html" class="btn-hero-primary">
+        <i class="bi bi-person-plus-fill"></i>Criar conta grátis
+      </a>
+      <a href="/frontend/src/pages/home/home.html" class="btn-hero-ghost">
+        <i class="bi bi-search"></i>Explorar eventos
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <strong style="color:#fff;font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;—&nbsp; Conectando pessoas através de eventos comunitários.
+    <br class="d-sm-none"/>
+    <span class="d-none d-sm-inline">&nbsp;|&nbsp;</span>
+    <a href="../sobre/sobre.html">Sobre</a> &nbsp;·&nbsp;
+    <a href="../contato/contato.html">Contato</a> &nbsp;·&nbsp;
+    <a href="../privacidade/privacidade.html">Privacidade</a> &nbsp;·&nbsp;
+    <a href="../termos/termos.html">Termos</a>
+    <br/><small class="mt-1 d-block">© 2025 EventoCom. Todos os direitos reservados.</small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="sobre.js"></script>
+</body>
+</html>

@@ -15,7 +15,7 @@
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="index.html">
+    <a class="navbar-brand" href="../home/home.html">
       <i class="bi bi-calendar-event-fill me-1"></i>Evento<span>Com</span>
     </a>
     <button class="navbar-toggler" type="button"
@@ -24,16 +24,16 @@
     </button>
     <div class="collapse navbar-collapse" id="navMain">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Explorar</a></li>
+        <li class="nav-item"><a class="nav-link" href="../home/home.html">Início</a></li>
+        <li class="nav-item"><a class="nav-link" href="../home/home.html">Explorar</a></li>
         <li class="nav-item"><a class="nav-link active" href="#">Meu Perfil</a></li>
       </ul>
-      <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
-        <span style="font-family:var(--font-body);font-size:.85rem;color:rgba(255,255,255,.65);">
+      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 mt-2 mt-lg-0">
+        <span class="nav-user-chip">
           <i class="bi bi-person-circle me-1" style="color:var(--accent);"></i>
           <strong id="navNome" style="color:#fff;"></strong>
         </span>
-        <button class="btn-logout" onclick="Auth.logout()">
+        <button class="btn btn-nav-login" id="btnLogout" type="button">
           <i class="bi bi-box-arrow-right me-1"></i>Sair
         </button>
       </div>
@@ -49,14 +49,14 @@
 
         <!-- Avatar -->
         <div class="avatar-wrap">
-          <div class="avatar-circle" id="avatarCircle" onclick="document.getElementById('avatarInput').click()">
+          <div class="avatar-circle" id="avatarCircle">
             <span id="avatarInitials"></span>
             <img id="avatarImg" src="" alt=""/>
           </div>
-          <div class="avatar-edit-btn" onclick="document.getElementById('avatarInput').click()">
+          <div class="avatar-edit-btn" id="avatarEditBtn">
             <i class="bi bi-camera-fill"></i>
           </div>
-          <input type="file" accept="image/*" class="avatar-input" id="avatarInput" onchange="trocarAvatar(this)"/>
+          <input type="file" accept="image/*" class="avatar-input" id="avatarInput"/>
         </div>
 
         <!-- Info -->
@@ -106,13 +106,13 @@
               <div class="info-card-header">
                 <p class="info-card-title"><i class="bi bi-person-vcard-fill"></i>Dados Pessoais</p>
                 <div class="edit-btns">
-                  <button class="btn-cancel-section" id="cancelPessoal" onclick="cancelarEdicao('cardPessoal','cancelPessoal','savePessoal','editPessoal')">
+                  <button class="btn-cancel-section" id="cancelPessoal" type="button">
                     <i class="bi bi-x-lg"></i>Cancelar
                   </button>
-                  <button class="btn-save-section" id="savePessoal" onclick="salvarSecao('cardPessoal','cancelPessoal','savePessoal','editPessoal','pessoal')">
+                  <button class="btn-save-section" id="savePessoal" type="button">
                     <i class="bi bi-check-lg"></i>Salvar
                   </button>
-                  <button class="btn-edit-section" id="editPessoal" onclick="ativarEdicao('cardPessoal','cancelPessoal','savePessoal','editPessoal')">
+                  <button class="btn-edit-section" id="editPessoal" type="button">
                     <i class="bi bi-pencil-fill"></i>Editar
                   </button>
                 </div>
@@ -160,8 +160,7 @@
                   <span class="field-value" id="fv-telefone">—</span>
                   <div class="field-input-wrap">
                     <i class="bi bi-telephone-fill fi-icon"></i>
-                    <input type="tel" class="field-input" id="fi-telefone-input" placeholder="(00) 00000-0000" maxlength="15"
-                      oninput="maskTel(this)"/>
+                    <input type="tel" class="field-input" id="fi-telefone-input" placeholder="(00) 00000-0000" maxlength="15"/>
                   </div>
                 </div>
                 <!-- Gênero -->
@@ -187,13 +186,13 @@
               <div class="info-card-header">
                 <p class="info-card-title"><i class="bi bi-geo-alt-fill"></i>Localização</p>
                 <div class="edit-btns">
-                  <button class="btn-cancel-section" id="cancelLoc" onclick="cancelarEdicao('cardLocalizacao','cancelLoc','saveLoc','editLoc')">
+                  <button class="btn-cancel-section" id="cancelLoc" type="button">
                     <i class="bi bi-x-lg"></i>Cancelar
                   </button>
-                  <button class="btn-save-section" id="saveLoc" onclick="salvarSecao('cardLocalizacao','cancelLoc','saveLoc','editLoc','localizacao')">
+                  <button class="btn-save-section" id="saveLoc" type="button">
                     <i class="bi bi-check-lg"></i>Salvar
                   </button>
-                  <button class="btn-edit-section" id="editLoc" onclick="ativarEdicao('cardLocalizacao','cancelLoc','saveLoc','editLoc')">
+                  <button class="btn-edit-section" id="editLoc" type="button">
                     <i class="bi bi-pencil-fill"></i>Editar
                   </button>
                 </div>
@@ -205,8 +204,7 @@
                   <span class="field-value" id="fv-cep">—</span>
                   <div class="field-input-wrap">
                     <i class="bi bi-pin-map-fill fi-icon"></i>
-                    <input type="text" class="field-input" id="fi-cep-input" placeholder="00000-000" maxlength="9"
-                      oninput="maskCEP(this)"/>
+                    <input type="text" class="field-input" id="fi-cep-input" placeholder="00000-000" maxlength="9"/>
                   </div>
                 </div>
                 <div class="field-item" id="fi-cidade">
@@ -250,13 +248,13 @@
               <div class="info-card-header">
                 <p class="info-card-title"><i class="bi bi-envelope-fill"></i>E-mail</p>
                 <div class="edit-btns">
-                  <button class="btn-cancel-section" id="cancelEmail" onclick="cancelarEdicao('cardEmail','cancelEmail','saveEmail','editEmail')">
+                  <button class="btn-cancel-section" id="cancelEmail" type="button">
                     <i class="bi bi-x-lg"></i>Cancelar
                   </button>
-                  <button class="btn-save-section" id="saveEmail" onclick="salvarSecao('cardEmail','cancelEmail','saveEmail','editEmail','email')">
+                  <button class="btn-save-section" id="saveEmail" type="button">
                     <i class="bi bi-check-lg"></i>Salvar
                   </button>
-                  <button class="btn-edit-section" id="editEmail" onclick="ativarEdicao('cardEmail','cancelEmail','saveEmail','editEmail')">
+                  <button class="btn-edit-section" id="editEmail" type="button">
                     <i class="bi bi-pencil-fill"></i>Editar
                   </button>
                 </div>
@@ -356,11 +354,11 @@
 
         <!-- Filtros -->
         <div class="filter-tabs">
-          <button class="filter-tab active" onclick="filtrarEventos('todos', this)">Todos (4)</button>
-          <button class="filter-tab" onclick="filtrarEventos('confirmado', this)">Confirmados (2)</button>
-          <button class="filter-tab" onclick="filtrarEventos('pendente', this)">Pendentes (1)</button>
-          <button class="filter-tab" onclick="filtrarEventos('concluido', this)">Concluídos (1)</button>
-          <button class="filter-tab" onclick="filtrarEventos('cancelado', this)">Cancelados (0)</button>
+          <button class="filter-tab active" data-filter="todos" data-label="Todos" type="button">Todos (0)</button>
+          <button class="filter-tab" data-filter="confirmado" data-label="Confirmados" type="button">Confirmados (0)</button>
+          <button class="filter-tab" data-filter="pendente" data-label="Pendentes" type="button">Pendentes (0)</button>
+          <button class="filter-tab" data-filter="concluido" data-label="Concluídos" type="button">Concluídos (0)</button>
+          <button class="filter-tab" data-filter="cancelado" data-label="Cancelados" type="button">Cancelados (0)</button>
         </div>
 
         <!-- Grid de eventos -->
@@ -396,7 +394,7 @@
                   <div class="field-input-wrap" style="display:block;">
                     <i class="bi bi-lock-fill fi-icon"></i>
                     <input type="password" class="field-input" id="senhaAtual" placeholder="••••••••" style="padding-right:40px;"/>
-                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaAtual','iconSA')">
+                    <button class="btn-toggle-pass" type="button" id="btnTogglePassAtual">
                       <i class="bi bi-eye-fill" id="iconSA"></i>
                     </button>
                   </div>
@@ -406,8 +404,8 @@
                   <div class="field-input-wrap" style="display:block;">
                     <i class="bi bi-lock-fill fi-icon"></i>
                     <input type="password" class="field-input" id="senhaNova" placeholder="Mínimo 8 caracteres"
-                      style="padding-right:40px;" oninput="avaliarSenha(this)" minlength="8"/>
-                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaNova','iconSN')">
+                      style="padding-right:40px;" minlength="8"/>
+                    <button class="btn-toggle-pass" type="button" id="btnTogglePassNova">
                       <i class="bi bi-eye-fill" id="iconSN"></i>
                     </button>
                   </div>
@@ -425,7 +423,7 @@
                     <i class="bi bi-lock-fill fi-icon"></i>
                     <input type="password" class="field-input" id="senhaConf" placeholder="Repita a nova senha"
                       style="padding-right:40px;"/>
-                    <button class="btn-toggle-pass" type="button" onclick="togglePass('senhaConf','iconSC')">
+                    <button class="btn-toggle-pass" type="button" id="btnTogglePassConf">
                       <i class="bi bi-eye-fill" id="iconSC"></i>
                     </button>
                   </div>
@@ -433,7 +431,7 @@
               </div>
 
               <div class="d-flex justify-content-end mt-4">
-                <button class="btn-save-section" style="display:flex;" onclick="salvarSenha()">
+                <button class="btn-save-section" style="display:flex;" id="btnSalvarSenha" type="button">
                   <i class="bi bi-check-lg"></i>Atualizar Senha
                 </button>
               </div>
@@ -494,6 +492,40 @@
   </div>
 </div>
 
+<!-- ===== MODAL: DETALHES DO EVENTO ===== -->
+<div class="modal fade" id="modalDetalhesEvento" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content modal-evento-pf">
+      <div class="modal-header p-0 border-0 position-relative">
+        <img id="mdet-img" class="modal-evento-pf-hero" src="" alt=""/>
+        <button type="button" class="btn-close-float" id="btnFecharDetalhesTop">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4 class="modal-evento-pf-titulo" id="mdet-nome"></h4>
+        <div class="row g-2">
+          <div class="col-12 col-sm-6">
+            <div class="modal-info-row"><i class="bi bi-tags-fill"></i><span id="mdet-cat"></span></div>
+            <div class="modal-info-row"><i class="bi bi-calendar3"></i><span id="mdet-data"></span></div>
+            <div class="modal-info-row"><i class="bi bi-clock-fill"></i><span id="mdet-hora"></span></div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <div class="modal-info-row"><i class="bi bi-geo-alt-fill"></i><span id="mdet-local"></span></div>
+            <div class="modal-info-row"><i class="bi bi-display"></i><span id="mdet-formato"></span></div>
+            <div class="modal-info-row"><i class="bi bi-person-fill"></i>Faixa etária: <strong id="mdet-idade" class="ms-1"></strong></div>
+          </div>
+        </div>
+        <p class="modal-desc-label">Sobre o evento</p>
+        <p class="modal-desc-text" id="mdet-desc"></p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnFecharDetalhesFooter">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MODAL: CANCELAR INSCRIÇÃO ===== -->
 <div class="modal fade modal-cancel" id="modalCancelar" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -511,9 +543,9 @@
       </div>
       <div class="modal-footer gap-2">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Voltar</button>
-        <button type="button" class="btn btn-sm"
+        <button type="button" class="btn btn-sm" id="btnConfirmarCancelamento"
           style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;"
-          onclick="confirmarCancelamento()">
+        >
           <i class="bi bi-x-circle me-1"></i>Confirmar cancelamento
         </button>
       </div>
@@ -542,9 +574,9 @@
       </div>
       <div class="modal-footer gap-2">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-sm"
+        <button type="button" class="btn btn-sm" id="btnExcluirConta"
           style="background:#ef4444;color:#fff;font-family:var(--font-body);font-weight:700;border:none;border-radius:8px;padding:7px 20px;"
-          onclick="excluirConta()">
+        >
           Excluir minha conta
         </button>
       </div>
@@ -561,16 +593,19 @@
 <!-- ===== FOOTER ===== -->
 <footer>
   <div class="container">
-    <strong style="color:rgba(255,255,255,.6);font-family:'Syne',sans-serif;">EventoCom</strong>
-    &nbsp;·&nbsp;<a href="privacidade.html">Privacidade</a>
-    &nbsp;·&nbsp;<a href="termos.html">Termos</a>
-    <br/><small class="mt-1 d-block" style="opacity:.6;">© 2025 EventoCom.</small>
+    <strong style="color:#fff;font-family:'Syne',sans-serif;">EventoCom</strong>
+    &nbsp;—&nbsp; Conectando pessoas através de eventos comunitários.
+    <br class="d-sm-none"/>
+    <span class="d-none d-sm-inline">&nbsp;|&nbsp;</span>
+    <a href="../sobre/sobre.html">Sobre</a> &nbsp;·&nbsp;
+    <a href="../contato/contato.html">Contato</a> &nbsp;·&nbsp;
+    <a href="../privacidade/privacidade.html">Privacidade</a> &nbsp;·&nbsp;
+    <a href="../termos/termos.html">Termos</a>
+    <br/><small class="mt-1 d-block">© 2025 EventoCom. Todos os direitos reservados.</small>
   </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../../services/api.js?v=20260410d"></script>
-<script src="../../auth.js?v=20260410d"></script>
-<script src="areausuario.js"></script>
+<script type="module" src="areausuario.js"></script>
 </body>
 </html>

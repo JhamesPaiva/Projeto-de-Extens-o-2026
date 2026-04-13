@@ -1,9 +1,62 @@
+import { authService } from '../../core/auth/auth-service.js';
+import { apiFetch } from '../../core/api/client.js';
+
   /* === Proteção da página === */
   (function() {
-    if (!Auth.requireInstituicao()) return;
-    const user = Auth.getUser();
+    if (!authService.requireInstituicao()) return;
+    const user = authService.getUser();
     document.getElementById('nomeUsuario').textContent = user.nome;
+    bindEvents();
+    updatePreview();
   })();
+
+  function bindEvents() {
+    document.getElementById('btnLogout')?.addEventListener('click', logout);
+    document.querySelectorAll('[data-step-target]').forEach((btn) => {
+      btn.addEventListener('click', () => goStep(Number(btn.getAttribute('data-step-target'))));
+    });
+
+    document.getElementById('btnAddIngresso')?.addEventListener('click', addIngresso);
+    document.getElementById('btnRemoveImagem')?.addEventListener('click', removeImagem);
+    document.getElementById('btnPublicarEvento')?.addEventListener('click', publicarEvento);
+
+    document.getElementById('uploadImageInput')?.addEventListener('change', (event) => {
+      previewImagem(event.target);
+    });
+
+    const previewFields = ['ev-nome', 'ev-categoria', 'ev-data-ini', 'ev-hora-ini', 'ev-formato', 'ev-entrada', 'ev-local-nome', 'ev-cidade', 'ev-estado'];
+    previewFields.forEach((id) => {
+      document.getElementById(id)?.addEventListener('input', updatePreview);
+      document.getElementById(id)?.addEventListener('change', updatePreview);
+    });
+
+    document.getElementById('ev-formato')?.addEventListener('change', toggleFormato);
+
+    document.getElementById('ev-nome')?.addEventListener('input', (event) => charCount(event.target, 'cc-nome'));
+    document.getElementById('ev-desc-curta')?.addEventListener('input', (event) => charCount(event.target, 'cc-curta'));
+    document.getElementById('ev-desc-completa')?.addEventListener('input', (event) => charCount(event.target, 'cc-completa'));
+
+    document.getElementById('listaIngressos')?.addEventListener('click', (event) => {
+      const removeBtn = event.target.closest('[data-remove-ingresso]');
+      if (removeBtn) {
+        removeIngresso(Number(removeBtn.getAttribute('data-remove-ingresso')));
+      }
+    });
+
+    document.getElementById('listaIngressos')?.addEventListener('input', (event) => {
+      const input = event.target.closest('[data-toggle-gratuito]');
+      if (input) {
+        toggleGratuito(Number(input.getAttribute('data-toggle-gratuito')));
+      }
+    });
+
+    document.getElementById('listaIngressos')?.addEventListener('change', (event) => {
+      const checkbox = event.target.closest('[data-set-gratuito]');
+      if (checkbox) {
+        setGratuito(Number(checkbox.getAttribute('data-set-gratuito')));
+      }
+    });
+  }
 
   /* === Steps === */
   let currentStep = 1;
@@ -35,6 +88,7 @@
     const cat      = document.getElementById('ev-categoria')?.value || '';
     const dataVal  = document.getElementById('ev-data-ini')?.value || '';
     const formato  = document.getElementById('ev-formato')?.value || '';
+    const entrada  = document.getElementById('ev-entrada')?.value || '';
     const localNome= document.getElementById('ev-local-nome')?.value || '';
     const cidade   = document.getElementById('ev-cidade')?.value || '';
     const estado   = document.getElementById('ev-estado')?.value || '';
@@ -42,6 +96,7 @@
     set('prev-nome',   nome   || 'Não preenchido', !nome);
     set('prev-cat',    cat    || '—', !cat);
     set('prev-formato', formato ? formato.charAt(0).toUpperCase() + formato.slice(1) : '—', !formato);
+    set('prev-entrada', entrada ? (entrada === 'gratuito' ? 'Gratuito' : 'Pago') : '—', !entrada);
 
     if (dataVal) {
       const d = new Date(dataVal + 'T00:00:00');
@@ -60,7 +115,7 @@
   }
 
   /* === Char counter === */
-  function charCount(el, countId, max) {
+  function charCount(el, countId) {
     document.getElementById(countId).textContent = el.value.length;
   }
 
@@ -81,7 +136,7 @@
     div.className = 'ingresso-item';
     div.id = `ingresso-${id}`;
     div.innerHTML = `
-      <button class="btn-remove-ingresso" type="button" onclick="removeIngresso(${id})">
+      <button class="btn-remove-ingresso" type="button" data-remove-ingresso="${id}">
         <i class="bi bi-trash3-fill"></i>
       </button>
       <div class="row g-2 align-items-center">
@@ -97,7 +152,7 @@
           <div class="input-wrap">
             <i class="bi bi-currency-dollar input-icon"></i>
             <input type="number" class="form-control input-custom" placeholder="0,00" min="0" step="0.01"
-              id="preco-${id}" oninput="toggleGratuito(${id})"/>
+              id="preco-${id}" data-toggle-gratuito="${id}"/>
           </div>
         </div>
         <div class="col-6 col-sm-3">
@@ -109,7 +164,7 @@
         </div>
         <div class="col-12 col-sm-2 d-flex align-items-end pb-1">
           <div class="form-check form-switch ms-1">
-            <input class="form-check-input" type="checkbox" id="gratis-${id}" onchange="setGratuito(${id})"/>
+            <input class="form-check-input" type="checkbox" id="gratis-${id}" data-set-gratuito="${id}"/>
             <label class="form-check-label" for="gratis-${id}" style="font-size:.78rem;color:var(--muted);">Gratuito</label>
           </div>
         </div>
@@ -191,6 +246,7 @@
     const horaIni  = document.getElementById('ev-hora-ini')?.value || '—';
     const horaFim  = document.getElementById('ev-hora-fim')?.value || '';
     const formato  = document.getElementById('ev-formato')?.value || '—';
+    const entrada  = document.getElementById('ev-entrada')?.value || 'gratuito';
     const cidade   = document.getElementById('ev-cidade')?.value || '—';
     const estado   = document.getElementById('ev-estado')?.value || '';
     const local    = document.getElementById('ev-local-nome')?.value || '—';
@@ -209,6 +265,7 @@
       { icon:'bi-calendar3',       label:'Data',        val: dataFmt },
       { icon:'bi-clock-fill',      label:'Horário',     val: horaFim ? `${horaIni} às ${horaFim}` : horaIni },
       { icon:'bi-display',         label:'Formato',     val: formato },
+      { icon:'bi-ticket-perforated-fill', label:'Entrada', val: entrada === 'gratuito' ? 'Gratuito' : 'Pago' },
       { icon:'bi-building',        label:'Local',       val: local },
       { icon:'bi-geo-alt-fill',    label:'Cidade',      val: estado ? `${cidade} – ${estado}` : cidade },
       { icon:'bi-chat-left-text',  label:'Descrição',   val: desc },
@@ -228,14 +285,17 @@
 
   /* === Publicar === */
   async function publicarEvento() {
-    if (!Auth.requireInstituicao()) return;
+    if (!authService.requireInstituicao()) return;
     if (!document.getElementById('chkPublicar').checked) {
       alert('Por favor, confirme os Termos para Organizadores antes de publicar.');
       return;
     }
 
     const previewSrc = document.getElementById('previewImg')?.src || '';
-    const imagemUrl = previewSrc.startsWith('data:') ? '' : previewSrc;
+    const imagemUrl = previewSrc || null;
+
+    const entradaSelecionada = (document.getElementById('ev-entrada')?.value || '').trim().toLowerCase();
+    const entrada = entradaSelecionada === 'pago' ? 'pago' : 'gratuito';
 
     const payload = {
       nome: document.getElementById('ev-nome')?.value.trim(),
@@ -246,10 +306,10 @@
       hora_inicio: document.getElementById('ev-hora-ini')?.value,
       hora_fim: document.getElementById('ev-hora-fim')?.value,
       formato: document.getElementById('ev-formato')?.value,
+      entrada,
       local_nome: document.getElementById('ev-local-nome')?.value.trim(),
       cidade: document.getElementById('ev-cidade')?.value.trim(),
       estado: document.getElementById('ev-estado')?.value,
-      idade: document.getElementById('ev-idade')?.value,
       imagem_url: imagemUrl,
     };
 
@@ -270,10 +330,14 @@
 
       if (/subject must be a string|token inválido|token invalid|expired|jwt/i.test(String(msg).toLowerCase())) {
         alert('Sua sessão expirou ou está inválida. Faça login novamente para publicar o evento.');
-        Auth.logout();
+        authService.logout();
         return;
       }
 
       alert(msg);
     }
+  }
+
+  function logout() {
+    authService.logout();
   }

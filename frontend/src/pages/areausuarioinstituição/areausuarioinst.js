@@ -1,39 +1,20 @@
-const eventosInst = [
-  {
-    id: 1, nome: 'Festival Verão Sonoro 2025', categoria: 'Música', status: 'publicado',
-    data: '2025-07-12', horaIni: '16:00', horaFim: '23:00',
-    formato: 'Presencial', localNome: 'Parque Municipal', cidade: 'São Paulo', estado: 'SP',
-    entrada: 'Pago', valor: 'R$ 40,00', capacidade: 500, inscritos: 128, idade: 'Livre',
-    descCurta: 'O maior festival de verão da cidade, com 20+ atrações musicais.',
-    desc: 'O Festival Verão Sonoro reúne mais de 20 atrações musicais em um único dia, com palcos simultâneos, área gastronômica e espaço cultural. Uma experiência inesquecível no coração da cidade.',
-    img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
-  },
-  {
-    id: 2, nome: 'Exposição Coletiva: Cores da Comunidade', categoria: 'Arte & Cultura', status: 'publicado',
-    data: '2025-08-05', horaIni: '10:00', horaFim: '18:00',
-    formato: 'Presencial', localNome: 'Centro Cultural', cidade: 'Curitiba', estado: 'PR',
-    entrada: 'Gratuito', valor: '—', capacidade: 300, inscritos: 56, idade: 'Livre',
-    descCurta: 'Exposição de artes visuais com 30 artistas locais sobre comunidade e diversidade.',
-    desc: 'Uma exposição de artes visuais que reúne 30 artistas locais em torno do tema comunidade, pertencimento e diversidade. Pinturas, fotografias, esculturas e instalações ocupam todo o espaço do Centro Cultural.',
-    img: 'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&q=80',
-  },
-  {
-    id: 3, nome: 'Workshop de Fotografia Urbana', categoria: 'Arte & Cultura', status: 'rascunho',
-    data: '2025-09-20', horaIni: '09:00', horaFim: '13:00',
-    formato: 'Presencial', localNome: 'Centro Cultural', cidade: 'Belo Horizonte', estado: 'MG',
-    entrada: 'Pago', valor: 'R$ 80,00', capacidade: 30, inscritos: 0, idade: '+16',
-    descCurta: 'Aprenda técnicas de fotografia nas ruas de BH com fotógrafos profissionais.',
-    desc: 'Um workshop prático de fotografia urbana pelas ruas e vielas de Belo Horizonte. Técnicas de composição, luz natural e storytelling visual com instrutores renomados.',
-    img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80',
-  },
-];
+import { authService } from '../../core/auth/auth-service.js';
+import { apiFetch } from '../../core/api/client.js';
+
+let eventosInst = [];
+let filtroAtual = 'todos';
+let usuarioInstituicaoId = null;
+let imagemEdicaoEvento = '';
+const EVENTO_IMG_PADRAO = 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80';
 
 /* =====================================================
    INIT
    ===================================================== */
-;(function init() {
-  if (!Auth.requireInstituicao()) return;
-  const user = Auth.getUser() || {};
+;(async function init() {
+  if (!authService.requireInstituicao()) return;
+  bindEvents();
+  const user = authService.getUser() || {};
+  usuarioInstituicaoId = user.id || null;
   const nome = user.nome || 'Instituição';
 
   document.getElementById('navNome').textContent = nome;
@@ -43,6 +24,12 @@ const eventosInst = [
   document.getElementById('instFantasia').textContent = nome;
   document.getElementById('logoInitials').textContent =
     nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  if (user.avatar_data) {
+    const logoImg = document.getElementById('logoImg');
+    logoImg.src = user.avatar_data;
+    logoImg.style.display = 'block';
+    document.getElementById('logoInitials').style.display = 'none';
+  }
 
   // Preenche campos de exibição
   document.getElementById('fv-razao-val').textContent = nome;
@@ -79,14 +66,195 @@ const eventosInst = [
   setSel('fi-area-input',      '');
   setSel('fi-estado-input',    user.estado || '');
 
-  renderEventos(eventosInst);
+  await carregarEventosDaApi(usuarioInstituicaoId);
 })();
+
+function bindEvents() {
+  document.getElementById('btnLogout')?.addEventListener('click', logout);
+
+  const triggerLogoPicker = () => document.getElementById('logoInput')?.click();
+  document.getElementById('instLogo')?.addEventListener('click', triggerLogoPicker);
+  document.getElementById('logoEditBtn')?.addEventListener('click', triggerLogoPicker);
+  document.getElementById('logoInput')?.addEventListener('change', (event) => trocarLogo(event.target));
+
+  document.getElementById('editInst')?.addEventListener('click', () => ativarEdicao('cardInst','cancelInst','saveInst','editInst'));
+  document.getElementById('cancelInst')?.addEventListener('click', () => cancelarEdicao('cardInst','cancelInst','saveInst','editInst'));
+  document.getElementById('saveInst')?.addEventListener('click', () => salvarSecao('cardInst','cancelInst','saveInst','editInst','inst'));
+
+  document.getElementById('editResp')?.addEventListener('click', () => ativarEdicao('cardResp','cancelResp','saveResp','editResp'));
+  document.getElementById('cancelResp')?.addEventListener('click', () => cancelarEdicao('cardResp','cancelResp','saveResp','editResp'));
+  document.getElementById('saveResp')?.addEventListener('click', () => salvarSecao('cardResp','cancelResp','saveResp','editResp','resp'));
+
+  document.getElementById('editEnd')?.addEventListener('click', () => ativarEdicao('cardEnd','cancelEnd','saveEnd','editEnd'));
+  document.getElementById('cancelEnd')?.addEventListener('click', () => cancelarEdicao('cardEnd','cancelEnd','saveEnd','editEnd'));
+  document.getElementById('saveEnd')?.addEventListener('click', () => salvarSecao('cardEnd','cancelEnd','saveEnd','editEnd','end'));
+
+  document.getElementById('editEmail')?.addEventListener('click', () => ativarEdicao('cardEmail','cancelEmail','saveEmail','editEmail'));
+  document.getElementById('cancelEmail')?.addEventListener('click', () => cancelarEdicao('cardEmail','cancelEmail','saveEmail','editEmail'));
+  document.getElementById('saveEmail')?.addEventListener('click', () => salvarSecao('cardEmail','cancelEmail','saveEmail','editEmail','email'));
+
+  document.getElementById('fi-resp-tel-input')?.addEventListener('input', (event) => maskTel(event.target));
+  document.getElementById('fi-cep-input')?.addEventListener('input', (event) => maskCEP(event.target));
+
+  document.querySelectorAll('.filter-tab[data-filter]').forEach((button) => {
+    button.addEventListener('click', () => filtrar(button.dataset.filter, button));
+  });
+
+  document.getElementById('btnTogglePassAtual')?.addEventListener('click', () => togglePass('senhaAtual', 'iconSA'));
+  document.getElementById('btnTogglePassNova')?.addEventListener('click', () => togglePass('senhaNova', 'iconSN'));
+  document.getElementById('btnTogglePassConf')?.addEventListener('click', () => togglePass('senhaConf', 'iconSC'));
+  document.getElementById('senhaNova')?.addEventListener('input', (event) => avaliarSenha(event.target));
+  document.getElementById('btnSalvarSenha')?.addEventListener('click', salvarSenha);
+  document.getElementById('btnExcluirConta')?.addEventListener('click', excluirConta);
+
+  document.getElementById('btnFecharModalVerTop')?.addEventListener('click', fecharModalVerEvento);
+  document.getElementById('btnFecharModalVerFooter')?.addEventListener('click', fecharModalVerEvento);
+  document.getElementById('mv-btn-editar')?.addEventListener('click', abrirEditar);
+
+  document.getElementById('me-img-input')?.addEventListener('change', (event) => carregarImagemEdicao(event.target));
+  document.getElementById('btnTrocarImagemEvento')?.addEventListener('click', () => document.getElementById('me-img-input')?.click());
+  document.getElementById('btnRemoverImagemEvento')?.addEventListener('click', removerImagemEdicao);
+  document.getElementById('btnSalvarEdicaoEvento')?.addEventListener('click', salvarEdicaoEvento);
+  document.getElementById('btnConfirmarExclusaoEvento')?.addEventListener('click', confirmarExclusao);
+
+  document.getElementById('listaEventos')?.addEventListener('click', (event) => {
+    const detailBtn = event.target.closest('[data-ev-detail]');
+    if (detailBtn) {
+      verEvento(Number(detailBtn.getAttribute('data-ev-detail')));
+      return;
+    }
+
+    const editBtn = event.target.closest('[data-ev-edit]');
+    if (editBtn) {
+      abrirEditarDireto(Number(editBtn.getAttribute('data-ev-edit')));
+      return;
+    }
+
+    const deleteBtn = event.target.closest('[data-ev-delete]');
+    if (deleteBtn) {
+      pedirExclusao(Number(deleteBtn.getAttribute('data-ev-delete')), deleteBtn.getAttribute('data-ev-name') || 'Evento');
+    }
+  });
+}
 
 function setFV(id, v) { const el=document.getElementById(id); if(el) el.textContent=v||'—'; }
 function setVal(id,v) { const el=document.getElementById(id); if(el) el.value=v||''; }
 function setSel(id,v) {
   const s=document.getElementById(id); if(!s) return;
   for(const o of s.options){ if(o.value===v||o.text===v){s.value=o.value;break;} }
+}
+
+async function carregarEventosDaApi(organizadorId) {
+  if (!organizadorId) {
+    eventosInst = [];
+    aplicarFiltroAtual();
+    atualizarStats();
+    return;
+  }
+
+  try {
+    const response = await apiFetch(`/events?organizador_id=${encodeURIComponent(organizadorId)}`);
+    const events = Array.isArray(response?.events) ? response.events : [];
+    eventosInst = events.map(normalizarEventoApi);
+  } catch (error) {
+    console.error('Erro ao carregar eventos da instituição:', error);
+    eventosInst = [];
+    showToast('Não foi possível carregar seus eventos agora.', true);
+  }
+
+  aplicarFiltroAtual();
+  atualizarStats();
+}
+
+function normalizarEventoApi(ev) {
+  const desc = String(ev?.descricao || '').trim();
+  const horaInicio = String(ev?.hora_inicio || '').slice(0, 5);
+  const horaFim = String(ev?.hora_fim || '').slice(0, 5);
+  const temEntrada = ev?.entrada != null || ev?.valor != null;
+  const temInscricoes =
+    ev?.inscritos != null ||
+    ev?.total_inscritos != null ||
+    ev?.inscritos_count != null ||
+    ev?.capacidade != null;
+  const inscritos = Number(
+    ev?.inscritos ?? ev?.total_inscritos ?? ev?.inscritos_count ?? 0,
+  );
+  const imagemUrlOriginal = typeof ev?.imagem_url === 'string' ? ev.imagem_url.trim() : '';
+
+  return {
+    id: Number(ev?.id) || Date.now(),
+    nome: ev?.nome || 'Evento sem título',
+    categoria: ev?.categoria || '—',
+    status: normalizarStatus(ev?.status),
+    data: String(ev?.data_inicio || '').slice(0, 10),
+    horaIni: horaInicio || '—',
+    horaFim: horaFim || '',
+    formato: formatarFormato(ev?.formato),
+    localNome: ev?.local_nome || 'Local a definir',
+    cidade: ev?.cidade || '—',
+    estado: ev?.estado || '—',
+    entrada: formatarEntrada(ev?.entrada),
+    valor: ev?.valor || '—',
+    capacidade: Number(ev?.capacidade || 0),
+    inscritos: Number.isFinite(inscritos) ? inscritos : 0,
+    temEntrada,
+    temInscricoes,
+    idade: ev?.idade || 'Livre',
+    descCurta: desc ? resumirTexto(desc, 150) : 'Sem descrição.',
+    desc: desc || 'Sem descrição.',
+    imagemUrlOriginal,
+    img: imagemUrlOriginal || EVENTO_IMG_PADRAO,
+  };
+}
+
+function normalizarStatus(status) {
+  const value = String(status || '').toLowerCase();
+  if (value === 'rascunho' || value === 'encerrado' || value === 'revisao' || value === 'revisão') {
+    return value === 'revisão' ? 'revisao' : value;
+  }
+  return 'publicado';
+}
+
+function formatarFormato(formato) {
+  const valor = String(formato || '').toLowerCase();
+  if (!valor) return '—';
+  return valor.charAt(0).toUpperCase() + valor.slice(1);
+}
+
+function formatarEntrada(entrada) {
+  const value = String(entrada || '').toLowerCase().trim();
+  if (value === 'gratuito') return 'Gratuito';
+  if (value === 'pago') return 'Pago';
+  return '—';
+}
+
+function resumirTexto(texto, limite) {
+  if (texto.length <= limite) return texto;
+  return `${texto.slice(0, limite).trimEnd()}...`;
+}
+
+function formatarDataCurta(dataIso) {
+  if (!dataIso) return 'Data a definir';
+  const data = new Date(`${dataIso}T00:00:00`);
+  if (Number.isNaN(data.getTime())) return 'Data a definir';
+  return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function formatarDataLonga(dataIso) {
+  if (!dataIso) return 'Data a definir';
+  const data = new Date(`${dataIso}T00:00:00`);
+  if (Number.isNaN(data.getTime())) return 'Data a definir';
+  return data.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function listaFiltradaAtual() {
+  return filtroAtual === 'todos'
+    ? eventosInst
+    : eventosInst.filter(e => e.status === filtroAtual);
+}
+
+function aplicarFiltroAtual() {
+  renderEventos(listaFiltradaAtual());
 }
 
 /* =====================================================
@@ -143,10 +311,24 @@ function salvarSecao(cId, canId, savId, edId, sec) {
 function trocarLogo(input) {
   const file = input.files[0]; if(!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
+    const avatarData = e.target.result;
     const img = document.getElementById('logoImg');
-    img.src=e.target.result; img.style.display='block';
+    img.src=avatarData; img.style.display='block';
     document.getElementById('logoInitials').style.display='none';
+
+    try {
+      const response = await apiFetch('/profile/avatar', {
+        method: 'PUT',
+        body: { avatar_data: avatarData },
+      });
+      const updatedUser = response?.user || {};
+      authService.updateUser({ avatar_data: updatedUser.avatar_data || avatarData });
+      showToast('Foto da instituição atualizada!');
+    } catch (error) {
+      const msg = error?.payload?.message || error?.message || 'Não foi possível salvar a foto da instituição.';
+      showToast(msg, true);
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -164,8 +346,7 @@ function renderEventos(lista) {
   empty.classList.add('d-none');
 
   container.innerHTML = lista.map(ev => {
-    const d = new Date(ev.data+'T00:00:00');
-    const dataFmt = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    const dataFmt = formatarDataCurta(ev.data);
     return `
     <div class="ev-item" data-status="${ev.status}" data-id="${ev.id}">
       <div class="ev-item-main">
@@ -198,9 +379,9 @@ function renderEventos(lista) {
         </div>
       </div>
       <div class="ev-actions">
-        <button class="btn-ev-ver" onclick="verEvento(${ev.id})"><i class="bi bi-eye"></i>Ver detalhes</button>
-        <button class="btn-ev-editar" onclick="abrirEditarDireto(${ev.id})"><i class="bi bi-pencil-fill"></i>Editar</button>
-        <button class="btn-ev-excluir" onclick="pedirExclusao(${ev.id},'${ev.nome.replace(/'/g,"\\'")}')"><i class="bi bi-trash3-fill"></i>Excluir</button>
+        <button class="btn-ev-ver" type="button" data-ev-detail="${ev.id}"><i class="bi bi-eye"></i>Ver detalhes</button>
+        <button class="btn-ev-editar" type="button" data-ev-edit="${ev.id}"><i class="bi bi-pencil-fill"></i>Editar</button>
+        <button class="btn-ev-excluir" type="button" data-ev-delete="${ev.id}" data-ev-name="${ev.nome.replace(/"/g, '&quot;')}"><i class="bi bi-trash3-fill"></i>Excluir</button>
       </div>
     </div>`; }).join('');
 }
@@ -208,8 +389,8 @@ function renderEventos(lista) {
 function filtrar(status, btn) {
   document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const lista = status==='todos' ? eventosInst : eventosInst.filter(e=>e.status===status);
-  renderEventos(lista);
+  filtroAtual = status;
+  aplicarFiltroAtual();
 }
 
 /* =====================================================
@@ -217,11 +398,16 @@ function filtrar(status, btn) {
    ===================================================== */
 let eventoAtual = null;
 
+function fecharModalVerEvento() {
+  bootstrap.Modal.getInstance(document.getElementById('modalVerEvento'))?.hide();
+}
+
 function verEvento(id) {
   const ev = eventosInst.find(e=>e.id===id); if(!ev) return;
   eventoAtual = ev;
-  const d = new Date(ev.data+'T00:00:00');
-  const dataFmt = d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const dataFmt = formatarDataLonga(ev.data);
+  const rowEntrada = document.getElementById('mv-row-entrada');
+  const rowInscritos = document.getElementById('mv-row-inscritos');
 
   document.getElementById('mv-img').src       = ev.img;
   document.getElementById('mv-nome').textContent   = ev.nome;
@@ -232,8 +418,17 @@ function verEvento(id) {
   document.getElementById('mv-formato').textContent= ev.formato;
   document.getElementById('mv-entrada').textContent= ev.entrada+(ev.valor&&ev.valor!=='—'?' – '+ev.valor:'');
   document.getElementById('mv-idade').textContent  = ev.idade;
-  document.getElementById('mv-inscritos').textContent = ev.inscritos + ' / ' + ev.capacidade;
+  document.getElementById('mv-inscritos').textContent = ev.capacidade > 0
+    ? `${ev.inscritos} / ${ev.capacidade}`
+    : `${ev.inscritos}`;
   document.getElementById('mv-desc').textContent   = ev.desc;
+
+  if (rowEntrada) {
+    rowEntrada.classList.toggle('d-none', !ev.temEntrada);
+  }
+  if (rowInscritos) {
+    rowInscritos.classList.toggle('d-none', !ev.temInscricoes);
+  }
 
   const pill = document.getElementById('mv-status');
   pill.textContent = statusLabels[ev.status];
@@ -266,46 +461,94 @@ function preencherFormEditar(ev) {
   setVal('me-hora-fim',  ev.horaFim||'');
   setVal('me-local-nome',ev.localNome);
   setVal('me-cidade',    ev.cidade);
-  setVal('me-valor',     ev.valor==='—'?'':ev.valor);
-  setVal('me-capacidade',ev.capacidade);
   setSel('me-categoria', ev.categoria);
   setSel('me-idade',     ev.idade);
   setSel('me-formato',   ev.formato);
-  setSel('me-entrada',   ev.entrada);
+  setSel('me-entrada',   String(ev.entrada || '').toLowerCase());
   setSel('me-estado',    ev.estado);
-  setSel('me-status',    ev.status);
+
+  imagemEdicaoEvento = ev.imagemUrlOriginal || '';
+  const input = document.getElementById('me-img-input');
+  if (input) input.value = '';
+  renderPreviewImagemEdicao(imagemEdicaoEvento);
 }
 
-function salvarEdicaoEvento() {
+function renderPreviewImagemEdicao(src) {
+  const wrap = document.getElementById('me-img-preview-wrap');
+  const img = document.getElementById('me-img-preview');
+  const placeholder = document.getElementById('me-img-placeholder');
+  if (!wrap || !img || !placeholder) return;
+
+  const temImagem = Boolean(src);
+  wrap.classList.toggle('d-none', !temImagem);
+  placeholder.style.display = temImagem ? 'none' : 'block';
+  img.src = temImagem ? src : '';
+}
+
+function carregarImagemEdicao(input) {
+  const file = input?.files?.[0];
+  if (!file) return;
+  if (!String(file.type || '').startsWith('image/')) {
+    showToast('Selecione um arquivo de imagem válido.', true);
+    input.value = '';
+    return;
+  }
+  if (file.size > 1_800_000) {
+    showToast('Imagem muito grande. Use até 1,8 MB.', true);
+    input.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imagemEdicaoEvento = String(e?.target?.result || '');
+    renderPreviewImagemEdicao(imagemEdicaoEvento);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removerImagemEdicao() {
+  imagemEdicaoEvento = '';
+  const input = document.getElementById('me-img-input');
+  if (input) input.value = '';
+  renderPreviewImagemEdicao('');
+}
+
+async function salvarEdicaoEvento() {
   if(!eventoAtual) return;
   const idx = eventosInst.findIndex(e=>e.id===eventoAtual.id);
   if(idx===-1) return;
 
-  eventosInst[idx] = {
-    ...eventosInst[idx],
-    nome:      document.getElementById('me-nome').value.trim()       || eventosInst[idx].nome,
-    descCurta: document.getElementById('me-desc-curta').value.trim(),
-    desc:      document.getElementById('me-desc').value.trim(),
-    data:      document.getElementById('me-data').value              || eventosInst[idx].data,
-    horaIni:   document.getElementById('me-hora-ini').value          || eventosInst[idx].horaIni,
-    horaFim:   document.getElementById('me-hora-fim').value,
-    localNome: document.getElementById('me-local-nome').value.trim() || eventosInst[idx].localNome,
-    cidade:    document.getElementById('me-cidade').value.trim()     || eventosInst[idx].cidade,
-    estado:    document.getElementById('me-estado').value,
-    entrada:   document.getElementById('me-entrada').value,
-    valor:     document.getElementById('me-valor').value.trim()      || '—',
-    capacidade:parseInt(document.getElementById('me-capacidade').value)||eventosInst[idx].capacidade,
-    categoria: document.getElementById('me-categoria').value,
-    idade:     document.getElementById('me-idade').value,
-    formato:   document.getElementById('me-formato').value,
-    status:    document.getElementById('me-status').value,
+  const payload = {
+    nome: document.getElementById('me-nome').value.trim() || eventosInst[idx].nome,
+    descricao: document.getElementById('me-desc').value.trim() || eventosInst[idx].desc,
+    data_inicio: document.getElementById('me-data').value || eventosInst[idx].data,
+    hora_inicio: document.getElementById('me-hora-ini').value || null,
+    hora_fim: document.getElementById('me-hora-fim').value || null,
+    local_nome: document.getElementById('me-local-nome').value.trim() || eventosInst[idx].localNome,
+    cidade: document.getElementById('me-cidade').value.trim() || eventosInst[idx].cidade,
+    estado: document.getElementById('me-estado').value || eventosInst[idx].estado,
+    categoria: document.getElementById('me-categoria').value || eventosInst[idx].categoria,
+    idade: document.getElementById('me-idade').value || eventosInst[idx].idade,
+    formato: document.getElementById('me-formato').value || eventosInst[idx].formato,
+    entrada: document.getElementById('me-entrada').value || String(eventosInst[idx].entrada || '').toLowerCase() || 'gratuito',
+    imagem_url: imagemEdicaoEvento || null,
   };
 
-  bootstrap.Modal.getInstance(document.getElementById('modalEditarEvento')).hide();
-  renderEventos(eventosInst);
-  atualizarStats();
-  showToast('Evento atualizado com sucesso!');
-  eventoAtual = null;
+  try {
+    await apiFetch(`/events/${eventoAtual.id}`, {
+      method: 'PUT',
+      body: payload,
+    });
+
+    bootstrap.Modal.getInstance(document.getElementById('modalEditarEvento')).hide();
+    await carregarEventosDaApi(usuarioInstituicaoId);
+    showToast('Evento atualizado com sucesso!');
+    eventoAtual = null;
+  } catch (error) {
+    const msg = error?.payload?.message || error?.message || 'Não foi possível atualizar o evento.';
+    showToast(msg, true);
+  }
 }
 
 /* =====================================================
@@ -319,14 +562,19 @@ function pedirExclusao(id, nome) {
   new bootstrap.Modal(document.getElementById('modalExcluirEvento')).show();
 }
 
-function confirmarExclusao() {
+async function confirmarExclusao() {
   if(!excluirTarget) return;
-  eventosInst = eventosInst.filter(e=>e.id!==excluirTarget);
-  bootstrap.Modal.getInstance(document.getElementById('modalExcluirEvento')).hide();
-  renderEventos(eventosInst);
-  atualizarStats();
-  showToast('Evento excluído.');
-  excluirTarget = null;
+
+  try {
+    await apiFetch(`/events/${excluirTarget}`, { method: 'DELETE' });
+    bootstrap.Modal.getInstance(document.getElementById('modalExcluirEvento')).hide();
+    excluirTarget = null;
+    await carregarEventosDaApi(usuarioInstituicaoId);
+    showToast('Evento excluído.');
+  } catch (error) {
+    const msg = error?.payload?.message || error?.message || 'Não foi possível excluir o evento.';
+    showToast(msg, true);
+  }
 }
 
 function atualizarStats() {
@@ -372,7 +620,11 @@ function salvarSenha() {
 }
 function excluirConta() {
   if(document.getElementById('inputConfExcluir').value.trim()!=='EXCLUIR') { showToast('Digite EXCLUIR para confirmar.',true); return; }
-  Auth.logout();
+  authService.logout();
+}
+
+function logout() {
+  authService.logout();
 }
 
 /* =====================================================
