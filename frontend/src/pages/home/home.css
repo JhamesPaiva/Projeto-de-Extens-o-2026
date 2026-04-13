@@ -62,6 +62,7 @@
     .btn-nav-login {
       font-family: var(--font-body);
       font-weight: 700;
+      font-size: .88rem;
       border: 1.5px solid rgba(255,255,255,0.4);
       color: #fff !important;
       border-radius: 8px;
@@ -73,6 +74,7 @@
     .btn-nav-register {
       font-family: var(--font-body);
       font-weight: 600;
+      font-size: .88rem;
       background: rgba(255,255,255,0.1);
       color: #fff !important;
       border: 1.5px solid rgba(255,255,255,0.25);
@@ -85,6 +87,7 @@
     .btn-nav-create {
       font-family: var(--font-body);
       font-weight: 700;
+      font-size: .88rem;
       background: var(--primary);
       color: #fff !important;
       border: none;

@@ -1,3 +1,7 @@
+import { initializeAuthenticatedNavbar } from '../../core/auth/navbar-auth.js';
+
+initializeAuthenticatedNavbar({ logoutButtonId: 'sobreLogoutBtn' });
+
 /* =====================================================
    SCROLL REVEAL
    ===================================================== */
