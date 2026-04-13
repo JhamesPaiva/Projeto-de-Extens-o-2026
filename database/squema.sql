@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     cep VARCHAR(20),
     cidade VARCHAR(100),
     estado VARCHAR(50),
+    avatar_data MEDIUMTEXT,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -26,6 +27,7 @@ CREATE TABLE IF NOT EXISTS events (
     hora_inicio TIME,
     hora_fim TIME,
     formato ENUM('presencial', 'online', 'híbrido') DEFAULT 'presencial',
+    entrada VARCHAR(20),
     local_nome VARCHAR(200),
     cidade VARCHAR(100),
     estado VARCHAR(50),
@@ -43,4 +45,17 @@ CREATE TABLE IF NOT EXISTS event_tickets (
     quantidade INT DEFAULT 0,
     gratuito BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (evento_id) REFERENCES events(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS event_subscriptions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    evento_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'confirmado',
+    payment_reference VARCHAR(120),
+    expires_em DATETIME,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_evento_usuario (evento_id, usuario_id),
+    FOREIGN KEY (evento_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
