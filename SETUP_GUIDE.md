@@ -223,9 +223,12 @@ python -m watchdog.auto_reload app.py
 Edite `backend/.env` conforme necessário:
 
 ```env
-# Chaves de segurança (mudar em produção!)
-SECRET_KEY=change-me
-JWT_SECRET_KEY=change-me-jwt
+# Chaves de segurança (obrigatório usar valores fortes)
+# Gere em PowerShell (64 chars):
+# $chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'
+# -join (1..64 | ForEach-Object { $chars[(Get-Random -Minimum 0 -Maximum $chars.Length)] })
+SECRET_KEY=<gere_uma_chave_forte>
+JWT_SECRET_KEY=<gere_outra_chave_forte>
 
 # Conexão MySQL
 DB_HOST=127.0.0.1          # localhost
@@ -235,6 +238,8 @@ DB_PASSWORD=               # deixe vazio se não tem senha
 DB_NAME=eventocom          # nome do banco
 DB_POOL_SIZE=5             # conexões simultâneas
 ```
+
+Observação: não versionar o arquivo `backend/.env` no Git. Apenas `backend/.env.example` deve ser compartilhado.
 
 ---
 
