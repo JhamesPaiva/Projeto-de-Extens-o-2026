@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS events (
     cidade VARCHAR(100),
     estado VARCHAR(50),
     idade VARCHAR(50),
-    imagem_url VARCHAR(255),
+    imagem_url MEDIUMTEXT,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (organizador_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

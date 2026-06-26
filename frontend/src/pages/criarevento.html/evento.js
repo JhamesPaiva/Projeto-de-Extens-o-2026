@@ -326,7 +326,7 @@ import { apiFetch } from '../../core/api/client.js';
       const modal = new bootstrap.Modal(document.getElementById('modalSucesso'));
       modal.show();
     } catch (error) {
-      const msg = error?.payload?.message || error?.payload?.msg || error?.message || 'Não foi possível publicar o evento. Tente novamente.';
+      const msg = error?.payload?.message || error?.payload?.msg || error?.message || 'Não foi possível publicar o evento. Tente novamente.N';
 
       if (/subject must be a string|token inválido|token invalid|expired|jwt/i.test(String(msg).toLowerCase())) {
         alert('Sua sessão expirou ou está inválida. Faça login novamente para publicar o evento.');

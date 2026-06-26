@@ -83,6 +83,15 @@ if (-not $SkipDB) {
         $schemaFile = Join-Path $ProjectRoot "database\squema.sql"
         mysql -u root eventocom < $schemaFile 2>&1
         Show-Status "Schema" "Tabelas criadas com sucesso"
+
+        $migrationsPath = Join-Path $ProjectRoot "database\migrations"
+        if (Test-Path $migrationsPath) {
+            Show-Info "Aplicando migrations..."
+            Get-ChildItem -Path $migrationsPath -Filter "*.sql" | Sort-Object Name | ForEach-Object {
+                mysql -u root eventocom < $_.FullName 2>&1
+                Show-Status "Migration" $_.Name
+            }
+        }
     } catch {
         Show-Status "Banco" "Erro ao configurar banco!" $false
         Write-Host "   Erro: $_" -ForegroundColor Red
