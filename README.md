@@ -38,7 +38,7 @@ Projeto-de-Extens-o-2026/
 
 ## Como Executar
 
-O caminho recomendado esta documentado em [SETUP_GUIDE.md](d:/Documentos/EXTENSÃO%202026/Projeto-de-Extens-o-2026/SETUP_GUIDE.md).
+O caminho recomendado esta documentado em [SETUP_GUIDE.md](./SETUP_GUIDE.md).
 
 Resumo rapido:
 
@@ -59,9 +59,3 @@ Resumo rapido:
 ## Observacao de Arquitetura
 
 O backend oficial em uso neste repositório e o backend Flask em `backend/`.
-Estruturas antigas ou placeholders de outras stacks nao devem ser consideradas fonte principal do projeto.
-
-## Licenca
-
-Este projeto esta sob a licenca MIT.
-
