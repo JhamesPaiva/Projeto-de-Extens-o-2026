@@ -29,7 +29,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ✅ Verifica se Python e MySQL estão instalados  
 ✅ Cria o banco de dados `eventocom`  
-✅ Importa as tabelas (users, events, event_tickets)  
+✅ Importa as tabelas (`users`, `events`, `event_subscriptions`) e aplica as migrations em `database/migrations/`  
 ✅ Instala todas as dependências Python  
 ✅ Inicia Backend ou Frontend conforme você escolher  
 
@@ -174,7 +174,7 @@ Projeto-de-Extensão-2026/
 │
 ├── database/
 │   ├── squema.sql          ✅ Script de criação de tabelas
-│   └── speed.sql           (vazio)
+│   └── migrations/         ✅ Ajustes de schema aplicados após o squema.sql
 │
 ├── setup.bat               🎯 Use este! (Windows)
 ├── setup.ps1               (PowerShell - alternativa)
@@ -184,7 +184,6 @@ Projeto-de-Extensão-2026/
 ## Observacao Importante
 
 O backend oficial do projeto e o backend Flask em `backend/app.py`.
-Artefatos antigos de uma estrutura Node.js nao fazem parte do fluxo atual de execucao.
 
 ---
 
@@ -206,15 +205,9 @@ python -m http.server 3000
 # Abre 2 janelas automaticamente
 ```
 
-### Opção C: Development com Hot Reload
-```powershell
-# Se instalar nodemon em outro projeto Node.js:
-cd backend
-pip install watchdog
+### Opção C: Hot Reload (já incluso)
 
-# E rodar com:
-python -m watchdog.auto_reload app.py
-```
+O `backend/app.py` já roda com `debug=True`, então o Flask recarrega automaticamente sempre que você salva um arquivo `.py` — não precisa instalar nada extra pra isso.
 
 ---
 
@@ -223,9 +216,12 @@ python -m watchdog.auto_reload app.py
 Edite `backend/.env` conforme necessário:
 
 ```env
-# Chaves de segurança (mudar em produção!)
-SECRET_KEY=change-me
-JWT_SECRET_KEY=change-me-jwt
+# Chaves de segurança (obrigatório usar valores fortes)
+# Gere em PowerShell (64 chars):
+# $chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'
+# -join (1..64 | ForEach-Object { $chars[(Get-Random -Minimum 0 -Maximum $chars.Length)] })
+SECRET_KEY=<gere_uma_chave_forte>
+JWT_SECRET_KEY=<gere_outra_chave_forte>
 
 # Conexão MySQL
 DB_HOST=127.0.0.1          # localhost
@@ -235,6 +231,8 @@ DB_PASSWORD=               # deixe vazio se não tem senha
 DB_NAME=eventocom          # nome do banco
 DB_POOL_SIZE=5             # conexões simultâneas
 ```
+
+Observação: não versionar o arquivo `backend/.env` no Git. Apenas `backend/.env.example` deve ser compartilhado.
 
 ---
 
@@ -277,7 +275,6 @@ Se tiver problemas:
 
 - ✅ Backend rodando
 - ✅ Frontend acessível
-- ⏭️ Implementar funcionalidades faltantes (ver PLANO_ACAO.md)
 - ⏭️ Testar fluxos com Postman
 - ⏭️ Conectar frontend ao backend
 

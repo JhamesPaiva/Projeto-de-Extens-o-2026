@@ -88,6 +88,21 @@ if errorlevel 1 (
 )
 echo ✅ Schema importado
 
+REM Aplicar migrations (correcoes de schema feitas depois do squema.sql)
+if exist "database\migrations" (
+    echo    Aplicando migrations...
+    for %%F in (database\migrations\*.sql) do (
+        "!MYSQL_CMD!" -u root -p12345678 eventocom < "%%F"
+        if errorlevel 1 (
+            echo ❌ Erro ao aplicar migration: %%F
+            pause
+            exit /b 1
+        )
+        echo    ✓ %%F
+    )
+    echo ✅ Migrations aplicadas
+)
+
 echo.
 echo 📦 Instalando Dependências Python...
 cd backend

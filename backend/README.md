@@ -48,11 +48,32 @@ Observacao: a persistencia principal agora esta em `repositories/`. O arquivo `m
 
 ## Endpoints principais
 
+### Saúde
+
 - `GET /api/ping`
+
+### Autenticação
+
 - `POST /api/register`
 - `POST /api/login`
+
+### Perfil (requer token JWT)
+
 - `GET /api/profile`
 - `PUT /api/profile`
-- `GET /api/events`
-- `GET /api/events/<id>`
-- `POST /api/events`
+- `PUT /api/profile/avatar`
+
+### Eventos
+
+- `GET /api/events` — lista eventos; aceita filtros via query string (`categoria`, `cidade`, `estado`, `formato`, `entrada`, `idade`, `data`, `search`, `organizador_id`)
+- `GET /api/events/<id>` — detalhe de um evento
+- `POST /api/events` — cria evento (requer token JWT)
+- `PUT /api/events/<id>` — edita evento (requer token JWT; apenas o organizador do evento)
+- `DELETE /api/events/<id>` — exclui evento (requer token JWT; apenas o organizador do evento)
+
+### Inscrições (requer token JWT)
+
+- `POST /api/events/<id>/subscribe` — inscreve o usuário no evento
+- `POST /api/events/<id>/subscribe/confirm-payment` — confirma pagamento de uma inscrição pendente
+- `DELETE /api/events/<id>/subscribe` — cancela a inscrição
+- `GET /api/my-subscriptions` — lista os eventos em que o usuário está inscrito

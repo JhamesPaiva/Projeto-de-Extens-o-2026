@@ -22,7 +22,8 @@ frontend/src/
 - `areausuariofisico`, `areausuarioinst` e `criarevento` usam `authService` e `apiFetch` modulares.
 - `areapublicainst` tambem foi migrada para consumo de modulos ES.
 - os arquivos legados `src/auth.js` e `src/services/api.js` foram removidos.
+- `areausuarioinst` e `criarevento` tambem nao tem mais handlers inline em HTML; todos os eventos sao ligados via `addEventListener`.
 
-## Proximo Passo
+## Estado Atual
 
-Remover gradualmente handlers inline restantes nas telas de area do usuario e criacao de evento, trocando para event listeners via `addEventListener`.
+A migracao para modulos ES e remocao de handlers inline foi concluida em todas as paginas do projeto.
